@@ -1,0 +1,14 @@
+<atlassian-plugin key="git" name="Git Plugin">
+    <plugin-info>
+        <description>Git Repository</description>
+        <version>1.0</version>
+        <vendor name="Pols Consulting" url="http://www.pols.co.uk"/>
+    </plugin-info>
+
+    <repository key="git" name="Git Repository"
+                class="uk.co.pols.bamboo.gitplugin.GitRepository">
+        <description>A Git Repository</description>
+        <resource type="freemarker" name="edit" location="gitRepositoryEdit.ftl"/>
+        <resource type="freemarker" name="view" location="gitRepositoryView.ftl"/>
+    </repository>
+</atlassian-plugin>
