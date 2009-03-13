@@ -1,0 +1,3 @@
+h1. A Git Plugin for the Bamboo builder server
+
+Build your git and GitHub repositories on the Amazon Cloud using Bamboo... 
