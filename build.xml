@@ -4,12 +4,10 @@
     <property file="git-bamboo-plugin.properties"/>
 
     <patternset id="ignored.files">
-        <exclude name="**/CVS/**"/>
-        <exclude name="**/SCCS/**"/>
-        <exclude name="**/RCS/**"/>
-        <exclude name="**/rcs/**"/>
         <exclude name="**/.DS_Store/**"/>
         <exclude name="**/.svn/**"/>
+        <exclude name="**/.git/**"/>
+        <exclude name="**/.gitignore/**"/>
     </patternset>
 
     <patternset id="compiler.resources">
@@ -26,7 +24,7 @@
     </patternset>
 
     <dirname property="module.git-bamboo-plugin.basedir" file="${ant.file}"/>
-    <property name="git-bamboo-plugin.output.dir" value="${module.git-bamboo-plugin.basedir}/classes"/>
+    <!--<property name="git-bamboo-plugin.output.dir" value="${module.git-bamboo-plugin.basedir}/classes"/>-->
     <property name="git-bamboo-plugin.testoutput.dir" value="${module.git-bamboo-plugin.basedir}/classes"/>
 
     <path id="git-bamboo-plugin.module.bootclasspath">
@@ -34,7 +32,6 @@
     </path>
 
     <path id="git-bamboo-plugin.module.classpath">
-        <!--<path refid="${module.jdk.classpath.git-bamboo-plugin}"/>-->
         <fileset dir="lib">
             <include name="**/*.jar"/>
       </fileset>
@@ -69,14 +66,14 @@
 
     <target name="compile.module.git-bamboo-plugin.production"
             description="compile module(s) git-bamboo-plugin production classes">
-        <mkdir dir="${git-bamboo-plugin.output.dir}"/>
-        <javac destdir="${git-bamboo-plugin.output.dir}" fork="true">
+        <mkdir dir="classes"/>
+        <javac destdir="classes" fork="true">
             <bootclasspath refid="git-bamboo-plugin.module.bootclasspath"/>
             <classpath refid="git-bamboo-plugin.module.classpath"/>
             <src refid="git-bamboo-plugin.module.sourcepath"/>
         </javac>
 
-        <copy todir="${git-bamboo-plugin.output.dir}">
+        <copy todir="classes">
             <fileset dir="${module.git-bamboo-plugin.basedir}/src/main/java">
                 <patternset refid="compiler.resources"/>
                 <type type="file"/>
@@ -93,7 +90,7 @@
         <mkdir dir="${git-bamboo-plugin.testoutput.dir}"/>
         <javac destdir="${git-bamboo-plugin.testoutput.dir}" fork="true">
             <classpath refid="git-bamboo-plugin.module.classpath"/>
-            <classpath location="${git-bamboo-plugin.output.dir}"/>
+            <classpath location="classes"/>
             <src refid="git-bamboo-plugin.module.test.sourcepath"/>
         </javac>
 
@@ -106,16 +103,12 @@
     </target>
 
     <target name="clean.module.git-bamboo-plugin" description="cleanup module">
-        <delete dir="${git-bamboo-plugin.output.dir}"/>
+        <delete dir="classes"/>
         <delete dir="${git-bamboo-plugin.testoutput.dir}"/>
-    </target>
-
-    <target name="init" description="Build initialization">
-        <!-- Perform any build initialization in this target -->
     </target>
 
     <target name="clean" depends="clean.module.git-bamboo-plugin" description="cleanup all"/>
 
-    <target name="all" depends="init, clean, compile.module.git-bamboo-plugin" description="build all"/>
+    <target name="all" depends="clean, compile.module.git-bamboo-plugin" description="build all"/>
 
 </project>
