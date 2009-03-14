@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="git-bamboo-plugin" default="all">
+
+    <property file="git-bamboo-plugin.properties"/>
+
+    <patternset id="ignored.files">
+        <exclude name="**/CVS/**"/>
+        <exclude name="**/SCCS/**"/>
+        <exclude name="**/RCS/**"/>
+        <exclude name="**/rcs/**"/>
+        <exclude name="**/.DS_Store/**"/>
+        <exclude name="**/.svn/**"/>
+    </patternset>
+
+    <patternset id="compiler.resources">
+        <include name="**/?*.properties"/>
+        <include name="**/?*.xml"/>
+        <include name="**/?*.gif"/>
+        <include name="**/?*.png"/>
+        <include name="**/?*.jpeg"/>
+        <include name="**/?*.jpg"/>
+        <include name="**/?*.html"/>
+        <include name="**/?*.dtd"/>
+        <include name="**/?*.tld"/>
+        <include name="**/?*.ftl"/>
+    </patternset>
+
+    <dirname property="module.git-bamboo-plugin.basedir" file="${ant.file}"/>
+    <property name="git-bamboo-plugin.output.dir" value="${module.git-bamboo-plugin.basedir}/classes"/>
+    <property name="git-bamboo-plugin.testoutput.dir" value="${module.git-bamboo-plugin.basedir}/classes"/>
+
+    <path id="git-bamboo-plugin.module.bootclasspath">
+        <!-- Paths to be included in compilation bootclasspath -->
+    </path>
+
+    <path id="git-bamboo-plugin.module.classpath">
+        <!--<path refid="${module.jdk.classpath.git-bamboo-plugin}"/>-->
+        <fileset dir="lib">
+            <include name="**/*.jar"/>
+      </fileset>
+    </path>
+
+
+    <patternset id="excluded.from.module.git-bamboo-plugin">
+        <patternset refid="ignored.files"/>
+    </patternset>
+
+    <patternset id="excluded.from.compilation.git-bamboo-plugin">
+        <patternset refid="excluded.from.module.git-bamboo-plugin"/>
+    </patternset>
+
+    <path id="git-bamboo-plugin.module.sourcepath">
+        <dirset dir="${module.git-bamboo-plugin.basedir}">
+            <include name="src/main/java"/>
+            <include name="src/main/resources"/>
+        </dirset>
+    </path>
+
+    <path id="git-bamboo-plugin.module.test.sourcepath">
+        <dirset dir="${module.git-bamboo-plugin.basedir}">
+            <include name="src/test/java"/>
+        </dirset>
+    </path>
+
+
+    <target name="compile.module.git-bamboo-plugin"
+            depends="compile.module.git-bamboo-plugin.production,compile.module.git-bamboo-plugin.tests"
+            description="compile module(s) git-bamboo-plugin"/>
+
+    <target name="compile.module.git-bamboo-plugin.production"
+            description="compile module(s) git-bamboo-plugin production classes">
+        <mkdir dir="${git-bamboo-plugin.output.dir}"/>
+        <javac destdir="${git-bamboo-plugin.output.dir}" fork="true">
+            <bootclasspath refid="git-bamboo-plugin.module.bootclasspath"/>
+            <classpath refid="git-bamboo-plugin.module.classpath"/>
+            <src refid="git-bamboo-plugin.module.sourcepath"/>
+        </javac>
+
+        <copy todir="${git-bamboo-plugin.output.dir}">
+            <fileset dir="${module.git-bamboo-plugin.basedir}/src/main/java">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+            <fileset dir="${module.git-bamboo-plugin.basedir}/src/main/resources">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile.module.git-bamboo-plugin.tests" depends="compile.module.git-bamboo-plugin.production"
+            description="compile module(s) git-bamboo-plugin test classes" unless="skip.tests">
+        <mkdir dir="${git-bamboo-plugin.testoutput.dir}"/>
+        <javac destdir="${git-bamboo-plugin.testoutput.dir}" fork="true">
+            <classpath refid="git-bamboo-plugin.module.classpath"/>
+            <classpath location="${git-bamboo-plugin.output.dir}"/>
+            <src refid="git-bamboo-plugin.module.test.sourcepath"/>
+        </javac>
+
+        <copy todir="${git-bamboo-plugin.testoutput.dir}">
+            <fileset dir="${module.git-bamboo-plugin.basedir}/src/test/java">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean.module.git-bamboo-plugin" description="cleanup module">
+        <delete dir="${git-bamboo-plugin.output.dir}"/>
+        <delete dir="${git-bamboo-plugin.testoutput.dir}"/>
+    </target>
+
+    <target name="init" description="Build initialization">
+        <!-- Perform any build initialization in this target -->
+    </target>
+
+    <target name="clean" depends="clean.module.git-bamboo-plugin" description="cleanup all"/>
+
+    <target name="all" depends="init, clean, compile.module.git-bamboo-plugin" description="build all"/>
+
+</project>
