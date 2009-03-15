@@ -24,10 +24,6 @@
     </patternset>
 
     <dirname property="module.git-bamboo-plugin.basedir" file="${ant.file}"/>
-    <property name="git-bamboo-plugin.testoutput.dir" value="${module.git-bamboo-plugin.basedir}/classes"/>
-
-    <path id="git-bamboo-plugin.module.bootclasspath">
-    </path>
 
     <path id="git-bamboo-plugin.module.classpath">
         <fileset dir="lib">
@@ -50,14 +46,14 @@
         </dirset>
     </path>
 
-    <target name="compile.module.git-bamboo-plugin"
-            depends="compile"
-            description="compile module(s) git-bamboo-plugin"/>
+    <target name="clean" description="Remove all build files">
+        <delete dir="classes"/>
+        <delete file="git-repository.jar"/>
+    </target>
 
-    <target name="compile" description="compile module(s) git-bamboo-plugin production classes">
+    <target name="compile" description="compile the source">
         <mkdir dir="classes"/>
         <javac destdir="classes" fork="true">
-            <bootclasspath refid="git-bamboo-plugin.module.bootclasspath"/>
             <classpath refid="git-bamboo-plugin.module.classpath"/>
             <src refid="git-bamboo-plugin.module.sourcepath"/>
         </javac>
@@ -74,10 +70,10 @@
         </copy>
     </target>
 
-    <target name="clean" description="Remove all build files">
-        <delete dir="classes"/>
+    <target name="jar" description="Create the bamboo plugin jar">
+        <jar destfile="git-repository.jar" basedir="classes"/>
     </target>
 
-    <target name="all" depends="clean, compile.module.git-bamboo-plugin" description="build all"/>
+    <target name="all" depends="clean, compile, jar" description="build all"/>
 
 </project>
