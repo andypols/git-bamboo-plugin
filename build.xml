@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="git-bamboo-plugin" default="all">
-
-    <property file="git-bamboo-plugin.properties"/>
-
-    <patternset id="ignored.files">
-        <exclude name="**/.DS_Store/**"/>
-        <exclude name="**/.svn/**"/>
-        <exclude name="**/.git/**"/>
-        <exclude name="**/.gitignore/**"/>
-    </patternset>
-
+    
     <patternset id="compiler.resources">
         <include name="**/?*.properties"/>
         <include name="**/?*.xml"/>
@@ -25,19 +16,11 @@
 
     <dirname property="module.git-bamboo-plugin.basedir" file="${ant.file}"/>
 
-    <path id="git-bamboo-plugin.module.classpath">
+    <path id="classpath">
         <fileset dir="lib">
             <include name="**/*.jar"/>
-      </fileset>
+        </fileset>
     </path>
-
-    <patternset id="excluded.from.module.git-bamboo-plugin">
-        <patternset refid="ignored.files"/>
-    </patternset>
-
-    <patternset id="excluded.from.compilation.git-bamboo-plugin">
-        <patternset refid="excluded.from.module.git-bamboo-plugin"/>
-    </patternset>
 
     <path id="git-bamboo-plugin.module.sourcepath">
         <dirset dir="${module.git-bamboo-plugin.basedir}">
@@ -54,7 +37,7 @@
     <target name="compile" description="compile the source">
         <mkdir dir="classes"/>
         <javac destdir="classes" fork="true">
-            <classpath refid="git-bamboo-plugin.module.classpath"/>
+            <classpath refid="classpath"/>
             <src refid="git-bamboo-plugin.module.sourcepath"/>
         </javac>
 
