@@ -4,7 +4,7 @@
                required='true' /]
 
 [@ww.select
-    labelKey='repository.git.authentication'
+    labelKey='Authentication Type'
     name='repository.git.authType'
     toggle='true'
     list=repository.authenticationTypes
