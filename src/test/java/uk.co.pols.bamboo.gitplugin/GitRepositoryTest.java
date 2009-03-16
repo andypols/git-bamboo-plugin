@@ -7,7 +7,7 @@ import com.atlassian.bamboo.repository.NameValuePair;
 import java.util.List;
 
 public class GitRepositoryTest extends TestCase {
-    GitRepository gitRepository = new GitRepository();
+    private GitRepository gitRepository = new GitRepository();
 
     public void testProvidesANameToAppearInTheGuiRepositoryDrownDown() {
         assertEquals("Git", gitRepository.getName());
@@ -15,6 +15,14 @@ public class GitRepositoryTest extends TestCase {
 
     public void testRepositoryProvidesAnShhAuthenticationOption() {
         assertContains(gitRepository.getAuthenticationTypes(), AuthenticationType.SSH.getNameValue());
+    }
+
+    public void testRepositoryProvidesAPasswordAuthenticationOption() {
+        assertContains(gitRepository.getAuthenticationTypes(), AuthenticationType.PASSWORD.getNameValue());
+    }
+
+    public void testProvidesALinkToTheGitHubGuidesPage() {
+        assertEquals("http://github.com/guides/home", gitRepository.getUrl());
     }
 
     private void assertContains(List<NameValuePair> authenticationTypes, NameValuePair expectedNamedValue) {
