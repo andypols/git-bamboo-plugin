@@ -23,7 +23,6 @@ import java.io.IOException;
  * Provides GIT and GITHUB support for the Bamboo Build Server
  */
 public class GitRepository extends AbstractRepository implements SelectableAuthenticationRepository, WebRepositoryEnabledRepository, InitialBuildAwareRepository, MutableQuietPeriodAwareRepository, RepositoryEventAware {
-
     private static final Log log = LogFactory.getLog(GitRepository.class);
 
     public static final String NAME = "Git";
@@ -133,7 +132,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     public HierarchicalConfiguration toConfiguration() {
-        log.info("**************** GitRepository.toConfiguration");
         HierarchicalConfiguration configuration = super.toConfiguration();
         configuration.setProperty(GIT_REPO_URL, getRepositoryUrl());
 //        configuration.setProperty(GIT_USERNAME, getUsername());
@@ -277,13 +275,12 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     public void postRetrieveSourceCode(BuildContext buildContext) {
     }
 
-
- /*
-cd working directory
-git init
-git remote add origin git@github.com:andypols/polsbusiness.git
-git pull origin master
-*/
+    /*
+    cd working directory
+    git init
+    git remote add origin git@github.com:andypols/polsbusiness.git
+    git pull origin master
+    */
 
     /**
      * Need
@@ -293,22 +290,27 @@ git pull origin master
      * - branch to pull from repository
      *
      * @param args
-     * @throws CommandException
      * @throws IOException
      */
-    public static void main(String[] args) throws CommandException, IOException {
+    public static void main(String[] args) throws IOException {
+        String gitHome = "/opt/local/bin";
+        String gitExe = gitHome + "/git";
+
         File workingDirectory = new File("/Users/andy/projects/git/temp/newrepo");
-        workingDirectory.mkdirs();
 
         Execute execute = new Execute(new PumpStreamHandler(System.out));
         execute.setWorkingDirectory(workingDirectory);
-        execute.setCommandline(new String[] { "/opt/local/bin/git", "init" });
-        execute.execute();
 
-        execute.setCommandline(new String[] { "/opt/local/bin/git", "remote", "add", "origin", "git@github.com:andypols/git-bamboo-plugin.git" });
-        execute.execute();
+        if (!workingDirectory.exists()) {
+            workingDirectory.mkdirs();
+            execute.setCommandline(new String[]{gitExe, "init"});
+            execute.execute();
 
-        execute.setCommandline(new String[] { "/opt/local/bin/git", "pull", "origin", "master" });
+            execute.setCommandline(new String[]{ gitExe, "remote", "add", "origin", "git@github.com:andypols/git-bamboo-plugin.git"});
+            execute.execute();
+        }
+
+        execute.setCommandline(new String[]{ gitExe, "pull", "origin", "master"});
         execute.execute();
     }
 }
