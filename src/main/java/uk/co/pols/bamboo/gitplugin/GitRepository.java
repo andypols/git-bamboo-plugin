@@ -6,13 +6,18 @@ import com.atlassian.bamboo.v2.build.BuildChanges;
 import com.atlassian.bamboo.v2.build.BuildContext;
 import com.atlassian.bamboo.v2.build.repository.RepositoryEventAware;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
+import com.atlassian.bamboo.command.CommandException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tools.ant.taskdefs.Execute;
+import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Provides GIT and GITHUB support for the Bamboo Build Server
@@ -62,7 +67,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     public void prepareConfigObject(BuildConfiguration buildConfiguration) {
-        log.info("*********** GitRepository.prepareConfigObject");
         String repositoryKey = buildConfiguration.getString(SELECTED_REPOSITORY);
 
         String authType = buildConfiguration.getString(GIT_AUTH_TYPE);
@@ -164,7 +168,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
      * @param repositoryUrl The subversion repository
      */
     public void setRepositoryUrl(String repositoryUrl) {
-        log.info("********** GitRepository.setRepositoryUrl");
         this.repositoryUrl = StringUtils.trim(repositoryUrl);
     }
 
@@ -174,17 +177,14 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
      * @return The subversion repository
      */
     public String getRepositoryUrl() {
-        log.info("****** GitRepository.getRepositoryUrl");
         return repositoryUrl;
     }
 
     public String getAuthType() {
-        log.info("****** GitRepository.getAuthType");
         return authType;
     }
 
     public void setAuthType(String authType) {
-        log.info("****** GitRepository.setAuthType");
         this.authType = authType;
     }
 
@@ -262,10 +262,32 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     public void preRetrieveSourceCode(BuildContext buildContext) {
-        log.info("****************** GitRepository.preRetrieveSourceCode");
     }
 
     public void postRetrieveSourceCode(BuildContext buildContext) {
-        log.info("****************** GitRepository.postRetrieveSourceCode");
+    }
+
+
+ /*
+cd working directory
+git init
+git remote add origin git@github.com:andypols/polsbusiness.git
+git pull origin master
+*/
+
+    public static void main(String[] args) throws CommandException, IOException {
+        File workingDirectory = new File("/Users/andy/projects/git/temp/newrepo");
+        workingDirectory.mkdirs();
+
+        Execute execute = new Execute(new PumpStreamHandler(System.out));
+        execute.setWorkingDirectory(workingDirectory);
+        execute.setCommandline(new String[] { "/opt/local/bin/git", "init" });
+        execute.execute();
+
+        execute.setCommandline(new String[] { "/opt/local/bin/git", "remote", "add", "origin", "git@github.com:andypols/git-bamboo-plugin.git" });
+        execute.execute();
+
+        execute.setCommandline(new String[] { "/opt/local/bin/git", "pull", "origin", "master" });
+        execute.execute();
     }
 }
