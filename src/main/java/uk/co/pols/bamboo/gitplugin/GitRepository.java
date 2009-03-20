@@ -32,12 +32,14 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     private static final String REPO_PREFIX = "repository.git.";
     public static final String GIT_REPO_URL = REPO_PREFIX + "repositoryUrl";
     public static final String GIT_USERNAME = REPO_PREFIX + "username";
+    public static final String GIT_BRANCH = REPO_PREFIX + "branch";
     public static final String GIT_PASSWORD = REPO_PREFIX + "userPassword";
     public static final String GIT_PASSPHRASE = REPO_PREFIX + "passphrase";
     public static final String GIT_AUTH_TYPE = REPO_PREFIX + "authType";
     public static final String GIT_KEYFILE = REPO_PREFIX + "keyFile";
 
     private String repositoryUrl;
+    private String branch;
     private String authType;
     private String keyFile;
     private String passphrase;
@@ -48,6 +50,10 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
     public String getHost() {
         return UNKNOWN_HOST;
+    }
+
+    public String getBranch() {
+        return branch;
     }
 
     public boolean isRepositoryDifferent(Repository repository) {
@@ -171,6 +177,10 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         this.repositoryUrl = StringUtils.trim(repositoryUrl);
     }
 
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
+
     /**
      * Which repository URL are we using?
      *
@@ -275,6 +285,17 @@ git remote add origin git@github.com:andypols/polsbusiness.git
 git pull origin master
 */
 
+    /**
+     * Need
+     * - working directory
+     * - path to git client binary
+     * - github url
+     * - branch to pull from repository
+     *
+     * @param args
+     * @throws CommandException
+     * @throws IOException
+     */
     public static void main(String[] args) throws CommandException, IOException {
         File workingDirectory = new File("/Users/andy/projects/git/temp/newrepo");
         workingDirectory.mkdirs();

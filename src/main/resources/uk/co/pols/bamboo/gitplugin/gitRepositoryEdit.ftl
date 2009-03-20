@@ -3,6 +3,11 @@
                description= 'The location of Git repository to clone (e.g. git@github.com:andypols/git-bamboo-plugin.git)'
                required='true' /]
 
+[@ww.textfield labelKey='Branch'
+               name='repository.git.branch'
+               description= 'The repository branch to build'
+               required='true' /]
+
 [@ww.select
     labelKey='Authentication Type'
     name='repository.git.authType'
