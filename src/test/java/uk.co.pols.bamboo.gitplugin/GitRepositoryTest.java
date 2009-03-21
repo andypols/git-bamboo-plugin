@@ -22,9 +22,7 @@ public class GitRepositoryTest extends TestCase {
 
         ErrorCollection errorCollection = gitRepository.validate(buildConfiguration);
 
-        assertTrue(errorCollection.hasAnyErrors());
-        assertEquals(1, errorCollection.getTotalErrors());
-        assertEquals("Please specify where the repository is located", errorCollection.getFieldErrors().get(GitRepository.GIT_REPO_URL));
+        assertHasError(errorCollection, GitRepository.GIT_REPO_URL, "Please specify where the repository is located");
     }
 
     public void testEnsuresThatTheUserSpecifiesTheRepositoryBranch() {
@@ -33,9 +31,7 @@ public class GitRepositoryTest extends TestCase {
 
         ErrorCollection errorCollection = gitRepository.validate(buildConfiguration);
 
-        assertTrue(errorCollection.hasAnyErrors());
-        assertEquals(1, errorCollection.getTotalErrors());
-        assertEquals("Please specify which branch you want to build", errorCollection.getFieldErrors().get(GitRepository.GIT_BRANCH));
+        assertHasError(errorCollection, GitRepository.GIT_BRANCH, "Please specify which branch you want to build");
     }
 
     public void testAcceptsARepositoryAndBranchWithoutReportingAnyErrors() {
@@ -46,6 +42,17 @@ public class GitRepositoryTest extends TestCase {
         ErrorCollection errorCollection = gitRepository.validate(buildConfiguration);
 
         assertFalse(errorCollection.hasAnyErrors());
+    }
+
+    public void testReportsMultipleErrors() {
+        BuildConfiguration buildConfiguration = new BuildConfiguration();
+
+        ErrorCollection errorCollection = gitRepository.validate(buildConfiguration);
+
+        assertTrue(errorCollection.hasAnyErrors());
+        assertEquals(2, errorCollection.getTotalErrors());
+        assertEquals("Please specify where the repository is located", errorCollection.getFieldErrors().get(GitRepository.GIT_REPO_URL));
+        assertEquals("Please specify which branch you want to build", errorCollection.getFieldErrors().get(GitRepository.GIT_BRANCH));
     }
 
     public void testSavesTheRepositorySettingsInTheBuildConfiguration() {
@@ -67,5 +74,11 @@ public class GitRepositoryTest extends TestCase {
 
         assertEquals("TheSpecialBranch", gitRepository.getBranch());
         assertEquals("TheTopSecretBuildRepoUrl", gitRepository.getRepositoryUrl());
+    }
+
+    private void assertHasError(ErrorCollection errorCollection, String fieldKey, String errorMessage) {
+        assertTrue(errorCollection.hasAnyErrors());
+        assertEquals(1, errorCollection.getTotalErrors());
+        assertEquals(errorMessage, errorCollection.getFieldErrors().get(fieldKey));
     }
 }
