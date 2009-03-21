@@ -72,7 +72,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         ErrorCollection errorCollection = super.validate(buildConfiguration);
 
         if (StringUtils.isEmpty(buildConfiguration.getString(GIT_REPO_URL))) {
-            errorCollection.addError(GIT_REPO_URL, "Please specify the build's Git Repository");
+            errorCollection.addError(GIT_REPO_URL, "Please specify where the repository is located");
         }
 
         if (StringUtils.isEmpty(buildConfiguration.getString(GIT_BRANCH))) {
