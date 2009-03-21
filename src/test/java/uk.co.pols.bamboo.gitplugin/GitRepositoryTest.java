@@ -3,6 +3,7 @@ package uk.co.pols.bamboo.gitplugin;
 import junit.framework.TestCase;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 
 public class GitRepositoryTest extends TestCase {
     private GitRepository gitRepository = new GitRepository();
@@ -45,5 +46,26 @@ public class GitRepositoryTest extends TestCase {
         ErrorCollection errorCollection = gitRepository.validate(buildConfiguration);
 
         assertFalse(errorCollection.hasAnyErrors());
+    }
+
+    public void testSavesTheRepositorySettingsInTheBuildConfiguration() {
+        gitRepository.setRepositoryUrl("TheTopSecretBuildRepoUrl");
+        gitRepository.setBranch("TheBranch");
+
+        HierarchicalConfiguration hierarchicalConfiguration = gitRepository.toConfiguration();
+
+        assertEquals("TheTopSecretBuildRepoUrl", hierarchicalConfiguration.getProperty(GitRepository.GIT_REPO_URL));
+        assertEquals("TheBranch", hierarchicalConfiguration.getProperty(GitRepository.GIT_BRANCH));
+    }
+
+    public void testLoadsTheRepositorySettingsFromTheBuildConfiguration() {
+        HierarchicalConfiguration buildConfiguration = new HierarchicalConfiguration();
+        buildConfiguration.setProperty(GitRepository.GIT_REPO_URL, "TheTopSecretBuildRepoUrl");
+        buildConfiguration.setProperty(GitRepository.GIT_BRANCH, "TheSpecialBranch");
+
+        gitRepository.populateFromConfig(buildConfiguration);
+
+        assertEquals("TheSpecialBranch", gitRepository.getBranch());
+        assertEquals("TheTopSecretBuildRepoUrl", gitRepository.getRepositoryUrl());
     }
 }
