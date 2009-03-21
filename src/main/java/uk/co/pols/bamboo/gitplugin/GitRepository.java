@@ -9,6 +9,7 @@ import com.atlassian.bamboo.v2.build.repository.RepositoryEventAware;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 
@@ -91,6 +92,9 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         setBranch(config.getString(GIT_BRANCH));
     }
 
+    public void onInitialBuild(BuildContext buildContext) {
+    }
+
     public boolean hasWebBasedRepositoryAccess() {
         return false;
     }
@@ -115,10 +119,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         throw new UnsupportedOperationException("TO DO");
     }
 
-    public void onInitialBuild(BuildContext buildContext) {
-        throw new UnsupportedOperationException("TO DO");
-    }
-
     public void setQuietPeriodEnabled(boolean b) {
         throw new UnsupportedOperationException("TO DO");
     }
@@ -137,10 +137,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
     public int getQuietPeriod() {
         return 0;
-    }
-
-    public boolean isRepositoryDifferent(Repository repository) {
-        return false;
     }
 
     public int getMaxRetries() {
@@ -169,7 +165,17 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         }
     }
 
-    
+    public boolean isRepositoryDifferent(Repository repository) {
+        if (repository != null && repository instanceof GitRepository) {
+            GitRepository gitRepository = (GitRepository) repository;
+            return !new EqualsBuilder()
+                    .append(this.getName(), gitRepository.getName())
+                    .append(getRepositoryUrl(), gitRepository.getRepositoryUrl())
+                    .isEquals();
+        }
+        return true;
+    }
+
     /*
     cd working directory
     git init

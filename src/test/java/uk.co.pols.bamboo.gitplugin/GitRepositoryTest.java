@@ -3,6 +3,12 @@ package uk.co.pols.bamboo.gitplugin;
 import junit.framework.TestCase;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
+import com.atlassian.bamboo.repository.svn.SvnRepository;
+import com.atlassian.bamboo.repository.CleanCheckoutAwareRepository;
+import com.atlassian.bamboo.repository.AbstractRepository;
+import com.atlassian.bamboo.repository.Repository;
+import com.atlassian.bamboo.repository.RepositoryException;
+import com.atlassian.bamboo.v2.build.BuildChanges;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 
 public class GitRepositoryTest extends TestCase {
@@ -44,7 +50,7 @@ public class GitRepositoryTest extends TestCase {
         assertFalse(errorCollection.hasAnyErrors());
     }
 
-    public void testReportsMultipleErrors() {
+    public void testReportsMultipleErrorsAtSameTime() {
         BuildConfiguration buildConfiguration = new BuildConfiguration();
 
         ErrorCollection errorCollection = gitRepository.validate(buildConfiguration);
@@ -76,9 +82,72 @@ public class GitRepositoryTest extends TestCase {
         assertEquals("TheTopSecretBuildRepoUrl", gitRepository.getRepositoryUrl());
     }
 
+    public void testClassesARepositoryOfADifferentTypeAsDifferent() {
+        assertTrue(gitRepository.isRepositoryDifferent(new TestRepository()));
+    }
+
+    public void testClassesANullRepositoryAsDifferent() {
+        assertTrue(gitRepository.isRepositoryDifferent(null));
+    }
+
+    public void testClassesAGitRepositoryWithADifferentUrlAsDifferent() {
+        GitRepository repositoryToCompare = new GitRepository();
+        repositoryToCompare.setRepositoryUrl("repositoryToCompareURL");
+
+        gitRepository.setRepositoryUrl("gitRepositoryURL");
+
+        assertTrue(gitRepository.isRepositoryDifferent(repositoryToCompare));
+    }
+
+    public void testClassesAGitRepositoryWithADifferentNameAsDifferent() {
+        GitRepository repositoryToCompare = new GitRepository();
+        repositoryToCompare.setBranch("repositoryToCompareBranch");
+
+        gitRepository.setRepositoryUrl("gitRepositoryBranch");
+
+        assertTrue(gitRepository.isRepositoryDifferent(repositoryToCompare));
+    }
+
+    public void testClassesAGitRepositoryWithTheSameUrlAndBranchAsBeingTheSame() {
+        GitRepository repositoryToCompare = new GitRepository();
+        repositoryToCompare.setBranch("repositoryBranch");
+        repositoryToCompare.setRepositoryUrl("repositoryUrl");
+
+        gitRepository.setRepositoryUrl("repositoryBranch");
+        gitRepository.setRepositoryUrl("repositoryUrl");
+
+        assertFalse(gitRepository.isRepositoryDifferent(repositoryToCompare));
+    }
+
     private void assertHasError(ErrorCollection errorCollection, String fieldKey, String errorMessage) {
         assertTrue(errorCollection.hasAnyErrors());
         assertEquals(1, errorCollection.getTotalErrors());
         assertEquals(errorMessage, errorCollection.getFieldErrors().get(fieldKey));
+    }
+
+    class TestRepository extends AbstractRepository {
+
+        public String getName() {
+            return null;
+        }
+
+        public String getHost() {
+            return null;
+        }
+
+        public boolean isRepositoryDifferent(Repository repository) {
+            return false;
+        }
+
+        public BuildChanges collectChangesSinceLastBuild(String string, String string1) throws RepositoryException {
+            return null;
+        }
+
+        public String retrieveSourceCode(String string, String string1) throws RepositoryException {
+            return null;
+        }
+
+        public void prepareConfigObject(BuildConfiguration buildConfiguration) {
+        }
     }
 }
