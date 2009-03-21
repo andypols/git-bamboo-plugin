@@ -3,8 +3,6 @@ package uk.co.pols.bamboo.gitplugin;
 import junit.framework.TestCase;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
-import com.atlassian.bamboo.repository.svn.SvnRepository;
-import com.atlassian.bamboo.repository.CleanCheckoutAwareRepository;
 import com.atlassian.bamboo.repository.AbstractRepository;
 import com.atlassian.bamboo.repository.Repository;
 import com.atlassian.bamboo.repository.RepositoryException;
