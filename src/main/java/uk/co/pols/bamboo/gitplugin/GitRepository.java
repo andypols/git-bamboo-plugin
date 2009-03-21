@@ -169,7 +169,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         if (repository != null && repository instanceof GitRepository) {
             GitRepository gitRepository = (GitRepository) repository;
             return !new EqualsBuilder()
-                    .append(this.getName(), gitRepository.getName())
                     .append(getRepositoryUrl(), gitRepository.getRepositoryUrl())
                     .isEquals();
         }

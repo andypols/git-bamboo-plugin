@@ -99,21 +99,10 @@ public class GitRepositoryTest extends TestCase {
         assertTrue(gitRepository.isRepositoryDifferent(repositoryToCompare));
     }
 
-    public void testClassesAGitRepositoryWithADifferentNameAsDifferent() {
+    public void testClassesAGitRepositoryWithTheSameUrlAsBeingTheSame() {
         GitRepository repositoryToCompare = new GitRepository();
-        repositoryToCompare.setBranch("repositoryToCompareBranch");
-
-        gitRepository.setRepositoryUrl("gitRepositoryBranch");
-
-        assertTrue(gitRepository.isRepositoryDifferent(repositoryToCompare));
-    }
-
-    public void testClassesAGitRepositoryWithTheSameUrlAndBranchAsBeingTheSame() {
-        GitRepository repositoryToCompare = new GitRepository();
-        repositoryToCompare.setBranch("repositoryBranch");
         repositoryToCompare.setRepositoryUrl("repositoryUrl");
 
-        gitRepository.setRepositoryUrl("repositoryBranch");
         gitRepository.setRepositoryUrl("repositoryUrl");
 
         assertFalse(gitRepository.isRepositoryDifferent(repositoryToCompare));
