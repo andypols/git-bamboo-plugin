@@ -1,6 +1,5 @@
 package uk.co.pols.bamboo.gitplugin;
 
-import com.atlassian.bamboo.commit.CommitFile;
 import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.repository.*;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
@@ -25,6 +24,9 @@ import java.util.ArrayList;
  * Provides GIT and GITHUB support for the Bamboo Build Server
  * <p/>
  * TODO Let user define the location of the git exe
+ * TODO dump what git is doing to the build log
+ * TODO run a which git command to guess the location of git
+ * TODO Add hook for github callback triggering the build
  */
 public class GitRepository extends AbstractRepository implements SelectableAuthenticationRepository {
     private static final Log log = LogFactory.getLog(GitRepository.class);
@@ -143,14 +145,17 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         return true;
     }
 
+    //
+    // next thing to do is create the GitLog command who's output we can play with...
+    //
     private String detectCommitsForUrl(String repositoryUrl, final String lastRevisionChecked, final List<Commit> commits, String planKey) {
-        log.info("detectCommitsForUrl: /" + lastRevisionChecked + "/");
+//        git log --relative-date  provides relative dates so should make it easier...
+
 //        GitLog gitLog = new GitLog();
 //        GitLogOptions opt = new GitLogOptions();
-//        if (lastRevisionChecked != null)
-//        {
+        if (lastRevisionChecked != null) {
 //            opt.setOptLimitCommitAfter(true, lastRevisionChecked);
-//        }
+        }
 //        List<GitLogResponse.Commit> gitCommits = gitLog.log(getCheckoutDirectory(planKey), opt, Ref.createBranchRef("origin/master"));
 //        if (gitCommits.size() > 1)
 //        {
