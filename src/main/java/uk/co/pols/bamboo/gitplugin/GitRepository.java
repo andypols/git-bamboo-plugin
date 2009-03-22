@@ -26,7 +26,7 @@ import java.util.ArrayList;
  * <p/>
  * TODO Let user define the location of the git exe
  */
-public class GitRepository extends AbstractRepository implements SelectableAuthenticationRepository, WebRepositoryEnabledRepository, InitialBuildAwareRepository {
+public class GitRepository extends AbstractRepository implements SelectableAuthenticationRepository {
     private static final Log log = LogFactory.getLog(GitRepository.class);
 
     public static final String NAME = "Git";
@@ -95,7 +95,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         return configuration;
     }
 
-
     public void populateFromConfig(HierarchicalConfiguration config) {
         super.populateFromConfig(config);
 
@@ -108,41 +107,17 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
     public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
         try {
-            pullFromRepository(getCheckoutDirectory(planKey), repositoryUrl);
+            pullFromRepository(getSourceCodeDirectory(planKey), repositoryUrl);
         } catch (IOException e) {
             throw new RepositoryException("Failed to retrieveSourceCode", e);
         }
         return detectCommitsForUrl(repositoryUrl, vcsRevisionKey, new ArrayList<Commit>(), planKey);
     }
 
-    public boolean hasWebBasedRepositoryAccess() {
-        return false;
-    }
-
-    public void setWebRepositoryUrl(String string) {
-        throw new UnsupportedOperationException("TO DO");
-    }
-
-    public void setWebRepositoryUrlRepoName(String string) {
-        throw new UnsupportedOperationException("TO DO");
-    }
-
-    public String getWebRepositoryUrl() {
-        throw new UnsupportedOperationException("TO DO");
-    }
-
-    public String getWebRepositoryUrlRepoName() {
-        throw new UnsupportedOperationException("TO DO");
-    }
-
-    public String getWebRepositoryUrlForFile(CommitFile commitFile) {
-        throw new UnsupportedOperationException("TO DO");
-    }
-
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
         try {
             String repositoryUrl = getRepositoryUrl();
-            pullFromRepository(getCheckoutDirectory(planKey), repositoryUrl);
+            pullFromRepository(getSourceCodeDirectory(planKey), repositoryUrl);
 
             final List<Commit> commits = new ArrayList<Commit>();
             String lastRevisionChecked = detectCommitsForUrl(repositoryUrl, lastVcsRevisionKey, commits, planKey);
@@ -166,10 +141,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
                     .isEquals();
         }
         return true;
-    }
-
-    private File getCheckoutDirectory(String planKey) throws RepositoryException {
-        return getSourceCodeDirectory(planKey);
     }
 
     private String detectCommitsForUrl(String repositoryUrl, final String lastRevisionChecked, final List<Commit> commits, String planKey) {
@@ -228,7 +199,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         Execute execute = new Execute(new PumpStreamHandler(System.out));
         execute.setWorkingDirectory(sourceDir);
 
-        if (!sourceDir.exists()) {
+        if (isWorkspaceEmpty(sourceDir)) {
             sourceDir.mkdirs();
             execute.setCommandline(new String[]{GIT_EXE, "init"});
             execute.execute();
