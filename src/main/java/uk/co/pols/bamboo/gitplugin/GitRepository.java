@@ -7,7 +7,6 @@ import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.v2.build.BuildChanges;
 import com.atlassian.bamboo.v2.build.BuildContext;
 import com.atlassian.bamboo.v2.build.BuildChangesImpl;
-import com.atlassian.bamboo.v2.build.repository.RepositoryEventAware;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -27,7 +26,7 @@ import java.util.ArrayList;
  * <p/>
  * TODO Let user define the location of the git exe
  */
-public class GitRepository extends AbstractRepository implements SelectableAuthenticationRepository, WebRepositoryEnabledRepository, InitialBuildAwareRepository, MutableQuietPeriodAwareRepository, RepositoryEventAware {
+public class GitRepository extends AbstractRepository implements SelectableAuthenticationRepository, WebRepositoryEnabledRepository, InitialBuildAwareRepository {
     private static final Log log = LogFactory.getLog(GitRepository.class);
 
     public static final String NAME = "Git";
@@ -116,7 +115,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         return detectCommitsForUrl(repositoryUrl, vcsRevisionKey, new ArrayList<Commit>(), planKey);
     }
 
-
     public boolean hasWebBasedRepositoryAccess() {
         return false;
     }
@@ -139,38 +137,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
     public String getWebRepositoryUrlForFile(CommitFile commitFile) {
         throw new UnsupportedOperationException("TO DO");
-    }
-
-    public void setQuietPeriodEnabled(boolean b) {
-        throw new UnsupportedOperationException("TO DO");
-    }
-
-    public void setQuietPeriod(int i) {
-        throw new UnsupportedOperationException("TO DO");
-    }
-
-    public void setMaxRetries(int i) {
-        throw new UnsupportedOperationException("TO DO");
-    }
-
-    public boolean isQuietPeriodEnabled() {
-        return false;
-    }
-
-    public int getQuietPeriod() {
-        return 0;
-    }
-
-    public int getMaxRetries() {
-        return 0;
-    }
-
-    public void preRetrieveSourceCode(BuildContext buildContext) {
-        // Nothing interesting to do pre source code checkout
-    }
-
-    public void postRetrieveSourceCode(BuildContext buildContext) {
-        // Nothing interesting to do after source code checkout
     }
 
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
@@ -203,11 +169,11 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     private File getCheckoutDirectory(String planKey) throws RepositoryException {
-        return new File(getSourceCodeDirectory(planKey), "checkout");
+        return getSourceCodeDirectory(planKey);
     }
 
     private String detectCommitsForUrl(String repositoryUrl, final String lastRevisionChecked, final List<Commit> commits, String planKey) {
-//        log.error("detecting commits for "+lastRevisionChecked);
+        log.info("detectCommitsForUrl: /" + lastRevisionChecked + "/");
 //        GitLog gitLog = new GitLog();
 //        GitLogOptions opt = new GitLogOptions();
 //        if (lastRevisionChecked != null)
@@ -258,13 +224,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         return lastRevisionChecked;
     }
 
-
-    /*
-    cd working directory
-    git init -- iff it does not already exist
-    git remote add origin git@github.com:andypols/polsbusiness.git
-    git pull origin master
-    */
     private void pullFromRepository(File sourceDir, String repositoryUrl) throws IOException {
         Execute execute = new Execute(new PumpStreamHandler(System.out));
         execute.setWorkingDirectory(sourceDir);
@@ -275,25 +234,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
             execute.execute();
 
             execute.setCommandline(new String[]{GIT_EXE, "remote", "add", "origin", repositoryUrl});
-            execute.execute();
-        }
-
-        execute.setCommandline(new String[]{GIT_EXE, "pull", "origin", "master"});
-        execute.execute();
-    }
-
-    public static void main(String[] args) throws IOException {
-        File workingDirectory = new File("/Users/andy/projects/git/temp/newrepo");
-
-        Execute execute = new Execute(new PumpStreamHandler(System.out));
-        execute.setWorkingDirectory(workingDirectory);
-
-        if (!workingDirectory.exists()) {
-            workingDirectory.mkdirs();
-            execute.setCommandline(new String[]{GIT_EXE, "init"});
-            execute.execute();
-
-            execute.setCommandline(new String[]{GIT_EXE, "remote", "add", "origin", "git@github.com:andypols/git-bamboo-plugin.git"});
             execute.execute();
         }
 
