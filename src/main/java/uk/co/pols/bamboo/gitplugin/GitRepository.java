@@ -110,6 +110,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
+        log.info("********** retrieveSourceCode");
         try {
             pullFromRepository(getSourceCodeDirectory(planKey), repositoryUrl);
         } catch (IOException e) {
@@ -119,6 +120,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
+        log.info("********** collectChangesSinceLastBuild " + planKey + " " + lastVcsRevisionKey);
         try {
             String repositoryUrl = getRepositoryUrl();
             pullFromRepository(getSourceCodeDirectory(planKey), repositoryUrl);
