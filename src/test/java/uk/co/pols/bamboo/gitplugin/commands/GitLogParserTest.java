@@ -47,7 +47,16 @@ public class GitLogParserTest extends TestCase {
         assertEquals(new DateTime(2009, 3, 13, 1, 24, 44, 0).toDate(), commits.get(FIRST_COMMIT).getDate());
     }
 
-    String sampleLog = "commit 264438f6f9e7a3cb341eb8270a0e520e91f10db5\n" +
+    public void testKnowsTheCommentOfEachCommit() throws ParseException {
+        GitLogParser parser = new GitLogParser(sampleLog);
+        List<Commit> commits = parser.extractCommits();
+
+        assertEquals("\n    adding some notes about what to do next\n\n", commits.get(MOST_RECENT_COMMIT).getComment());
+        assertEquals("\n    Using parent's isWorkspaceEmpty to know when to initialise the repository and create a link to the remote repo url\n    \n    More removing of interfaces I don't care about\n\n", commits.get(1).getComment());
+        assertEquals("\n    first commit\n", commits.get(FIRST_COMMIT).getComment());
+    }
+
+    private String sampleLog = "commit 264438f6f9e7a3cb341eb8270a0e520e91f10db5\n" +
             "Author: Andy Pols <andy@pols.co.uk>\n" +
             "Date:   2009-03-22 11:21:21 +0000\n" +
             "\n" +

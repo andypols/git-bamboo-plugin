@@ -7,7 +7,6 @@ import com.atlassian.bamboo.author.Author;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormat;
@@ -30,23 +29,25 @@ public class GitLogParser {
         String[] lines = log.split("\n");
         Author currentAuthor = null;
         DateTime date = null;
+        StringBuffer comment = new StringBuffer();
 
         for (String line : lines) {
             if (line.startsWith(NEW_COMMIT_LINE_PREFIX)) {
                 if(currentAuthor != null && date != null) {
-                    commits.add(new CommitImpl(currentAuthor, "Moo", date.toDate()));
+                    commits.add(new CommitImpl(currentAuthor, comment.toString(), date.toDate()));
                 }
+                comment = new StringBuffer();
             } else if (line.startsWith(AUTHOR_LINE_PREFIX)) {
                 currentAuthor = extractAuthor(line);
             } else if (line.startsWith(DATE_LINE_PREFIX)) {
                 date = GIT_ISO_DATE_FORMAT.parseDateTime(line.substring(DATE_LINE_PREFIX.length()).trim());
             } else {
-
+                comment.append(line).append("\n");
             }
         }
 
         if(currentAuthor != null) {
-            commits.add(new CommitImpl(currentAuthor, "Moo", date.toDate()));
+            commits.add(new CommitImpl(currentAuthor, comment.toString(), date.toDate()));
         }
         return commits;
     }
