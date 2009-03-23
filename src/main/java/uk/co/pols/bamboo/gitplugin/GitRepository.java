@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
+import uk.co.pols.bamboo.gitplugin.commands.GitLogCommand;
+
 /**
  * Provides GIT and GITHUB support for the Bamboo Build Server
  * <p/>
@@ -148,55 +150,30 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     //
     // next thing to do is create the GitLog command who's output we can play with...
     //
-    private String detectCommitsForUrl(String repositoryUrl, final String lastRevisionChecked, final List<Commit> commits, String planKey) {
-//        git log --relative-date  provides relative dates so should make it easier...
-
-//        GitLog gitLog = new GitLog();
-//        GitLogOptions opt = new GitLogOptions();
+    private String detectCommitsForUrl(String repositoryUrl, final String lastRevisionChecked, final List<Commit> commits, String planKey) throws RepositoryException {
+        GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, getSourceCodeDirectory(planKey));
         if (lastRevisionChecked != null) {
 //            opt.setOptLimitCommitAfter(true, lastRevisionChecked);
         }
-//        List<GitLogResponse.Commit> gitCommits = gitLog.log(getCheckoutDirectory(planKey), opt, Ref.createBranchRef("origin/master"));
-//        if (gitCommits.size() > 1)
-//        {
-//            gitCommits.remove(gitCommits.size()-1);
-//            log.error("commits found:"+gitCommits.size());
-//            String startRevision = gitCommits.get(gitCommits.size() - 1).getDateString();
-//            String latestRevisionOnServer = gitCommits.get(0).getDateString();
-//            log.info("Collecting changes for '" + planKey + "' on path '" + repositoryUrl + "' from version " + startRevision + " to " + latestRevisionOnServer);
-//
-//            for (GitLogResponse.Commit logEntry : gitCommits)
-//            {
-//                CommitImpl commit = new CommitImpl();
-//                String authorName = logEntry.getAuthor();
-//
-//                // it is possible to have commits with empty committer. BAM-2945
-//                if (StringUtils.isBlank(authorName))
-//                {
-//                    log.info("Author name is empty for " + commit.toString());
-//                    authorName = Author.UNKNOWN_AUTHOR;
-//                }
-//                commit.setAuthor(new AuthorImpl(authorName));
-//                commit.setDate(new Date(logEntry.getDateString()));
-//                commit.setComment(logEntry.getMessage());
-//                List<CommitFile> files = new ArrayList();
-//
-//                if (logEntry.getFiles() != null) {
-//                    for (GitLogResponse.CommitFile file : logEntry.getFiles())
-//                    {
-//                        CommitFileImpl commitFile = new CommitFileImpl();
-//                        commitFile.setName(file.getName());
-//                        commitFile.setRevision(logEntry.getSha());
-//                        files.add(commitFile);
-//                    }
-//                }
-//                commit.setFiles(files);
-//
-//                commits.add(commit);
-//            }
-//            return latestRevisionOnServer;
-//        }
-        log.info("******  returning last revision:" + lastRevisionChecked);
+        try {
+            List<Commit> gitCommits = gitLogCommand.extractCommits();
+
+            if (gitCommits.size() > 1) {
+                gitCommits.remove(gitCommits.size() - 1);
+                log.info("commits found:" + gitCommits.size());
+
+                String startRevision = gitCommits.get(gitCommits.size() - 1).getDate().toString();
+                String latestRevisionOnServer = gitCommits.get(0).getDate().toString();
+                log.info("Collecting changes for '" + planKey + "' on path '" + repositoryUrl + "' from version " + startRevision + " to " + latestRevisionOnServer);
+
+                for (Commit logEntry : gitCommits) {
+                    commits.add(logEntry);
+                }
+                return latestRevisionOnServer;
+            }
+        } catch (IOException e) {
+            //
+        }
         return lastRevisionChecked;
     }
 
