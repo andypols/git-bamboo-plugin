@@ -11,10 +11,12 @@ import java.util.List;
 public class GitLogCommand {
     private String gitExe;
     private File sourceCodeDirectory;
+    private String lastRevisionChecked;
 
-    public GitLogCommand(String gitExe, File sourceCodeDirectory) {
+    public GitLogCommand(String gitExe, File sourceCodeDirectory, String lastRevisionChecked) {
         this.gitExe = gitExe;
         this.sourceCodeDirectory = sourceCodeDirectory;
+        this.lastRevisionChecked = lastRevisionChecked;
     }
 
     public List<Commit> extractCommits() throws IOException {
@@ -22,9 +24,22 @@ public class GitLogCommand {
 
         Execute execute = new Execute(new PumpStreamHandler(stringOutputStream));
         execute.setWorkingDirectory(sourceCodeDirectory);
-        execute.setCommandline(new String[]{gitExe, "log", "--date=iso8601"});
+        execute.setCommandline(getCommandLine());
         execute.execute();
 
-        return new GitLogParser(stringOutputStream.toString()).extractCommits();
+        GitLogParser logParser = new GitLogParser(stringOutputStream.toString());
+        lastRevisionChecked = logParser.getMostRecentCommitDate();
+        return logParser.extractCommits();
+    }
+
+    public String getLastRevisionChecked() {
+        return lastRevisionChecked;
+    }
+
+    private String[] getCommandLine() {
+        if (lastRevisionChecked != null) {
+            return new String[]{gitExe, "log", "--date=iso8601", "--since=\"" + lastRevisionChecked + "\""};
+        }
+        return new String[]{gitExe, "log", "--date=iso8601"};
     }
 }

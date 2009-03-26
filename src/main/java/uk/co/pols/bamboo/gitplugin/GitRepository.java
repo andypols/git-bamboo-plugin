@@ -4,7 +4,6 @@ import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.repository.*;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.v2.build.BuildChanges;
-import com.atlassian.bamboo.v2.build.BuildContext;
 import com.atlassian.bamboo.v2.build.BuildChangesImpl;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -14,21 +13,30 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
+import uk.co.pols.bamboo.gitplugin.commands.GitLogCommand;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
-
-import uk.co.pols.bamboo.gitplugin.commands.GitLogCommand;
+import java.util.List;
 
 /**
  * Provides GIT and GITHUB support for the Bamboo Build Server
  * <p/>
+ *
+ * TODO ** NEXT ** return the lastCommitTime in a same format git gave it to us.... (in return value of detectCommitsForUrl)
+ *
  * TODO Let user define the location of the git exe
  * TODO dump what git is doing to the build log
  * TODO run a which git command to guess the location of git
  * TODO Add hook for github callback triggering the build
+ * TODO don't include all historical commits on first build
+ *
+ * This is what capistarno does....
+ * git reset -q --hard 10e162370493a984c279ffc7ca59e18d7850e844;
+ * git checkout -q -b deploy 10e162370493a984c279ffc7ca59e18d7850e844;
+ *
+ * So if I can do a remote history I'm laughing...
  */
 public class GitRepository extends AbstractRepository implements SelectableAuthenticationRepository {
     private static final Log log = LogFactory.getLog(GitRepository.class);
@@ -106,11 +114,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         setBranch(config.getString(GIT_BRANCH));
     }
 
-    public void onInitialBuild(BuildContext buildContext) {
-    }
-
     public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
-        log.info("********** retrieveSourceCode");
         try {
             pullFromRepository(getSourceCodeDirectory(planKey), repositoryUrl);
         } catch (IOException e) {
@@ -120,7 +124,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
-        log.info("********** collectChangesSinceLastBuild " + planKey + " " + lastVcsRevisionKey);
         try {
             String repositoryUrl = getRepositoryUrl();
             pullFromRepository(getSourceCodeDirectory(planKey), repositoryUrl);
@@ -153,10 +156,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     // next thing to do is create the GitLog command who's output we can play with...
     //
     private String detectCommitsForUrl(String repositoryUrl, final String lastRevisionChecked, final List<Commit> commits, String planKey) throws RepositoryException {
-        GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, getSourceCodeDirectory(planKey));
-        if (lastRevisionChecked != null) {
-//            opt.setOptLimitCommitAfter(true, lastRevisionChecked);
-        }
+        GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, getSourceCodeDirectory(planKey), lastRevisionChecked);
         try {
             List<Commit> gitCommits = gitLogCommand.extractCommits();
 
@@ -165,7 +165,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
                 log.info("commits found:" + gitCommits.size());
 
                 String startRevision = gitCommits.get(gitCommits.size() - 1).getDate().toString();
-                String latestRevisionOnServer = gitCommits.get(0).getDate().toString();
+                String latestRevisionOnServer = gitLogCommand.getLastRevisionChecked();
                 log.info("Collecting changes for '" + planKey + "' on path '" + repositoryUrl + "' from version " + startRevision + " to " + latestRevisionOnServer);
 
                 for (Commit logEntry : gitCommits) {

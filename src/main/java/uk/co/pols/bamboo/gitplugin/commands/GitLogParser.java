@@ -16,9 +16,10 @@ public class GitLogParser {
     private static final String AUTHOR_LINE_PREFIX = "Author:";
     private static final String NEW_COMMIT_LINE_PREFIX = "commit";
     private static final DateTimeFormatter GIT_ISO_DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss +SSSS");
+    private static final String DATE_LINE_PREFIX = "Date:";
 
     private String log;
-    private static final String DATE_LINE_PREFIX = "Date:";
+    private String mostRecentCommitDate = null;
 
     public GitLogParser(String log) {
         this.log = (log == null) ? "" : log;
@@ -40,7 +41,11 @@ public class GitLogParser {
             } else if (line.startsWith(AUTHOR_LINE_PREFIX)) {
                 currentAuthor = extractAuthor(line);
             } else if (line.startsWith(DATE_LINE_PREFIX)) {
-                date = GIT_ISO_DATE_FORMAT.parseDateTime(line.substring(DATE_LINE_PREFIX.length()).trim());
+                String commitDate = line.substring(DATE_LINE_PREFIX.length()).trim();
+                if(mostRecentCommitDate == null) {
+                    mostRecentCommitDate = commitDate;
+                }
+                date = GIT_ISO_DATE_FORMAT.parseDateTime(commitDate);
             } else {
                 comment.append(line).append("\n");
             }
@@ -50,6 +55,10 @@ public class GitLogParser {
             commits.add(new CommitImpl(currentAuthor, comment.toString(), date.toDate()));
         }
         return commits;
+    }
+
+    public String getMostRecentCommitDate() {
+        return mostRecentCommitDate;
     }
 
     private Author extractAuthor(String line) {

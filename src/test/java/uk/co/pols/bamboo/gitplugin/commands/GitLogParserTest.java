@@ -56,6 +56,13 @@ public class GitLogParserTest extends TestCase {
         assertEquals("\n    first commit\n", commits.get(FIRST_COMMIT).getComment());
     }
 
+    public void testKnowsTheDateOfTheMostRecentCommit() {
+        GitLogParser parser = new GitLogParser(sampleLog);
+        parser.extractCommits();
+
+        assertEquals("2009-03-22 11:21:21 +0000", parser.getMostRecentCommitDate());
+    }
+
     private String sampleLog = "commit 264438f6f9e7a3cb341eb8270a0e520e91f10db5\n" +
             "Author: Andy Pols <andy@pols.co.uk>\n" +
             "Date:   2009-03-22 11:21:21 +0000\n" +
