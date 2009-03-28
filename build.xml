@@ -36,7 +36,7 @@
 
     <target name="compile" description="compile the source">
         <mkdir dir="classes"/>
-        <javac destdir="classes" fork="true">
+        <javac destdir="classes" fork="true" debug="true" >
             <classpath refid="classpath"/>
             <src refid="git-bamboo-plugin.module.sourcepath"/>
         </javac>
