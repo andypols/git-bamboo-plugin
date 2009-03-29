@@ -4,12 +4,16 @@ import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 public class GitLogCommand {
+    private static final Log log = LogFactory.getLog(GitLogCommand.class);
+
     private String gitExe;
     private File sourceCodeDirectory;
     private String lastRevisionChecked;
@@ -22,11 +26,12 @@ public class GitLogCommand {
         this.commandExecutor = commandExecutor;
     }
 
-    public List<Commit> extractCommits(BuildLogger buildLogger) throws IOException {
+    public List<Commit> extractCommits() throws IOException {
         StringOutputStream stringOutputStream = new StringOutputStream();
 
         String logText = commandExecutor.execute(getCommandLine(), sourceCodeDirectory);
-        GitLogParser logParser = new GitLogParser(buildLogger.addBuildLogEntry(logText));
+        log.info(logText);
+        GitLogParser logParser = new GitLogParser(logText);
 
         List<Commit> commits = logParser.extractCommits();
         lastRevisionChecked = logParser.getMostRecentCommitDate();
