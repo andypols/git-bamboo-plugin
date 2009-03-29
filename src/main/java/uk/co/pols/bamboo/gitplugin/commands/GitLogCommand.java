@@ -28,8 +28,13 @@ public class GitLogCommand {
         execute.execute();
 
         GitLogParser logParser = new GitLogParser(stringOutputStream.toString());
+
+        stringOutputStream.close();
+        List<Commit> commits = logParser.extractCommits();
+
         lastRevisionChecked = logParser.getMostRecentCommitDate();
-        return logParser.extractCommits();
+
+        return commits;
     }
 
     public String getLastRevisionChecked() {
@@ -40,6 +45,6 @@ public class GitLogCommand {
         if (lastRevisionChecked != null) {
             return new String[]{gitExe, "log", "--date=iso8601", "--since=\"" + lastRevisionChecked + "\""};
         }
-        return new String[]{gitExe, "log", "--date=iso8601"};
+        return new String[]{gitExe, "log", "-1", "--date=iso8601"};
     }
 }
