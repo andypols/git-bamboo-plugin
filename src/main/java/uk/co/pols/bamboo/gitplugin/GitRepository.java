@@ -49,7 +49,6 @@ import java.util.*;
 public class GitRepository extends AbstractRepository implements SelectableAuthenticationRepository, WebRepositoryEnabledRepository, InitialBuildAwareRepository, MutableQuietPeriodAwareRepository, RepositoryEventAware {
     private static final Log log = LogFactory.getLog(GitRepository.class);
 
-    // ------------------------------------------------------------------------------------------------------- Constants
     public static final String NAME = "Git";
     public static final String KEY = "git";
 
@@ -99,7 +98,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
-        log.info("******* GitRepository.collectChangesSinceLastBuild");
         String repositoryUrl = getRepositoryUrl();
         String lastRevisionChecked = lastVcsRevisionKey;
         final List<Commit> commits = new ArrayList<Commit>();
@@ -119,8 +117,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
      * @throws RepositoryException
      */
     private String detectUpdatesForUrl(String repositorySvnUrl, final String lastRevisionChecked, final List<Commit> commits, String planKey) throws RepositoryException {
-        log.info("****** GitRepository.detectUpdatesForUrl");
-
         try {
             File sourceDirectory = getSourceCodeDirectory(planKey);
             BuildLogger buildLogger = buildLoggerManager.getBuildLogger(planKey);
@@ -153,7 +149,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
-        log.info("****** GitRepository.retrieveSourceCode");
         return retrieveSourceCodeWithException(planKey, vcsRevisionKey);
     }
 
