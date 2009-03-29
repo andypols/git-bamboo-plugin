@@ -196,7 +196,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
      * Checks if the URL has changed
      */
     public void preRetrieveSourceCode(final BuildContext buildContext) {
-        log.info("****** GitRepository.preRetrieveSourceCode");
 //        try {
 //            final String planKey = buildContext.getPlanKey();
 //            final File directory = getSourceCodeDirectory(planKey);

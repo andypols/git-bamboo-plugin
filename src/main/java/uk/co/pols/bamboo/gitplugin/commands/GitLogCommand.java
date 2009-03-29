@@ -1,9 +1,6 @@
 package uk.co.pols.bamboo.gitplugin.commands;
 
 import com.atlassian.bamboo.commit.Commit;
-import com.atlassian.bamboo.build.logger.BuildLogger;
-import org.apache.tools.ant.taskdefs.Execute;
-import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
