@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 import uk.co.pols.bamboo.gitplugin.commands.GitLogCommand;
+import uk.co.pols.bamboo.gitplugin.commands.AntCommandExecutor;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,7 +126,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
             pullLatestChangesFromRepository(buildLogger, getSourceCodeDirectory(planKey), execute);
 
-            GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, getSourceCodeDirectory(planKey), lastRevisionChecked);
+            GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, getSourceCodeDirectory(planKey), lastRevisionChecked, new AntCommandExecutor());
             List<Commit> gitCommits = gitLogCommand.extractCommits();
 
             String latestRevisionOnServer = gitLogCommand.getLastRevisionChecked();
@@ -175,7 +176,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
             pullLatestChangesFromRepository(buildLogger, sourceDirectory, execute);
 
-            GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, sourceDirectory, vcsRevisionKey);
+            GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, sourceDirectory, vcsRevisionKey, new AntCommandExecutor());
             gitLogCommand.extractCommits();
             String lastRevisionChecked = gitLogCommand.getLastRevisionChecked();
             log.info(buildLogger.addBuildLogEntry("Last revision was '" + lastRevisionChecked + "'."));

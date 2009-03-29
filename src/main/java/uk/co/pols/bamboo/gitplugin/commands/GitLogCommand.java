@@ -12,22 +12,19 @@ public class GitLogCommand {
     private String gitExe;
     private File sourceCodeDirectory;
     private String lastRevisionChecked;
+    private CommandExecutor commandExecutor;
 
-    public GitLogCommand(String gitExe, File sourceCodeDirectory, String lastRevisionChecked) {
+    public GitLogCommand(String gitExe, File sourceCodeDirectory, String lastRevisionChecked, CommandExecutor commandExecutor) {
         this.gitExe = gitExe;
         this.sourceCodeDirectory = sourceCodeDirectory;
         this.lastRevisionChecked = lastRevisionChecked;
+        this.commandExecutor = commandExecutor;
     }
 
     public List<Commit> extractCommits() throws IOException {
         StringOutputStream stringOutputStream = new StringOutputStream();
 
-        Execute execute = new Execute(new PumpStreamHandler(stringOutputStream));
-        execute.setWorkingDirectory(sourceCodeDirectory);
-        execute.setCommandline(getCommandLine());
-        execute.execute();
-
-        GitLogParser logParser = new GitLogParser(stringOutputStream.toString());
+        GitLogParser logParser = new GitLogParser(commandExecutor.execute(getCommandLine(), sourceCodeDirectory));
 
         stringOutputStream.close();
         List<Commit> commits = logParser.extractCommits();
