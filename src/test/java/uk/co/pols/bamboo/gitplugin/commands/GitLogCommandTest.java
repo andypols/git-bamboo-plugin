@@ -25,7 +25,7 @@ public class GitLogCommandTest extends MockObjectTestCase {
 
         checking(new Expectations() {{
             one(commandExecutor).execute(new String[]{GIT_EXE, "log", "-1", "--date=iso8601"}, SOURCE_CODE_DIRECTORY); will(returnValue(mostRecentCommitLog));
-//            one(buildLogger).addBuildLogEntry(mostRecentCommitLog);
+            one(buildLogger).addBuildLogEntry(mostRecentCommitLog);
         }});
 
         List<Commit> commits = gitLogCommand.extractCommits(buildLogger);

@@ -25,7 +25,8 @@ public class GitLogCommand {
     public List<Commit> extractCommits(BuildLogger buildLogger) throws IOException {
         StringOutputStream stringOutputStream = new StringOutputStream();
 
-        GitLogParser logParser = new GitLogParser(commandExecutor.execute(getCommandLine(), sourceCodeDirectory));
+        String logText = commandExecutor.execute(getCommandLine(), sourceCodeDirectory);
+        GitLogParser logParser = new GitLogParser(buildLogger.addBuildLogEntry(logText));
 
         stringOutputStream.close();
         List<Commit> commits = logParser.extractCommits();
