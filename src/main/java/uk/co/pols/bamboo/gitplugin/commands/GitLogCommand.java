@@ -1,6 +1,7 @@
 package uk.co.pols.bamboo.gitplugin.commands;
 
 import com.atlassian.bamboo.commit.Commit;
+import com.atlassian.bamboo.build.logger.BuildLogger;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 
@@ -21,7 +22,7 @@ public class GitLogCommand {
         this.commandExecutor = commandExecutor;
     }
 
-    public List<Commit> extractCommits() throws IOException {
+    public List<Commit> extractCommits(BuildLogger buildLogger) throws IOException {
         StringOutputStream stringOutputStream = new StringOutputStream();
 
         GitLogParser logParser = new GitLogParser(commandExecutor.execute(getCommandLine(), sourceCodeDirectory));

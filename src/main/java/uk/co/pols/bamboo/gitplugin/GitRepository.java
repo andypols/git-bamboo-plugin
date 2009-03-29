@@ -127,7 +127,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
             pullLatestChangesFromRepository(buildLogger, getSourceCodeDirectory(planKey), execute);
 
             GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, getSourceCodeDirectory(planKey), lastRevisionChecked, new AntCommandExecutor());
-            List<Commit> gitCommits = gitLogCommand.extractCommits();
+            List<Commit> gitCommits = gitLogCommand.extractCommits(buildLogger);
 
             String latestRevisionOnServer = gitLogCommand.getLastRevisionChecked();
             if (lastRevisionChecked == null) {
@@ -177,7 +177,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
             pullLatestChangesFromRepository(buildLogger, sourceDirectory, execute);
 
             GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, sourceDirectory, vcsRevisionKey, new AntCommandExecutor());
-            gitLogCommand.extractCommits();
+            gitLogCommand.extractCommits(buildLogger);
             String lastRevisionChecked = gitLogCommand.getLastRevisionChecked();
             log.info(buildLogger.addBuildLogEntry("Last revision was '" + lastRevisionChecked + "'."));
             return lastRevisionChecked;

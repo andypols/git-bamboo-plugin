@@ -23,13 +23,13 @@ public class GitLogCommandTest extends MockObjectTestCase {
     public void testGetsTheMostRecentLogItemIfNotCheckedLogBefore() throws IOException {
         GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, null, commandExecutor);
 
-//        checking(new Expectations() {{
-//            one(commandExecutor).execute(new String[]{GIT_EXE, "log", "-1", "--date=iso8601"}, SOURCE_CODE_DIRECTORY); will(returnValue(mostRecentCommitLog));
+        checking(new Expectations() {{
+            one(commandExecutor).execute(new String[]{GIT_EXE, "log", "-1", "--date=iso8601"}, SOURCE_CODE_DIRECTORY); will(returnValue(mostRecentCommitLog));
 //            one(buildLogger).addBuildLogEntry(mostRecentCommitLog);
-//        }});
-//
-//        List<Commit> commits = gitLogCommand.extractCommits();
-//
+        }});
+
+        List<Commit> commits = gitLogCommand.extractCommits(buildLogger);
+
 //        assertEquals(1, commits.size());
     }
 
