@@ -28,11 +28,10 @@ public class GitLogCommand {
         String logText = commandExecutor.execute(getCommandLine(), sourceCodeDirectory);
         GitLogParser logParser = new GitLogParser(buildLogger.addBuildLogEntry(logText));
 
-        stringOutputStream.close();
         List<Commit> commits = logParser.extractCommits();
-
         lastRevisionChecked = logParser.getMostRecentCommitDate();
 
+        stringOutputStream.close();
         return commits;
     }
 
