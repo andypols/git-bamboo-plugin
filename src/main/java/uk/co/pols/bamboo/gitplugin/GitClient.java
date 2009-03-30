@@ -8,9 +8,10 @@ import java.util.List;
 import java.io.IOException;
 import java.io.File;
 
-import uk.co.pols.bamboo.gitplugin.commands.GitPullCommand;
+import uk.co.pols.bamboo.gitplugin.commands.ExecutorGitPullCommand;
 import uk.co.pols.bamboo.gitplugin.commands.AntCommandExecutor;
 import uk.co.pols.bamboo.gitplugin.commands.GitLogCommand;
+import uk.co.pols.bamboo.gitplugin.commands.GitPullCommand;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.taskdefs.Execute;
@@ -18,7 +19,6 @@ import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 
 public class GitClient {
     private static final Log log = LogFactory.getLog(GitClient.class);
-
     private String gitExe;
 
     public GitClient(String gitExe) {
@@ -46,11 +46,10 @@ public class GitClient {
 
     public String getLatestUpdate(BuildLogger buildLogger, String repositoryUrl, String planKey, String lastRevisionChecked, List<Commit> commits, File sourceCodeDirectory) throws RepositoryException {
         try {
-            new GitPullCommand(gitExe, sourceCodeDirectory, new AntCommandExecutor()).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
+            pullCommand(sourceCodeDirectory).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
 
-            GitLogCommand gitLogCommand = new GitLogCommand(gitExe, sourceCodeDirectory, lastRevisionChecked, new AntCommandExecutor());
+            GitLogCommand gitLogCommand = logCommand(sourceCodeDirectory, lastRevisionChecked);
             List<Commit> gitCommits = gitLogCommand.extractCommits();
-
             String latestRevisionOnServer = gitLogCommand.getLastRevisionChecked();
             if (lastRevisionChecked == null) {
                 log.info("Never checked logs for '" + planKey + "' on path '" + repositoryUrl + "'  setting latest revision to " + latestRevisionOnServer);
@@ -58,9 +57,7 @@ public class GitClient {
             }
             if (!latestRevisionOnServer.equals(lastRevisionChecked)) {
                 log.info("Collecting changes for '" + planKey + "' on path '" + repositoryUrl + "' since " + lastRevisionChecked);
-                for (Commit logEntry : gitCommits) {
-                    commits.add(logEntry);
-                }
+                commits.addAll(gitCommits);
             }
 
             return latestRevisionOnServer;
@@ -69,17 +66,11 @@ public class GitClient {
         }
     }
 
-    public String getLatestRevision(File sourceDirectory, String lastRevisionTime, String repositoryUrl, BuildLogger buildLogger) throws RepositoryException {
-        try {
-            new GitPullCommand(gitExe, sourceDirectory, new AntCommandExecutor()).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
+    protected GitPullCommand pullCommand(File sourceCodeDirectory) {
+        return new ExecutorGitPullCommand(gitExe, sourceCodeDirectory, new AntCommandExecutor());
+    }
 
-            GitLogCommand gitLogCommand = new GitLogCommand(gitExe, sourceDirectory, lastRevisionTime, new AntCommandExecutor());
-            gitLogCommand.extractCommits();
-            String lastRevisionChecked = gitLogCommand.getLastRevisionChecked();
-            log.info(buildLogger.addBuildLogEntry("Last revision was '" + lastRevisionChecked + "'."));
-            return lastRevisionChecked;
-        } catch (IOException e) {
-            throw new RepositoryException("Failed to get latest revision", e);
-        }
+    protected GitLogCommand logCommand(File sourceCodeDirectory, String lastRevisionChecked) {
+        return new GitLogCommand(gitExe, sourceCodeDirectory, lastRevisionChecked, new AntCommandExecutor());
     }
 }

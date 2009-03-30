@@ -56,8 +56,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     public static final String SVN_PASSWORD = REPO_PREFIX + "userPassword";
     public static final String SVN_KEYFILE = REPO_PREFIX + "keyFile";
     public static final String SVN_PASSPHRASE = REPO_PREFIX + "passphrase";
-    public static final String SVN_SSL_KEYFILE = REPO_PREFIX + "sslKeyFile";
-    public static final String SVN_SSL_PASSPHRASE = REPO_PREFIX + "sslPassphrase";
 
     private static final String USE_EXTERNALS = REPO_PREFIX + "useExternals";
 
@@ -70,7 +68,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     private String keyFile;
     private String webRepositoryUrlRepoName;
     private String authType;
-    private boolean useExternals;
 
     private final QuietPeriodHelper quietPeriodHelper = new QuietPeriodHelper(REPO_PREFIX);
     private boolean quietPeriodEnabled = false;
@@ -106,7 +103,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         if (isWorkspaceEmpty(sourceDirectory)) {
             gitClient.initialiseRemoteRepository(sourceDirectory, repositoryUrl, buildLogger);
         }
-        return gitClient.getLatestRevision(sourceDirectory, vcsRevisionKey, repositoryUrl, buildLogger);
+        return gitClient.getLatestUpdate(buildLogger, repositoryUrl, planKey, vcsRevisionKey, new ArrayList<Commit>(), sourceDirectory);
     }
 
     /**
@@ -561,14 +558,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
     public void setMaxRetries(int maxRetries) {
         this.maxRetries = maxRetries;
-    }
-
-    public boolean isUseExternals() {
-        return useExternals;
-    }
-
-    public void setUseExternals(boolean useExternals) {
-        this.useExternals = useExternals;
     }
 
     @Override
