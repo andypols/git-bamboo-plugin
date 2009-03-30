@@ -19,22 +19,13 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.taskdefs.Execute;
-import org.apache.tools.ant.taskdefs.PumpStreamHandler;
-import uk.co.pols.bamboo.gitplugin.commands.GitLogCommand;
-import uk.co.pols.bamboo.gitplugin.commands.AntCommandExecutor;
-import uk.co.pols.bamboo.gitplugin.commands.GitPullCommand;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
  * Provides GIT and GITHUB support for the Bamboo Build Server
- * <p/>
- * <p/>
- * TODO ** NEXT ** return the lastCommitTime in a same format git gave it to us.... (in return value of detectUpdatesForUrl)
- * <p/>
+ *
  * TODO Let user define the location of the git exe
  * TODO dump what git is doing to the build log
  * TODO run a which git command to guess the location of git
@@ -95,18 +86,16 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
         final List<Commit> commits = new ArrayList<Commit>();
-        return new BuildChangesImpl(String.valueOf(detectUpdatesForUrl(repositoryUrl, lastVcsRevisionKey, commits, planKey)), commits);
-    }
 
-    private String detectUpdatesForUrl(String repositoryUrl, final String lastRevisionChecked, final List<Commit> commits, String planKey) throws RepositoryException {
-        return new GitClient(GIT_EXE).getLatestUpdate(
+        String latestCommitTime = new GitClient(GIT_EXE).getLatestUpdate(
                 buildLoggerManager.getBuildLogger(planKey),
                 repositoryUrl,
                 planKey,
-                lastRevisionChecked,
+                lastVcsRevisionKey,
                 commits,
                 getSourceCodeDirectory(planKey)
         );
+        return new BuildChangesImpl(String.valueOf(latestCommitTime), commits);
     }
 
     public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
