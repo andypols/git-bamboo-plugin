@@ -13,6 +13,8 @@ import uk.co.pols.bamboo.gitplugin.commands.AntCommandExecutor;
 import uk.co.pols.bamboo.gitplugin.commands.GitLogCommand;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tools.ant.taskdefs.Execute;
+import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 
 public class GitClient {
     private static final Log log = LogFactory.getLog(GitClient.class);
@@ -22,6 +24,25 @@ public class GitClient {
     public GitClient(String gitExe) {
         this.gitExe = gitExe;
     }
+
+    public void initialiseRemoteRepository(File sourceDirectory, String repositoryUrl, BuildLogger buildLogger) throws RepositoryException {
+        try {
+            Execute execute = new Execute(new PumpStreamHandler(System.out));
+            execute.setWorkingDirectory(sourceDirectory);
+
+            sourceDirectory.mkdirs();
+            log.info(buildLogger.addBuildLogEntry(sourceDirectory.getAbsolutePath() + " is empty. Creating new git repository '" + gitExe + " init'"));
+            log.info(buildLogger.addBuildLogEntry("'" + gitExe + " init'"));
+            execute.setCommandline(new String[]{gitExe, "init"});
+            execute.execute();
+
+            log.info(buildLogger.addBuildLogEntry("'" + gitExe + " remote add origin '" + repositoryUrl));
+            execute.setCommandline(new String[]{gitExe, "remote", "add", "origin", repositoryUrl});
+            execute.execute();
+        } catch (IOException e) {
+            throw new RepositoryException("Failed to initialise repository", e);
+        }
+    }    
 
     public String getLatestUpdate(BuildLogger buildLogger, String repositoryUrl, String planKey, String lastRevisionChecked, List<Commit> commits, File sourceCodeDirectory) throws RepositoryException {
         try {

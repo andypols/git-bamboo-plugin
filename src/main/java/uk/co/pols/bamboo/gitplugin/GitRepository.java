@@ -81,16 +81,11 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     private String authType;
     private boolean useExternals;
 
-    // Quiet Period
     private final QuietPeriodHelper quietPeriodHelper = new QuietPeriodHelper(REPO_PREFIX);
     private boolean quietPeriodEnabled = false;
     private int quietPeriod = QuietPeriodHelper.DEFAULT_QUIET_PERIOD;
     private int maxRetries = QuietPeriodHelper.DEFAULT_MAX_RETRIES;
 
-    /**
-     * Maps the path to the latest checked revision
-     */
-    private Map<String, Long> externalPathRevisionMappings = new HashMap<String, Long>();
 
     @Override
     public void addDefaultValues(BuildConfiguration buildConfiguration) {
@@ -115,32 +110,17 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
-        return retrieveSourceCodeWithException(planKey, vcsRevisionKey);
-    }
-
-    private String retrieveSourceCodeWithException(String planKey, String vcsRevisionKey) throws RepositoryException {
         File sourceDirectory = getSourceCodeDirectory(planKey);
         BuildLogger buildLogger = buildLoggerManager.getBuildLogger(planKey);
-        Execute execute = new Execute(new PumpStreamHandler(System.out));
-        execute.setWorkingDirectory(sourceDirectory);
 
         try {
             if (isWorkspaceEmpty(sourceDirectory)) {
-                sourceDirectory.mkdirs();
-                log.info(buildLogger.addBuildLogEntry(sourceDirectory.getAbsolutePath() + " is empty. Creating new git repository '" + GIT_EXE + " init'"));
-                log.info(buildLogger.addBuildLogEntry("'" + GIT_EXE + " init'"));
-                execute.setCommandline(new String[]{GIT_EXE, "init"});
-                execute.execute();
-
-                log.info(buildLogger.addBuildLogEntry("'" + GIT_EXE + " remote add origin '" + repositoryUrl));
-                execute.setCommandline(new String[]{GIT_EXE, "remote", "add", "origin", repositoryUrl});
-                execute.execute();
+                new GitClient(GIT_EXE).initialiseRemoteRepository(sourceDirectory, repositoryUrl, buildLogger);
             } else {
                 log.info(buildLogger.addBuildLogEntry("Source found at  '" + sourceDirectory.getAbsolutePath() + "'. Updating source..."));
             }
 
-            GitPullCommand gitPullCommand = new GitPullCommand(GIT_EXE, sourceDirectory, new AntCommandExecutor());
-            gitPullCommand.pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
+            new GitPullCommand(GIT_EXE, sourceDirectory, new AntCommandExecutor()).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
 
             GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, sourceDirectory, vcsRevisionKey, new AntCommandExecutor());
             gitLogCommand.extractCommits();
@@ -612,14 +592,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
     public void setUseExternals(boolean useExternals) {
         this.useExternals = useExternals;
-    }
-
-    public Map<String, Long> getExternalPathRevisionMappings() {
-        return externalPathRevisionMappings;
-    }
-
-    public SortedMap<String, Long> getExternalPathRevisionMappingsSorted() {
-        return new TreeMap<String, Long>(externalPathRevisionMappings);
     }
 
     @Override
