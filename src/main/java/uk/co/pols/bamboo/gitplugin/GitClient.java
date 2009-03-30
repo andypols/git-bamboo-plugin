@@ -42,7 +42,7 @@ public class GitClient {
         } catch (IOException e) {
             throw new RepositoryException("Failed to initialise repository", e);
         }
-    }    
+    }
 
     public String getLatestUpdate(BuildLogger buildLogger, String repositoryUrl, String planKey, String lastRevisionChecked, List<Commit> commits, File sourceCodeDirectory) throws RepositoryException {
         try {
@@ -66,6 +66,20 @@ public class GitClient {
             return latestRevisionOnServer;
         } catch (IOException e) {
             throw new RepositoryException("Failed to get latest update", e);
+        }
+    }
+
+    public String getLatestRevision(File sourceDirectory, String lastRevisionTime, String repositoryUrl, BuildLogger buildLogger) throws RepositoryException {
+        try {
+            new GitPullCommand(gitExe, sourceDirectory, new AntCommandExecutor()).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
+
+            GitLogCommand gitLogCommand = new GitLogCommand(gitExe, sourceDirectory, lastRevisionTime, new AntCommandExecutor());
+            gitLogCommand.extractCommits();
+            String lastRevisionChecked = gitLogCommand.getLastRevisionChecked();
+            log.info(buildLogger.addBuildLogEntry("Last revision was '" + lastRevisionChecked + "'."));
+            return lastRevisionChecked;
+        } catch (IOException e) {
+            throw new RepositoryException("Failed to get latest revision", e);
         }
     }
 }

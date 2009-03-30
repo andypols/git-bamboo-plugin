@@ -112,24 +112,12 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
         File sourceDirectory = getSourceCodeDirectory(planKey);
         BuildLogger buildLogger = buildLoggerManager.getBuildLogger(planKey);
+        GitClient gitClient = new GitClient(GIT_EXE);
 
-        try {
-            if (isWorkspaceEmpty(sourceDirectory)) {
-                new GitClient(GIT_EXE).initialiseRemoteRepository(sourceDirectory, repositoryUrl, buildLogger);
-            } else {
-                log.info(buildLogger.addBuildLogEntry("Source found at  '" + sourceDirectory.getAbsolutePath() + "'. Updating source..."));
-            }
-
-            new GitPullCommand(GIT_EXE, sourceDirectory, new AntCommandExecutor()).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
-
-            GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, sourceDirectory, vcsRevisionKey, new AntCommandExecutor());
-            gitLogCommand.extractCommits();
-            String lastRevisionChecked = gitLogCommand.getLastRevisionChecked();
-            log.info(buildLogger.addBuildLogEntry("Last revision was '" + lastRevisionChecked + "'."));
-            return lastRevisionChecked;
-        } catch (IOException e) {
-            throw new RepositoryException("Failed to retrieve source", e);
+        if (isWorkspaceEmpty(sourceDirectory)) {
+            gitClient.initialiseRemoteRepository(sourceDirectory, repositoryUrl, buildLogger);
         }
+        return gitClient.getLatestRevision(sourceDirectory, vcsRevisionKey, repositoryUrl, buildLogger);
     }
 
     /**
