@@ -23,6 +23,7 @@ import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 import uk.co.pols.bamboo.gitplugin.commands.GitLogCommand;
 import uk.co.pols.bamboo.gitplugin.commands.AntCommandExecutor;
+import uk.co.pols.bamboo.gitplugin.commands.GitPullCommand;
 
 import java.io.File;
 import java.io.IOException;
@@ -124,7 +125,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
             Execute execute = new Execute(new PumpStreamHandler(System.out));
             execute.setWorkingDirectory(sourceDirectory);
 
-            pullLatestChangesFromRepository(buildLogger, getSourceCodeDirectory(planKey), execute);
+            new GitPullCommand(GIT_EXE, getSourceCodeDirectory(planKey), new AntCommandExecutor()).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
 
             GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, getSourceCodeDirectory(planKey), lastRevisionChecked, new AntCommandExecutor());
             List<Commit> gitCommits = gitLogCommand.extractCommits();
@@ -174,7 +175,8 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
                 log.info(buildLogger.addBuildLogEntry("Source found at  '" + sourceDirectory.getAbsolutePath() + "'. Updating source..."));
             }
 
-            pullLatestChangesFromRepository(buildLogger, sourceDirectory, execute);
+            GitPullCommand gitPullCommand = new GitPullCommand(GIT_EXE, sourceDirectory, new AntCommandExecutor());
+            gitPullCommand.pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
 
             GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, sourceDirectory, vcsRevisionKey, new AntCommandExecutor());
             gitLogCommand.extractCommits();
@@ -184,12 +186,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         } catch (IOException e) {
             throw new RepositoryException("Failed to retrieve source", e);
         }
-    }
-
-    private void pullLatestChangesFromRepository(BuildLogger buildLogger, File sourceDirectory, Execute execute) throws IOException {
-        log.info(buildLogger.addBuildLogEntry("Pulling source from '" + repositoryUrl + "' into '" + sourceDirectory.getAbsolutePath() + "'."));
-        execute.setCommandline(new String[]{GIT_EXE, "pull", "origin", "master"});
-        execute.execute();
     }
 
     /**

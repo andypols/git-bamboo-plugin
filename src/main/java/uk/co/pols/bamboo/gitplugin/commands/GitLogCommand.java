@@ -24,16 +24,14 @@ public class GitLogCommand {
     }
 
     public List<Commit> extractCommits() throws IOException {
-        StringOutputStream stringOutputStream = new StringOutputStream();
-
         String logText = commandExecutor.execute(getCommandLine(), sourceCodeDirectory);
+
         log.info(logText);
         GitLogParser logParser = new GitLogParser(logText);
 
         List<Commit> commits = logParser.extractCommits();
         lastRevisionChecked = logParser.getMostRecentCommitDate();
 
-        stringOutputStream.close();
         return commits;
     }
 
