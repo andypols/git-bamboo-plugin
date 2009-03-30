@@ -70,7 +70,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
     private static final String USE_EXTERNALS = REPO_PREFIX + "useExternals";
 
-    // ------------------------------------------------------------------------------------------------- Type Properties
     private String repositoryUrl;
     private String branch;
     private String webRepositoryUrl;
@@ -100,54 +99,19 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
-        String repositoryUrl = getRepositoryUrl();
-        String lastRevisionChecked = lastVcsRevisionKey;
         final List<Commit> commits = new ArrayList<Commit>();
-
-        lastRevisionChecked = detectUpdatesForUrl(repositoryUrl, lastRevisionChecked, commits, planKey);
-        return new BuildChangesImpl(String.valueOf(lastRevisionChecked), commits);
+        return new BuildChangesImpl(String.valueOf(detectUpdatesForUrl(repositoryUrl, lastVcsRevisionKey, commits, planKey)), commits);
     }
 
-    /**
-     * Detects the updates for the given repositpry since the lastRevisionChecked revision and HEAD for that URL
-     *
-     * @param repositorySvnUrl    - the SVN URL to check
-     * @param lastRevisionChecked - latest revision checked for this URL. Null if never checked
-     * @param commits             - the commits are added to this list
-     * @param planKey             - used for debugging only
-     * @return
-     * @throws RepositoryException
-     */
-    private String detectUpdatesForUrl(String repositorySvnUrl, final String lastRevisionChecked, final List<Commit> commits, String planKey) throws RepositoryException {
-        try {
-            File sourceDirectory = getSourceCodeDirectory(planKey);
-            BuildLogger buildLogger = buildLoggerManager.getBuildLogger(planKey);
-            Execute execute = new Execute(new PumpStreamHandler(System.out));
-            execute.setWorkingDirectory(sourceDirectory);
-
-            new GitPullCommand(GIT_EXE, getSourceCodeDirectory(planKey), new AntCommandExecutor()).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
-
-            GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, getSourceCodeDirectory(planKey), lastRevisionChecked, new AntCommandExecutor());
-            List<Commit> gitCommits = gitLogCommand.extractCommits();
-
-            String latestRevisionOnServer = gitLogCommand.getLastRevisionChecked();
-            if (lastRevisionChecked == null) {
-                log.info("Never checked logs for '" + planKey + "' on path '" + repositorySvnUrl + "'  setting latest revision to " + latestRevisionOnServer);
-                return latestRevisionOnServer;
-            }
-
-            if (!latestRevisionOnServer.equals(lastRevisionChecked)) {
-                log.info("Collecting changes for '" + planKey + "' on path '" + repositorySvnUrl + "' since " + lastRevisionChecked);
-                for (Commit logEntry : gitCommits) {
-                    commits.add(logEntry);
-                }
-            }
-
-            return latestRevisionOnServer;
-        }
-        catch (IOException e) {
-            throw new RepositoryException("Failed to detectUpdatesForUrl", e);
-        }
+    private String detectUpdatesForUrl(String repositoryUrl, final String lastRevisionChecked, final List<Commit> commits, String planKey) throws RepositoryException {
+        return new GitClient(GIT_EXE).getLatestUpdate(
+                buildLoggerManager.getBuildLogger(planKey),
+                repositoryUrl,
+                planKey,
+                lastRevisionChecked,
+                commits,
+                getSourceCodeDirectory(planKey)
+        );
     }
 
     public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
