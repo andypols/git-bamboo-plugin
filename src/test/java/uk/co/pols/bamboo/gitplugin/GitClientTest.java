@@ -25,10 +25,9 @@ public class GitClientTest extends MockObjectTestCase {
     private static final String NO_PREVIOUS_LATEST_UPDATE_TIME = null;
     private ArrayList<Commit> commits = new ArrayList<Commit>();
     private static final File SOURCE_CODE_DIRECTORY = new File("src");
+    private GitClient gitClient = gitClient();
 
     public void testSetsTheLatestUpdateToTheMostRecentCommitTheFirstTimeTheBuildIsRun() throws RepositoryException, IOException {
-        GitClient gitClient = gitClient();
-
         checking(new Expectations() {{
             one(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL);
             one(gitLogCommand).extractCommits(); will(returnValue(new ArrayList<Commit>()));
@@ -42,8 +41,6 @@ public class GitClientTest extends MockObjectTestCase {
     }
 
     public void testDoesNotReturnAnyCommitsIfThereHaveNotBeenAnyCommentsSinceTheLastCheck() throws RepositoryException, IOException {
-        GitClient gitClient = gitClient();
-
         checking(new Expectations() {{
             one(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL);
             one(gitLogCommand).extractCommits(); will(returnValue(new ArrayList<Commit>()));
@@ -56,9 +53,7 @@ public class GitClientTest extends MockObjectTestCase {
         assertTrue(commits.isEmpty());
     }
 
-
     public void testReturnsTheNewCommitsAndLatestCommitTimeIfThereAreNewCommentsSinceTheLastCheck() throws RepositoryException, IOException {
-        GitClient gitClient = gitClient();
         final ArrayList<Commit> latestCommits = new ArrayList<Commit>();
         latestCommits.add(new CommitImpl());
         latestCommits.add(new CommitImpl());
@@ -74,30 +69,21 @@ public class GitClientTest extends MockObjectTestCase {
         assertEquals("2009-03-25 01:09:25 +0000", latestUpdate);
         assertEquals(2, commits.size());
     }
-    /*
 
-public String getLatestUpdate(BuildLogger buildLogger, String repositoryUrl, String planKey, String lastRevisionChecked, List<Commit> commits, File sourceCodeDirectory) throws RepositoryException {
-    try {
-        pullCommand(sourceCodeDirectory).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
+    public void testWrapsIoExceptionsInRepositoryExceptions() throws RepositoryException, IOException {
+        final IOException ioException = new IOException("EXPECTED EXCEPTION");
 
-        ExtractorGitLogCommand gitLogCommand = logCommand(sourceCodeDirectory, lastRevisionChecked);
-        List<Commit> gitCommits = gitLogCommand.extractCommits();
-        String latestRevisionOnServer = gitLogCommand.getLastRevisionChecked();
-        if (lastRevisionChecked == null) {
-            log.info("Never checked logs for '" + planKey + "' on path '" + repositoryUrl + "'  setting latest revision to " + latestRevisionOnServer);
-            return latestRevisionOnServer;
+        checking(new Expectations() {{
+            one(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL); will(throwException(ioException));
+        }});
+
+        try {
+            gitClient.getLatestUpdate(buildLogger, REPOSITORY_URL, "plankey", LAST_REVISION_CHECKED, commits, SOURCE_CODE_DIRECTORY);
+        } catch (RepositoryException e) {
+            assertEquals("Failed to get latest update", e.getMessage());
+            assertSame(ioException, e.getCause());
         }
-        if (!latestRevisionOnServer.equals(lastRevisionChecked)) {
-            log.info("Collecting changes for '" + planKey + "' on path '" + repositoryUrl + "' since " + lastRevisionChecked);
-            commits.addAll(gitCommits);
-        }
-
-        return latestRevisionOnServer;
-    } catch (IOException e) {
-        throw new RepositoryException("Failed to get latest update", e);
     }
-}
-*/
 
     private GitClient gitClient() {
         return new GitClient(GIT_EXE) {
