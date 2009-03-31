@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.atlassian.bamboo.commit.Commit;
 
-public class GitLogCommandTest extends MockObjectTestCase {
+public class ExecutorGitLogCommandTest extends MockObjectTestCase {
     private static final File SOURCE_CODE_DIRECTORY = new File("source/directory");
     private static final String DATE_OF_LAST_BUILD = "2009-03-13 01:27:52 +0000";
     private static final String GIT_EXE = "git";
@@ -17,7 +17,7 @@ public class GitLogCommandTest extends MockObjectTestCase {
     private final CommandExecutor commandExecutor = mock(CommandExecutor.class);
 
     public void testGetsTheMostRecentLogItemIfNotCheckedLogBefore() throws IOException {
-        GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, null, commandExecutor);
+        GitLogCommand gitLogCommand = new ExtractorGitLogCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, null, commandExecutor);
 
         checking(new Expectations() {{
             one(commandExecutor).execute(new String[]{GIT_EXE, "log", "-1", "--date=iso8601"}, SOURCE_CODE_DIRECTORY); will(returnValue(mostRecentCommitLog));
@@ -30,7 +30,7 @@ public class GitLogCommandTest extends MockObjectTestCase {
     }
 
     public void testGetsTheLogsSinceTheLastBuild() throws IOException {
-        GitLogCommand gitLogCommand = new GitLogCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, DATE_OF_LAST_BUILD, commandExecutor);
+        GitLogCommand gitLogCommand = new ExtractorGitLogCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, DATE_OF_LAST_BUILD, commandExecutor);
 
         checking(new Expectations() {{
             one(commandExecutor).execute(new String[]{GIT_EXE, "log", "--date=iso8601", "--since=\"" + DATE_OF_LAST_BUILD + "\""}, SOURCE_CODE_DIRECTORY); will(returnValue(sampleLog));

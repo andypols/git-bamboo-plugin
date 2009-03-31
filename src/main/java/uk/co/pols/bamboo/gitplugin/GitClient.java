@@ -8,10 +8,7 @@ import java.util.List;
 import java.io.IOException;
 import java.io.File;
 
-import uk.co.pols.bamboo.gitplugin.commands.ExecutorGitPullCommand;
-import uk.co.pols.bamboo.gitplugin.commands.AntCommandExecutor;
-import uk.co.pols.bamboo.gitplugin.commands.GitLogCommand;
-import uk.co.pols.bamboo.gitplugin.commands.GitPullCommand;
+import uk.co.pols.bamboo.gitplugin.commands.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.taskdefs.Execute;
@@ -71,6 +68,6 @@ public class GitClient {
     }
 
     protected GitLogCommand logCommand(File sourceCodeDirectory, String lastRevisionChecked) {
-        return new GitLogCommand(gitExe, sourceCodeDirectory, lastRevisionChecked, new AntCommandExecutor());
+        return new ExtractorGitLogCommand(gitExe, sourceCodeDirectory, lastRevisionChecked, new AntCommandExecutor());
     }
 }
