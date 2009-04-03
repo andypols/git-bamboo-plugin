@@ -25,9 +25,8 @@ import java.util.*;
 
 /**
  * Provides GIT and GITHUB support for the Bamboo Build Server
- *
+ * <p/>
  * TODO Let user define the location of the git exe
- * TODO dump what git is doing to the build log
  * TODO run a which git command to guess the location of git
  * TODO Add hook for github callback triggering the build
  * TODO don't include all historical commits on first build
@@ -39,7 +38,7 @@ import java.util.*;
  * <p/>
  * So if I can do a remote history I'm laughing...
  */
-public class GitRepository extends AbstractRepository implements SelectableAuthenticationRepository, WebRepositoryEnabledRepository, InitialBuildAwareRepository, MutableQuietPeriodAwareRepository, RepositoryEventAware {
+public class GitRepository extends AbstractRepository implements SelectableAuthenticationRepository, WebRepositoryEnabledRepository, InitialBuildAwareRepository, RepositoryEventAware {
     private static final Log log = LogFactory.getLog(GitRepository.class);
 
     public static final String NAME = "Git";
@@ -69,22 +68,10 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     private String webRepositoryUrlRepoName;
     private String authType;
 
-    private final QuietPeriodHelper quietPeriodHelper = new QuietPeriodHelper(REPO_PREFIX);
-    private boolean quietPeriodEnabled = false;
-    private int quietPeriod = QuietPeriodHelper.DEFAULT_QUIET_PERIOD;
-    private int maxRetries = QuietPeriodHelper.DEFAULT_MAX_RETRIES;
-
-
-    @Override
-    public void addDefaultValues(BuildConfiguration buildConfiguration) {
-        super.addDefaultValues(buildConfiguration);
-        quietPeriodHelper.addDefaultValues(buildConfiguration);
-    }
-
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
-        final List<Commit> commits = new ArrayList<Commit>();
+        List<Commit> commits = new ArrayList<Commit>();
 
-        String latestCommitTime = new GitClient(GIT_EXE).getLatestUpdate(
+        String latestCommitTime = gitClient().getLatestUpdate(
                 buildLoggerManager.getBuildLogger(planKey),
                 repositoryUrl,
                 planKey,
@@ -92,13 +79,14 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
                 commits,
                 getSourceCodeDirectory(planKey)
         );
+
         return new BuildChangesImpl(String.valueOf(latestCommitTime), commits);
     }
 
     public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
         File sourceDirectory = getSourceCodeDirectory(planKey);
         BuildLogger buildLogger = buildLoggerManager.getBuildLogger(planKey);
-        GitClient gitClient = new GitClient(GIT_EXE);
+        GitClient gitClient = gitClient();
 
         if (isWorkspaceEmpty(sourceDirectory)) {
             gitClient.initialiseRemoteRepository(sourceDirectory, repositoryUrl, buildLogger);
@@ -274,79 +262,18 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
         setRepositoryUrl(config.getString(GIT_REPO_URL));
         setBranch(config.getString(GIT_BRANCH));
-
-//        setUsername(config.getString(SVN_USERNAME));
-//        setAuthType(config.getString(SVN_AUTH_TYPE));
-//
-//        if (AuthenticationType.PASSWORD.getKey().equals(authType)) {
-//            setEncryptedPassword(config.getString(SVN_PASSWORD));
-//        } else if (AuthenticationType.SSH.getKey().equals(authType)) {
-//            setKeyFile(config.getString(SVN_KEYFILE));
-//            setEncryptedPassphrase(config.getString(SVN_PASSPHRASE));
-//        } else if (AuthenticationType.SSL_CLIENT_CERTIFICATE.getKey().equals(authType)) {
-//            setKeyFile(config.getString(SVN_SSL_KEYFILE));
-//            setEncryptedPassphrase(config.getString(SVN_SSL_PASSPHRASE));
-//        }
-//
-//        setWebRepositoryUrl(config.getString(WEB_REPO_URL));
-//        setWebRepositoryUrlRepoName(config.getString(WEB_REPO_MODULE_NAME));
-//
-//        setUseExternals(config.getBoolean(USE_EXTERNALS, false));
-//
-//        final Map<String, String> stringMaps = ConfigUtils.getMapFromConfiguration(EXTERNAL_PATH_MAPPINGS2, config);
-//        externalPathRevisionMappings = ConfigUtils.toLongMap(stringMaps);
-
-        quietPeriodHelper.populateFromConfig(config, this);
     }
 
-    /*
-     * Store SvnRepository data into configuration object.
-     *
-     */
     @Override
     public HierarchicalConfiguration toConfiguration() {
         HierarchicalConfiguration configuration = super.toConfiguration();
         configuration.setProperty(GIT_REPO_URL, getRepositoryUrl());
         configuration.setProperty(GIT_BRANCH, getBranch());
 
-//        configuration.setProperty(SVN_USERNAME, getUsername());
-//        configuration.setProperty(SVN_AUTH_TYPE, getAuthType());
-
-//        if (AuthenticationType.PASSWORD.getKey().equals(authType)) {
-//            configuration.setProperty(SVN_PASSWORD, getEncryptedPassword());
-//        } else if (AuthenticationType.SSH.getKey().equals(authType)) {
-//            configuration.setProperty(SVN_KEYFILE, getKeyFile());
-//            configuration.setProperty(SVN_PASSPHRASE, getEncryptedPassphrase());
-//        } else if (AuthenticationType.SSL_CLIENT_CERTIFICATE.getKey().equals(authType)) {
-//            configuration.setProperty(SVN_SSL_KEYFILE, getKeyFile());
-//            configuration.setProperty(SVN_SSL_PASSPHRASE, getEncryptedPassphrase());
-//        }
-//
-//        configuration.setProperty(WEB_REPO_URL, getWebRepositoryUrl());
-//        configuration.setProperty(WEB_REPO_MODULE_NAME, getWebRepositoryUrlRepoName());
-//
-//        configuration.setProperty(USE_EXTERNALS, isUseExternals());
-
-        // If check externals && the externals map is empty, then inite it
-//        if (isUseExternals() && externalPathRevisionMappings.isEmpty()) {
-//            initExternalsRevisionMapping();
-//        }
-
-//        final Map<String, String> stringMap = ConfigUtils.toStringMap(externalPathRevisionMappings);
-//        ConfigUtils.addMapToBuilConfiguration(EXTERNAL_PATH_MAPPINGS2, stringMap, configuration);
-
-        // Quiet period
-        quietPeriodHelper.toConfiguration(configuration, this);
         return configuration;
     }
 
     public void onInitialBuild(BuildContext buildContext) {
-    }
-
-    public boolean isAdvancedOptionEnabled(BuildConfiguration buildConfiguration) {
-        final boolean useExternals = buildConfiguration.getBoolean(USE_EXTERNALS, false);
-        final boolean quietPeriodEnabled = quietPeriodHelper.isEnabled(buildConfiguration);
-        return useExternals || quietPeriodEnabled;
     }
 
     public String getName() {
@@ -424,15 +351,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
 
     public void setBranch(String branch) {
         this.branch = branch;
-    }
-
-    /**
-     * Return repository URL with extrapolated Bamboo variables
-     *
-     * @return Repository URL with extrapolated Bamboo variables
-     */
-    public String getSubstitutedRepositoryUrl() {
-        return variableSubstitutionBean.substituteBambooVariables(repositoryUrl);
     }
 
     public void setUsername(String username) {
@@ -536,30 +454,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         return "github.com";
     }
 
-    public boolean isQuietPeriodEnabled() {
-        return quietPeriodEnabled;
-    }
-
-    public void setQuietPeriodEnabled(boolean quietPeriodEnabled) {
-        this.quietPeriodEnabled = quietPeriodEnabled;
-    }
-
-    public int getQuietPeriod() {
-        return quietPeriod;
-    }
-
-    public void setQuietPeriod(int quietPeriod) {
-        this.quietPeriod = quietPeriod;
-    }
-
-    public int getMaxRetries() {
-        return maxRetries;
-    }
-
-    public void setMaxRetries(int maxRetries) {
-        this.maxRetries = maxRetries;
-    }
-
     @Override
     public int hashCode() {
         return new HashCodeBuilder(101, 11)
@@ -612,5 +506,9 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         if (StringUtils.isEmpty(buildConfiguration.getString(fieldKey))) {
             errorCollection.addError(fieldKey, errorMessage);
         }
+    }
+
+    protected GitClient gitClient() {
+        return new GitClient(GIT_EXE);
     }
 }
