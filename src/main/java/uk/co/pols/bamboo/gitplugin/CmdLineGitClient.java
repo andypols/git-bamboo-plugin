@@ -3,17 +3,14 @@ package uk.co.pols.bamboo.gitplugin;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.repository.RepositoryException;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.io.IOException;
-import java.io.File;
-
-import uk.co.pols.bamboo.gitplugin.commands.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.taskdefs.Execute;
-import org.apache.tools.ant.taskdefs.PumpStreamHandler;
+import uk.co.pols.bamboo.gitplugin.commands.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CmdLineGitClient implements GitClient {
     private static final Log log = LogFactory.getLog(CmdLineGitClient.class);
@@ -58,23 +55,24 @@ public class CmdLineGitClient implements GitClient {
     }
 
     protected GitLogCommand logCommand(File sourceCodeDirectory, String lastRevisionChecked) {
+        // todo this is an executor NOT an Extractor!!!! come back and rename
         return new ExtractorGitLogCommand(gitExe, sourceCodeDirectory, lastRevisionChecked, new AntCommandExecutor());
     }
 
+    protected GitInitCommand initCommand(File sourceCodeDirectory) {
+        return new ExecutorGitInitCommand(gitExe, sourceCodeDirectory, new AntCommandExecutor());
+    }
+
+    protected GitRemoteCommand remoteCommand(File sourceCodeDirectory) {
+        return new ExecutorGitRemoteCommand(gitExe, sourceCodeDirectory, new AntCommandExecutor());
+    }
+
     private void initialiseRemoteRepository(File sourceDirectory, String repositoryUrl, BuildLogger buildLogger) throws RepositoryException {
+        log.info(buildLogger.addBuildLogEntry(sourceDirectory.getAbsolutePath() + " is empty. Creating new git repository"));
         try {
-            Execute execute = new Execute(new PumpStreamHandler(System.out));
-            execute.setWorkingDirectory(sourceDirectory);
-
             sourceDirectory.mkdirs();
-            log.info(buildLogger.addBuildLogEntry(sourceDirectory.getAbsolutePath() + " is empty. Creating new git repository '" + gitExe + " init'"));
-            log.info(buildLogger.addBuildLogEntry("'" + gitExe + " init'"));
-            execute.setCommandline(new String[]{gitExe, "init"});
-            execute.execute();
-
-            log.info(buildLogger.addBuildLogEntry("'" + gitExe + " remote add origin '" + repositoryUrl));
-            execute.setCommandline(new String[]{gitExe, "remote", "add", "origin", repositoryUrl});
-            execute.execute();
+            initCommand(sourceDirectory).init(buildLogger);
+            remoteCommand(sourceDirectory).add_origin(repositoryUrl, buildLogger);
         } catch (IOException e) {
             throw new RepositoryException("Failed to initialise repository", e);
         }

@@ -27,7 +27,6 @@ import java.util.List;
  * TODO Let user define the location of the git exe
  * TODO run a which git command to guess the location of git
  * TODO Add hook for github callback triggering the build
- * TODO don't include all historical commits on first build
  * TODO work out if the repository url has changed...
  * <p/>
  * This is what capistarno does....
