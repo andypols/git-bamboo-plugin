@@ -5,6 +5,7 @@ import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.repository.RepositoryException;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.io.IOException;
 import java.io.File;
 
@@ -20,25 +21,6 @@ public class CmdLineGitClient implements GitClient {
 
     public CmdLineGitClient(String gitExe) {
         this.gitExe = gitExe;
-    }
-
-    public void initialiseRemoteRepository(File sourceDirectory, String repositoryUrl, BuildLogger buildLogger) throws RepositoryException {
-        try {
-            Execute execute = new Execute(new PumpStreamHandler(System.out));
-            execute.setWorkingDirectory(sourceDirectory);
-
-            sourceDirectory.mkdirs();
-            log.info(buildLogger.addBuildLogEntry(sourceDirectory.getAbsolutePath() + " is empty. Creating new git repository '" + gitExe + " init'"));
-            log.info(buildLogger.addBuildLogEntry("'" + gitExe + " init'"));
-            execute.setCommandline(new String[]{gitExe, "init"});
-            execute.execute();
-
-            log.info(buildLogger.addBuildLogEntry("'" + gitExe + " remote add origin '" + repositoryUrl));
-            execute.setCommandline(new String[]{gitExe, "remote", "add", "origin", repositoryUrl});
-            execute.execute();
-        } catch (IOException e) {
-            throw new RepositoryException("Failed to initialise repository", e);
-        }
     }
 
     public String getLatestUpdate(BuildLogger buildLogger, String repositoryUrl, String planKey, String lastRevisionChecked, List<Commit> commits, File sourceCodeDirectory) throws RepositoryException {
@@ -63,11 +45,38 @@ public class CmdLineGitClient implements GitClient {
         }
     }
 
+    public String initialiseRepository(File sourceCodeDirectory, String planKey, String vcsRevisionKey, GitRepositoryConfig gitRepositoryConfig, boolean isWorkspaceEmpty, BuildLogger buildLogger) throws RepositoryException {
+        if (isWorkspaceEmpty) {
+            initialiseRemoteRepository(sourceCodeDirectory, gitRepositoryConfig.getRepositoryUrl(), buildLogger);
+        }
+
+        return getLatestUpdate(buildLogger, gitRepositoryConfig.getRepositoryUrl(), planKey, vcsRevisionKey, new ArrayList<Commit>(), sourceCodeDirectory);
+    }
+
     protected GitPullCommand pullCommand(File sourceCodeDirectory) {
         return new ExecutorGitPullCommand(gitExe, sourceCodeDirectory, new AntCommandExecutor());
     }
 
     protected GitLogCommand logCommand(File sourceCodeDirectory, String lastRevisionChecked) {
         return new ExtractorGitLogCommand(gitExe, sourceCodeDirectory, lastRevisionChecked, new AntCommandExecutor());
+    }
+
+    private void initialiseRemoteRepository(File sourceDirectory, String repositoryUrl, BuildLogger buildLogger) throws RepositoryException {
+        try {
+            Execute execute = new Execute(new PumpStreamHandler(System.out));
+            execute.setWorkingDirectory(sourceDirectory);
+
+            sourceDirectory.mkdirs();
+            log.info(buildLogger.addBuildLogEntry(sourceDirectory.getAbsolutePath() + " is empty. Creating new git repository '" + gitExe + " init'"));
+            log.info(buildLogger.addBuildLogEntry("'" + gitExe + " init'"));
+            execute.setCommandline(new String[]{gitExe, "init"});
+            execute.execute();
+
+            log.info(buildLogger.addBuildLogEntry("'" + gitExe + " remote add origin '" + repositoryUrl));
+            execute.setCommandline(new String[]{gitExe, "remote", "add", "origin", repositoryUrl});
+            execute.execute();
+        } catch (IOException e) {
+            throw new RepositoryException("Failed to initialise repository", e);
+        }
     }
 }

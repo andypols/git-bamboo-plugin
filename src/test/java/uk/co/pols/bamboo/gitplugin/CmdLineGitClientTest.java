@@ -14,7 +14,7 @@ import com.atlassian.bamboo.repository.RepositoryException;
 import uk.co.pols.bamboo.gitplugin.commands.GitPullCommand;
 import uk.co.pols.bamboo.gitplugin.commands.GitLogCommand;
 
-public class GitClientTest extends MockObjectTestCase {
+public class CmdLineGitClientTest extends MockObjectTestCase {
     private static final String GIT_EXE = "git";
     private static final String LAST_REVISION_CHECKED = "2009-03-22 01:09:25 +0000";
     private static final String REPOSITORY_URL = "repository.url";

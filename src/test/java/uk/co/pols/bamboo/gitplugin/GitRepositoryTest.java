@@ -23,6 +23,7 @@ public class GitRepositoryTest extends MockObjectTestCase {
     private static final File SRC_CODE_DIR = new File("test/src/code/directory");
     private static final String RESPOSITORY_URL = "RepositoryUrl";
 
+    private GitRepositoryConfig gitRepositoryConfig = new GitRepositoryConfig();
     private GitClient gitClient = mock(GitClient.class);
     private BuildLoggerManager buildLoggerManager = mock(BuildLoggerManager.class);
     private BuildLogger buildLogger = mock(BuildLogger.class);
@@ -77,8 +78,8 @@ public class GitRepositoryTest extends MockObjectTestCase {
     public void testInitialisesTheRepositoryIfTheWorkspaceIsEmpty() throws RepositoryException {
         checking(new Expectations() {{
             one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
-            one(gitClient).initialiseRemoteRepository(SRC_CODE_DIR, RESPOSITORY_URL, buildLogger);
-            one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, PLAN_KEY, null, new ArrayList<Commit>(), SRC_CODE_DIR); will(returnValue("time of this build"));
+            one(gitClient).initialiseRepository(SRC_CODE_DIR, PLAN_KEY, null, gitRepositoryConfig, true, buildLogger);
+            will(returnValue("time of this build"));
         }});
 
         String timeOfLastCommmit = gitRepository(true).retrieveSourceCode(PLAN_KEY, null);
@@ -89,7 +90,8 @@ public class GitRepositoryTest extends MockObjectTestCase {
     public void testChecksOutTheSourceCodeIfTheIfTheWorkspaceIsNotEmpty() throws RepositoryException {
         checking(new Expectations() {{
             one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
-            one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, PLAN_KEY, null, new ArrayList<Commit>(), SRC_CODE_DIR); will(returnValue("time of this build"));
+            one(gitClient).initialiseRepository(SRC_CODE_DIR, PLAN_KEY, null, gitRepositoryConfig, false, buildLogger);
+            will(returnValue("time of this build"));
         }});
 
         String timeOfLastCommmit = gitRepository(false).retrieveSourceCode(PLAN_KEY, null);
@@ -123,6 +125,10 @@ public class GitRepositoryTest extends MockObjectTestCase {
 
             protected boolean isWorkspaceEmpty(File file) {
                 return isWorkspaceEmpty;
+            }
+
+            protected GitRepositoryConfig gitRepositoryConfig() {
+                return gitRepositoryConfig;
             }
         };
 

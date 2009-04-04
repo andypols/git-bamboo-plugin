@@ -44,7 +44,7 @@ public class GitRepository extends AbstractRepository implements /*SelectableAut
     public static final String KEY = "git";
     public static final String REPO_PREFIX = "repository.git.";
 
-    private GitRepositoryConfig gitRepositoryConfig = new GitRepositoryConfig();
+    private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
         List<Commit> commits = new ArrayList<Commit>();
@@ -62,14 +62,13 @@ public class GitRepository extends AbstractRepository implements /*SelectableAut
     }
 
     public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
-        File sourceDirectory = getSourceCodeDirectory(planKey);
-        BuildLogger buildLogger = buildLoggerManager.getBuildLogger(planKey);
-        GitClient gitClient = gitClient();
-
-        if (isWorkspaceEmpty(sourceDirectory)) {
-            gitClient.initialiseRemoteRepository(sourceDirectory, gitRepositoryConfig.getRepositoryUrl(), buildLogger);
-        }
-        return gitClient.getLatestUpdate(buildLogger, gitRepositoryConfig.getRepositoryUrl(), planKey, vcsRevisionKey, new ArrayList<Commit>(), sourceDirectory);
+        return gitClient().initialiseRepository(
+                getSourceCodeDirectory(planKey),
+                planKey,
+                vcsRevisionKey,
+                gitRepositoryConfig,
+                isWorkspaceEmpty(getSourceCodeDirectory(planKey)),
+                buildLoggerManager.getBuildLogger(planKey));
     }
 
     @Override
@@ -177,5 +176,9 @@ public class GitRepository extends AbstractRepository implements /*SelectableAut
 
     protected GitClient gitClient() {
         return new CmdLineGitClient(GIT_EXE);
+    }
+
+    protected GitRepositoryConfig gitRepositoryConfig() {
+        return new GitRepositoryConfig();
     }
 }
