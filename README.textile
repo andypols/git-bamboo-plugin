@@ -1,9 +1,15 @@
 h1. A Git Plugin for the Bamboo builder server
 
-Build your git and GitHub repositories on the Amazon Cloud using Bamboo... 
+Build your git and GitHub repositories on the Amazon Cloud using Bamboo...
+
+h2. Installation
+
+Copy the git-repository jar to @$BAMBOO_INSTALL_DIR/webapp/WEB-INF/lib@
+
+Restart Bamboo.
 
 h2. Build from source
 
 Copy the jmock2 and atlassian bamboo jars into the lib directory (can't distribute these on github).
 
-Run the ant all task.
+Run the @ant all@ task.
