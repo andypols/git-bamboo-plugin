@@ -6,6 +6,7 @@ import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.repository.AbstractRepository;
 import com.atlassian.bamboo.repository.Repository;
 import com.atlassian.bamboo.repository.RepositoryException;
+import com.atlassian.bamboo.repository.cvsimpl.CVSRepository;
 import com.atlassian.bamboo.v2.build.BuildChanges;
 import com.atlassian.bamboo.build.BuildLoggerManager;
 import com.atlassian.bamboo.build.logger.BuildLogger;
@@ -25,21 +26,7 @@ public class GitRepositoryTest extends MockObjectTestCase {
     private GitClient gitClient = mock(GitClient.class);
     private BuildLoggerManager buildLoggerManager = mock(BuildLoggerManager.class);
     private BuildLogger buildLogger = mock(BuildLogger.class);
-    private GitRepository gitRepository;
-
-    protected void setUp() throws Exception {
-        gitRepository = new GitRepository() {
-            protected GitClient gitClient() {
-                return gitClient;
-            }
-
-            public File getSourceCodeDirectory(String projectKey) {
-                return SRC_CODE_DIR;
-            }
-        };
-        gitRepository.setBuildLoggerManager(buildLoggerManager);
-        gitRepository.setRepositoryUrl(RESPOSITORY_URL);
-    }
+    private GitRepository gitRepository = gitRepository(false);
 
     public void testProvidesANameToAppearInTheGuiRepositoryDrownDown() {
         assertEquals("Git", gitRepository.getName());
@@ -47,66 +34,6 @@ public class GitRepositoryTest extends MockObjectTestCase {
 
     public void testProvidesALinkToTheGitHubGuidesPage() {
         assertEquals("http://github.com/guides/home", gitRepository.getUrl());
-    }
-
-    public void testEnsuresThatTheUserSpecifiesTheRepositoryUrl() {
-        BuildConfiguration buildConfiguration = new BuildConfiguration();
-        buildConfiguration.setProperty(GitRepository.GIT_BRANCH, "TheBranch");
-
-        ErrorCollection errorCollection = gitRepository.validate(buildConfiguration);
-
-        assertHasError(errorCollection, GitRepository.GIT_REPO_URL, "Please specify where the repository is located");
-    }
-
-    public void testEnsuresThatTheUserSpecifiesTheRepositoryBranch() {
-        BuildConfiguration buildConfiguration = new BuildConfiguration();
-        buildConfiguration.setProperty(GitRepository.GIT_REPO_URL, "The Rep Url");
-
-        ErrorCollection errorCollection = gitRepository.validate(buildConfiguration);
-
-        assertHasError(errorCollection, GitRepository.GIT_BRANCH, "Please specify which branch you want to build");
-    }
-
-    public void testAcceptsARepositoryAndBranchWithoutReportingAnyErrors() {
-        BuildConfiguration buildConfiguration = new BuildConfiguration();
-        buildConfiguration.setProperty(GitRepository.GIT_REPO_URL, "The Rep Url");
-        buildConfiguration.setProperty(GitRepository.GIT_BRANCH, "The Branch");
-
-        ErrorCollection errorCollection = gitRepository.validate(buildConfiguration);
-
-        assertFalse(errorCollection.hasAnyErrors());
-    }
-
-    public void testReportsMultipleErrorsAtSameTime() {
-        BuildConfiguration buildConfiguration = new BuildConfiguration();
-
-        ErrorCollection errorCollection = gitRepository.validate(buildConfiguration);
-
-        assertTrue(errorCollection.hasAnyErrors());
-        assertEquals(2, errorCollection.getTotalErrors());
-        assertEquals("Please specify where the repository is located", errorCollection.getFieldErrors().get(GitRepository.GIT_REPO_URL));
-        assertEquals("Please specify which branch you want to build", errorCollection.getFieldErrors().get(GitRepository.GIT_BRANCH));
-    }
-
-    public void testSavesTheRepositorySettingsInTheBuildConfiguration() {
-        gitRepository.setRepositoryUrl("TheTopSecretBuildRepoUrl");
-        gitRepository.setBranch("TheBranch");
-
-        HierarchicalConfiguration hierarchicalConfiguration = gitRepository.toConfiguration();
-
-        assertEquals("TheTopSecretBuildRepoUrl", hierarchicalConfiguration.getProperty(GitRepository.GIT_REPO_URL));
-        assertEquals("TheBranch", hierarchicalConfiguration.getProperty(GitRepository.GIT_BRANCH));
-    }
-
-    public void testLoadsTheRepositorySettingsFromTheBuildConfiguration() {
-        HierarchicalConfiguration buildConfiguration = new HierarchicalConfiguration();
-        buildConfiguration.setProperty(GitRepository.GIT_REPO_URL, "TheTopSecretBuildRepoUrl");
-        buildConfiguration.setProperty(GitRepository.GIT_BRANCH, "TheSpecialBranch");
-
-        gitRepository.populateFromConfig(buildConfiguration);
-
-        assertEquals("TheSpecialBranch", gitRepository.getBranch());
-        assertEquals("TheTopSecretBuildRepoUrl", gitRepository.getRepositoryUrl());
     }
 
     public void testClassesARepositoryOfADifferentTypeAsDifferent() {
@@ -138,7 +65,8 @@ public class GitRepositoryTest extends MockObjectTestCase {
     public void testUsesAGitClientToDetectTheChangesSinceTheLastBuild() throws RepositoryException {
         checking(new Expectations() {{
             one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
-            one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, PLAN_KEY, "time of previous build", new ArrayList<Commit>(), SRC_CODE_DIR); will(returnValue("time of this build"));
+            one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, PLAN_KEY, "time of previous build", new ArrayList<Commit>(), SRC_CODE_DIR);
+            will(returnValue("time of this build"));
         }});
 
         BuildChanges buildChanges = gitRepository.collectChangesSinceLastBuild(PLAN_KEY, "time of previous build");
@@ -146,10 +74,61 @@ public class GitRepositoryTest extends MockObjectTestCase {
         assertEquals("time of this build", buildChanges.getVcsRevisionKey());
     }
 
-    private void assertHasError(ErrorCollection errorCollection, String fieldKey, String errorMessage) {
-        assertTrue(errorCollection.hasAnyErrors());
-        assertEquals(1, errorCollection.getTotalErrors());
-        assertEquals(errorMessage, errorCollection.getFieldErrors().get(fieldKey));
+    public void testInitialisesTheRepositoryIfTheWorkspaceIsEmpty() throws RepositoryException {
+        checking(new Expectations() {{
+            one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
+            one(gitClient).initialiseRemoteRepository(SRC_CODE_DIR, RESPOSITORY_URL, buildLogger);
+            one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, PLAN_KEY, null, new ArrayList<Commit>(), SRC_CODE_DIR); will(returnValue("time of this build"));
+        }});
+
+        String timeOfLastCommmit = gitRepository(true).retrieveSourceCode(PLAN_KEY, null);
+
+        assertEquals("time of this build", timeOfLastCommmit);
+    }
+
+    public void testChecksOutTheSourceCodeIfTheIfTheWorkspaceIsNotEmpty() throws RepositoryException {
+        checking(new Expectations() {{
+            one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
+            one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, PLAN_KEY, null, new ArrayList<Commit>(), SRC_CODE_DIR); will(returnValue("time of this build"));
+        }});
+
+        String timeOfLastCommmit = gitRepository(false).retrieveSourceCode(PLAN_KEY, null);
+
+        assertEquals("time of this build", timeOfLastCommmit);
+    }
+
+    public void testARepositoryThatIsNotAGitRepositoryIsClearlyDifferent() {
+        assertTrue(gitRepository(false).isRepositoryDifferent(new CVSRepository()));
+    }
+
+    public void testARepositoryWithADifferentRepositoryIsDifferent() {
+        GitRepository gitRepository = gitRepository(false);
+        gitRepository.setRepositoryUrl("one/url");
+
+        GitRepository differentRepository = new GitRepository();
+        differentRepository.setRepositoryUrl("other/url");
+
+        assertTrue(gitRepository.isRepositoryDifferent(differentRepository));
+    }
+
+    private GitRepository gitRepository(final boolean isWorkspaceEmpty) {
+        gitRepository = new GitRepository() {
+            protected GitClient gitClient() {
+                return gitClient;
+            }
+
+            public File getSourceCodeDirectory(String projectKey) {
+                return SRC_CODE_DIR;
+            }
+
+            protected boolean isWorkspaceEmpty(File file) {
+                return isWorkspaceEmpty;
+            }
+        };
+
+        gitRepository.setBuildLoggerManager(buildLoggerManager);
+        gitRepository.setRepositoryUrl(RESPOSITORY_URL);
+        return gitRepository;
     }
 
     class TestRepository extends AbstractRepository {
