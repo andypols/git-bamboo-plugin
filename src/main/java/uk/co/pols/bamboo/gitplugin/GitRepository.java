@@ -38,7 +38,7 @@ import java.util.*;
  * <p/>
  * So if I can do a remote history I'm laughing...
  */
-public class GitRepository extends AbstractRepository implements SelectableAuthenticationRepository, WebRepositoryEnabledRepository, InitialBuildAwareRepository, RepositoryEventAware {
+public class GitRepository extends AbstractRepository implements /*SelectableAuthenticationRepository,*/ WebRepositoryEnabledRepository, InitialBuildAwareRepository, RepositoryEventAware {
     private static final Log log = LogFactory.getLog(GitRepository.class);
 
     public static final String NAME = "Git";
@@ -55,8 +55,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     public static final String SVN_PASSWORD = REPO_PREFIX + "userPassword";
     public static final String SVN_KEYFILE = REPO_PREFIX + "keyFile";
     public static final String SVN_PASSPHRASE = REPO_PREFIX + "passphrase";
-
-    private static final String USE_EXTERNALS = REPO_PREFIX + "useExternals";
 
     private String repositoryUrl;
     private String branch;
@@ -94,35 +92,8 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         return gitClient.getLatestUpdate(buildLogger, repositoryUrl, planKey, vcsRevisionKey, new ArrayList<Commit>(), sourceDirectory);
     }
 
-    /**
-     * Checks if the URL has changed
-     */
     public void preRetrieveSourceCode(final BuildContext buildContext) {
-//        try {
-//            final String planKey = buildContext.getPlanKey();
-//            final File directory = getSourceCodeDirectory(planKey);
-//            if (!isWorkspaceEmpty(directory)) {
-//                clientManager = getSvnClientManager();
-//                final SVNWCClient wcClient = clientManager.getWCClient();
-//
-//                final SVNInfo svnInfo = wcClient.doInfo(directory, null);
-//                final SVNURL localSvnRepositoryPath = svnInfo.getURL();
-//                final SVNURL actualUrl = getSubstitutedSvnUrl();
-//                if (localSvnRepositoryPath != null && !localSvnRepositoryPath.equals(actualUrl)) {
-//                    final BuildLogger buildLogger = buildLoggerManager.getBuildLogger(planKey);
-//                    log.info(buildLogger.addBuildLogEntry(
-//                            "Existing source path at '" + directory.getAbsolutePath() + "' is '" + localSvnRepositoryPath + "'" +
-//                                    " and differs from '" + actualUrl + "'"));
-//                    setReferencesDifferentRepository(true);
-//                }
-//            }
-//        }
-//        catch (Exception e) {
-//            log.warn("Exception while detecting whether source code differs. Ignoring...", e);
-//        }
-//        finally {
-//            dispose(clientManager);
-//        }
+        // what to do if the repository has changed...
     }
 
     public void postRetrieveSourceCode(final BuildContext buildContext) {
@@ -135,81 +106,8 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
         validateMandatoryField(buildConfiguration, errorCollection, GIT_REPO_URL, "Please specify where the repository is located");
         validateMandatoryField(buildConfiguration, errorCollection, GIT_BRANCH, "Please specify which branch you want to build");
 
-//        String repoUrl = buildConfiguration.getString(SVN_REPO_URL);
-//        repoUrl = variableSubstitutionBean.substituteBambooVariables(repoUrl);
-//        if (StringUtils.isBlank(repoUrl)) {
-//            errorCollection.addError(SVN_REPO_URL, "Please specify the build's Subversion Repository");
-//        } else {
-//            SVNClientManager clientManager = null;
-//            try {
-//                String authType = buildConfiguration.getString(SVN_AUTH_TYPE);
-//                String username = buildConfiguration.getString(SVN_USERNAME);
-//                SVNRepository svnRepository = null;
-//                if (StringUtils.isBlank(authType) || AuthenticationType.PASSWORD.getKey().equals(authType)) {
-//                    String password = stringEncrypter.get().decrypt(buildConfiguration.getString(SVN_PASSWORD));
-        // BAM-1085, BAM-890, BAM-1028 - don't try to create a new {@link SVNRepositoryImpl} object for getting the latest revision number.
-        // Use the interface provided by SVNKit.
-//                    clientManager = svnClientManagerFactory.getSVNClientManager(DEFAULT_SVN_OPTIONS, getStandardAuthManager(username, password));
-//                    svnRepository = clientManager.createRepository(SVNURL.parseURIEncoded(repoUrl), true);
-//                } else if (AuthenticationType.SSH.getKey().equals(authType)) {
-//                    String keyFile = variableSubstitutionBean.substituteBambooVariables(buildConfiguration.getString(SVN_KEYFILE));
-//                    String passphrase = stringEncrypter.get().decrypt(buildConfiguration.getString(SVN_PASSPHRASE));
-//
-        // BAM-1085, BAM-890, BAM-1028 - don't try to create a new {@link SVNRepositoryImpl} object for getting the latest revision number.
-        // Use the interface provided by SVNKit.
-//                    clientManager = svnClientManagerFactory.getSVNClientManager(DEFAULT_SVN_OPTIONS, getSshAuthManager(username, keyFile, passphrase));
-//                    svnRepository = clientManager.createRepository(SVNURL.parseURIEncoded(repoUrl), true);
-//
-        // Validate that the key file exists
-//                    File file = new File(keyFile);
-//                    if (!file.exists()) {
-//                        errorCollection.addError(SVN_KEYFILE, textProvider.getText("repository.keyFile.error"));
-//                    }
-//                } else if (AuthenticationType.SSL_CLIENT_CERTIFICATE.getKey().equals(authType)) {
-//                    String keyFile = variableSubstitutionBean.substituteBambooVariables(buildConfiguration.getString(SVN_SSL_KEYFILE));
-//                    String passphrase = stringEncrypter.get().decrypt(buildConfiguration.getString(SVN_SSL_PASSPHRASE));
-//
-        // BAM-1085, BAM-890, BAM-1028 - don't try to create a new {@link SVNRepositoryImpl} object for getting the latest revision number.
-        // Use the interface provided by SVNKit.
-//                    clientManager = svnClientManagerFactory.getSVNClientManager(DEFAULT_SVN_OPTIONS, getSslAuthManager(keyFile, passphrase));
-//                    svnRepository = clientManager.createRepository(SVNURL.parseURIEncoded(repoUrl), true);
-
-        // Validate that the key file exists
-//                    File file = new File(keyFile);
-//                    if (!file.exists()) {
-//                        errorCollection.addError(SVN_SSL_KEYFILE, textProvider.getText("repository.keyFile.error"));
-//                    }
-//                }
-
-//                svnRepository.testConnection();
-//            }
-//            catch (SVNException e) {
-//                log.info("Failed to validate the subversion url", e);
-//                errorCollection.addError(SVN_REPO_URL, "This is not a valid Subversion Repository: " + (e.getMessage()));
-//            }
-//            finally {
-//                dispose(clientManager);
-//            }
-//        }
-
-//        String webRepoUrl = buildConfiguration.getString(WEB_REPO_URL);
-//        webRepoUrl = variableSubstitutionBean.substituteBambooVariables(webRepoUrl);
-//        if (!StringUtils.isBlank(webRepoUrl) && !UrlUtils.verifyHierachicalURI(webRepoUrl)) {
-//            errorCollection.addError(WEB_REPO_URL, "This is not a valid url");
-//        }
-
-//        quietPeriodHelper.validate(buildConfiguration, errorCollection);
-
         return errorCollection;
     }
-
-//    private ISVNAuthenticationManager getStandardAuthManager(String userName, String password) {
-//        return SVNWCUtil.createDefaultAuthenticationManager(userName, password);
-//    }
-
-//    private ISVNAuthenticationManager getSshAuthManager(String userName, String privateKeyFile, String passphrase) {
-//        return SVNWCUtil.createDefaultAuthenticationManager(null, userName, null, new File(privateKeyFile), passphrase, false);
-//    }
 
     public boolean isRepositoryDifferent(Repository repository) {
         if (repository instanceof GitRepository) {
@@ -224,37 +122,7 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     public void prepareConfigObject(BuildConfiguration buildConfiguration) {
-//        String repositoryKey = buildConfiguration.getString(SELECTED_REPOSITORY);
-
-//        String authType = buildConfiguration.getString(SVN_AUTH_TYPE);
-//        if (AuthenticationType.PASSWORD.getKey().equals(authType)) {
-//            boolean svnPasswordChanged = buildConfiguration.getBoolean(TEMPORARY_SVN_PASSWORD_CHANGE);
-//            if (svnPasswordChanged) {
-//                String newPassword = buildConfiguration.getString(TEMPORARY_SVN_PASSWORD);
-//                if (getKey().equals(repositoryKey)) {
-//                    buildConfiguration.setProperty(GitRepository.SVN_PASSWORD, stringEncrypter.get().encrypt(newPassword));
-//                }
-//            }
-//        } else if (AuthenticationType.SSH.getKey().equals(authType)) {
-//            boolean passphraseChanged = buildConfiguration.getBoolean(TEMPORARY_SVN_PASSPHRASE_CHANGE);
-//            if (passphraseChanged) {
-//                String newPassphrase = buildConfiguration.getString(TEMPORARY_SVN_PASSPHRASE);
-//                buildConfiguration.setProperty(GitRepository.SVN_PASSPHRASE, stringEncrypter.get().encrypt(newPassphrase));
-//            }
-//        } else if (AuthenticationType.SSL_CLIENT_CERTIFICATE.getKey().equals(authType)) {
-//            if (buildConfiguration.getBoolean(TEMPORARY_SVN_SSL_PASSPHRASE_CHANGE)) {
-//                String newPassphrase = buildConfiguration.getString(TEMPORARY_SVN_SSL_PASSPHRASE);
-//                buildConfiguration.setProperty(SVN_SSL_PASSPHRASE, stringEncrypter.get().encrypt(newPassphrase));
-//            }
-//        }
-
-//        // Disabling advanced will clear all advanced
-//        if (!buildConfiguration.getBoolean(TEMPORARY_SVN_ADVANCED, false)) {
-//            quietPeriodHelper.clearFromBuildConfiguration(buildConfiguration);
-//            buildConfiguration.clearTree(USE_EXTERNALS);
-//        }
     }
-
 
     @Override
     public void populateFromConfig(HierarchicalConfiguration config) {
@@ -495,12 +363,12 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
                 .toComparison();
     }
 
-    public List<NameValuePair> getAuthenticationTypes() {
-        List<NameValuePair> types = new ArrayList<NameValuePair>();
-        types.add(AuthenticationType.PASSWORD.getNameValue());
-        types.add(AuthenticationType.SSH.getNameValue());
-        return types;
-    }
+//    public List<NameValuePair> getAuthenticationTypes() {
+//        List<NameValuePair> types = new ArrayList<NameValuePair>();
+//        types.add(AuthenticationType.PASSWORD.getNameValue());
+//        types.add(AuthenticationType.SSH.getNameValue());
+//        return types;
+//    }
 
     private void validateMandatoryField(BuildConfiguration buildConfiguration, ErrorCollection errorCollection, String fieldKey, String errorMessage) {
         if (StringUtils.isEmpty(buildConfiguration.getString(fieldKey))) {
@@ -509,6 +377,6 @@ public class GitRepository extends AbstractRepository implements SelectableAuthe
     }
 
     protected GitClient gitClient() {
-        return new GitClient(GIT_EXE);
+        return new CmdLineGitClient(GIT_EXE);
     }
 }

@@ -7,10 +7,39 @@ import com.atlassian.bamboo.repository.AbstractRepository;
 import com.atlassian.bamboo.repository.Repository;
 import com.atlassian.bamboo.repository.RepositoryException;
 import com.atlassian.bamboo.v2.build.BuildChanges;
+import com.atlassian.bamboo.build.BuildLoggerManager;
+import com.atlassian.bamboo.build.logger.BuildLogger;
+import com.atlassian.bamboo.commit.Commit;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.jmock.integration.junit3.MockObjectTestCase;
+import org.jmock.Expectations;
 
-public class GitRepositoryTest extends TestCase {
-    private GitRepository gitRepository = new GitRepository();
+import java.io.File;
+import java.util.ArrayList;
+
+public class GitRepositoryTest extends MockObjectTestCase {
+    private static final String PLAN_KEY = "plan-key";
+    private static final File SRC_CODE_DIR = new File("test/src/code/directory");
+    private static final String RESPOSITORY_URL = "RepositoryUrl";
+
+    private GitClient gitClient = mock(GitClient.class);
+    private BuildLoggerManager buildLoggerManager = mock(BuildLoggerManager.class);
+    private BuildLogger buildLogger = mock(BuildLogger.class);
+    private GitRepository gitRepository;
+
+    protected void setUp() throws Exception {
+        gitRepository = new GitRepository() {
+            protected GitClient gitClient() {
+                return gitClient;
+            }
+
+            public File getSourceCodeDirectory(String projectKey) {
+                return SRC_CODE_DIR;
+            }
+        };
+        gitRepository.setBuildLoggerManager(buildLoggerManager);
+        gitRepository.setRepositoryUrl(RESPOSITORY_URL);
+    }
 
     public void testProvidesANameToAppearInTheGuiRepositoryDrownDown() {
         assertEquals("Git", gitRepository.getName());
@@ -104,6 +133,17 @@ public class GitRepositoryTest extends TestCase {
         gitRepository.setRepositoryUrl("repositoryUrl");
 
         assertFalse(gitRepository.isRepositoryDifferent(repositoryToCompare));
+    }
+
+    public void testUsesAGitClientToDetectTheChangesSinceTheLastBuild() throws RepositoryException {
+        checking(new Expectations() {{
+            one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
+            one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, PLAN_KEY, "time of previous build", new ArrayList<Commit>(), SRC_CODE_DIR); will(returnValue("time of this build"));
+        }});
+
+        BuildChanges buildChanges = gitRepository.collectChangesSinceLastBuild(PLAN_KEY, "time of previous build");
+
+        assertEquals("time of this build", buildChanges.getVcsRevisionKey());
     }
 
     private void assertHasError(ErrorCollection errorCollection, String fieldKey, String errorMessage) {

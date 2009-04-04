@@ -25,7 +25,7 @@ public class GitClientTest extends MockObjectTestCase {
     private static final String NO_PREVIOUS_LATEST_UPDATE_TIME = null;
     private ArrayList<Commit> commits = new ArrayList<Commit>();
     private static final File SOURCE_CODE_DIRECTORY = new File("src");
-    private GitClient gitClient = gitClient();
+    private CmdLineGitClient gitClient = gitClient();
 
     public void testSetsTheLatestUpdateToTheMostRecentCommitTheFirstTimeTheBuildIsRun() throws RepositoryException, IOException {
         checking(new Expectations() {{
@@ -85,8 +85,8 @@ public class GitClientTest extends MockObjectTestCase {
         }
     }
 
-    private GitClient gitClient() {
-        return new GitClient(GIT_EXE) {
+    private CmdLineGitClient gitClient() {
+        return new CmdLineGitClient(GIT_EXE) {
             protected GitPullCommand pullCommand(File sourceCodeDirectory) {
                 return gitPullCommand;
             }
