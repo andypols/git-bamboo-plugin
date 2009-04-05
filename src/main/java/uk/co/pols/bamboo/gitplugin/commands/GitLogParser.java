@@ -2,15 +2,21 @@ package uk.co.pols.bamboo.gitplugin.commands;
 
 import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.commit.CommitImpl;
+import com.atlassian.bamboo.commit.CommitFile;
+import com.atlassian.bamboo.commit.CommitFileImpl;
 import com.atlassian.bamboo.author.AuthorImpl;
 import com.atlassian.bamboo.author.Author;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
+import java.util.NoSuchElementException;
 
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.DateTime;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 public class GitLogParser {
     private static final String AUTHOR_LINE_PREFIX = "Author:";
@@ -27,31 +33,49 @@ public class GitLogParser {
 
     public List<Commit> extractCommits() {
         List<Commit> commits = new ArrayList<Commit>();
-        String[] lines = log.split("\n");
         Author currentAuthor = null;
         DateTime date = null;
         StringBuffer comment = new StringBuffer();
+        List<CommitFile> commitFile = new ArrayList<CommitFile>();
 
-        for (String line : lines) {
+        for (String line : log.split("\n")) {
             if (line.startsWith(NEW_COMMIT_LINE_PREFIX)) {
-                if(currentAuthor != null && date != null) {
+                if (currentAuthor != null && date != null) {
                     commits.add(new CommitImpl(currentAuthor, comment.toString(), date.toDate()));
                 }
                 comment = new StringBuffer();
+                commitFile = new ArrayList<CommitFile>();
             } else if (line.startsWith(AUTHOR_LINE_PREFIX)) {
                 currentAuthor = extractAuthor(line);
             } else if (line.startsWith(DATE_LINE_PREFIX)) {
                 String commitDate = line.substring(DATE_LINE_PREFIX.length()).trim();
-                if(mostRecentCommitDate == null) {
+                if (mostRecentCommitDate == null) {
                     mostRecentCommitDate = commitDate;
                 }
                 date = GIT_ISO_DATE_FORMAT.parseDateTime(commitDate);
+            } else if (line.startsWith("Merge")){
+                // ignore
             } else {
-                comment.append(line).append("\n");
+                if (line.length() > 0 && Character.isDigit(line.toCharArray()[0])) {
+                    // Could be a commit message or fileDetails (FileDetails always starts with an int)
+                    StringTokenizer st = new StringTokenizer(line);
+                    try {
+                        int linesAdded = Integer.parseInt(st.nextToken());
+                        int linesDeleted = Integer.parseInt(st.nextToken());
+                        String filename = st.nextToken();
+
+                        commitFile.add(new CommitFileImpl(filename));
+                    } catch (Exception e) {
+                    }
+                } else {
+                    if (line.length() > 0 && !"\n".equals(line)) {
+                        comment.append(line).append("\n");
+                    }
+                }
             }
         }
 
-        if(currentAuthor != null) {
+        if (currentAuthor != null) {
             commits.add(new CommitImpl(currentAuthor, comment.toString(), date.toDate()));
         }
         return commits;
