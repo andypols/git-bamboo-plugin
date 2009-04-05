@@ -41,8 +41,8 @@ public class ExtractorGitLogCommand implements GitLogCommand {
 
     private String[] getCommandLine() {
         if (lastRevisionChecked != null) {
-            return new String[]{gitExe, "log", "--date=iso8601", "--since=\"" + lastRevisionChecked + "\""};
+            return new String[]{gitExe, "log", "--numstat", "--date=iso8601", "--since=\"" + lastRevisionChecked + "\""};
         }
-        return new String[]{gitExe, "log", "-1", "--date=iso8601"};
+        return new String[]{gitExe, "log", "-1", "--numstat", "--date=iso8601"};
     }
 }
