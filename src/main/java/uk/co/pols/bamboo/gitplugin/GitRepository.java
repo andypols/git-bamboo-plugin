@@ -28,6 +28,7 @@ import java.util.List;
  * TODO run a which git command to guess the location of git
  * TODO Add hook for github callback triggering the build
  * TODO work out if the repository url has changed...
+ * TODO can link to the commits using https://github.com/andypols/git-bamboo-plugin/commit/5d87fb199040eb77db5056dd7a2bab435d5f05b0
  * <p/>
  * This is what capistarno does....
  * git reset -q --hard 10e162370493a984c279ffc7ca59e18d7850e844;
