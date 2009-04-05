@@ -1,6 +1,7 @@
 package uk.co.pols.bamboo.gitplugin.commands;
 
 import com.atlassian.bamboo.commit.Commit;
+import com.atlassian.bamboo.commit.CommitFile;
 import junit.framework.TestCase;
 import org.joda.time.DateTime;
 
@@ -76,6 +77,14 @@ public class GitLogParserTest extends TestCase {
 
         assertEquals(1, commits.size());
         assertEquals("    Merge branch 'new-ui'\n", commits.get(0).getComment());
+    }
+
+    public void testKnowsWhichFilesHaveChangedInTheCommit() {
+        GitLogParser parser = new GitLogParser(sampleLog);
+        List<Commit> commits = parser.extractCommits();
+
+        List<CommitFile> updatedFiles = commits.get(MOST_RECENT_COMMIT).getFiles();
+        assertEquals(1, updatedFiles.size());
     }
 
     private String sampleLog = "commit 264438f6f9e7a3cb341eb8270a0e520e91f10db5\n" +
