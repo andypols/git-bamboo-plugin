@@ -85,6 +85,9 @@ public class GitLogParserTest extends TestCase {
 
         List<CommitFile> updatedFiles = commits.get(MOST_RECENT_COMMIT).getFiles();
         assertEquals(1, updatedFiles.size());
+        CommitFile commitFile = updatedFiles.get(0);
+        assertEquals("src/main/java/uk/co/pols/bamboo/gitplugin/GitRepository.java", commitFile.getName());
+//        assertEquals("The commit hash identifies the version", "264438f6f9e7a3cb341eb8270a0e520e91f10db5", commitFile.getRevision());
     }
 
     private String sampleLog = "commit 264438f6f9e7a3cb341eb8270a0e520e91f10db5\n" +
