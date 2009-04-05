@@ -5,9 +5,7 @@ import org.jmock.Expectations;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
-import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 
 public class ExecutorGitInitCommandTest extends MockObjectTestCase {
@@ -18,13 +16,13 @@ public class ExecutorGitInitCommandTest extends MockObjectTestCase {
     private BuildLogger buildLogger = mock(BuildLogger.class);
 
     public void testInitialisesANewGitRepository() throws IOException {
-        GitInitCommand gitLogCommand = new ExecutorGitInitCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, commandExecutor);
+        GitInitCommand gitInitCommand = new ExecutorGitInitCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, commandExecutor);
 
         checking(new Expectations() {{
             one(buildLogger).addBuildLogEntry("Running 'git init'");
             one(commandExecutor).execute(new String[]{GIT_EXE, "init"}, SOURCE_CODE_DIRECTORY);
         }});
 
-        gitLogCommand.init(buildLogger);
+        gitInitCommand.init(buildLogger);
     }
 }
