@@ -21,7 +21,7 @@ public class ExecutorGitRemoteCommand implements GitRemoteCommand {
     }
 
     public void add_origin(String repositoryUrl, BuildLogger buildLogger) throws IOException {
-        log.info(buildLogger.addBuildLogEntry("Running '" + gitExe + " remote add origin '" + repositoryUrl));
+        log.info(buildLogger.addBuildLogEntry("Running '" + gitExe + " remote add origin '" + repositoryUrl + "'"));
         commandExecutor.execute(new String[]{gitExe, "remote", "add", "origin", repositoryUrl}, sourceCodeDirectory);
     }
 }
