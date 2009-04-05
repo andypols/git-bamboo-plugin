@@ -36,6 +36,7 @@ public class GitLogParser {
         Author currentAuthor = null;
         DateTime date = null;
         StringBuffer comment = new StringBuffer();
+        String commitId = null;
         List<CommitFile> commitFile = new ArrayList<CommitFile>();
 
         for (String line : log.split("\n")) {
@@ -44,6 +45,7 @@ public class GitLogParser {
                     commits.add(previousCommit(currentAuthor, comment, date, commitFile));
                 }
                 comment = new StringBuffer();
+                commitId = line.substring(NEW_COMMIT_LINE_PREFIX.length() + 1);
                 commitFile = new ArrayList<CommitFile>();
             } else if (line.startsWith(AUTHOR_LINE_PREFIX)) {
                 currentAuthor = extractAuthor(line);
@@ -64,8 +66,11 @@ public class GitLogParser {
                         int linesDeleted = Integer.parseInt(st.nextToken());
                         String filename = st.nextToken();
 
-                        commitFile.add(new CommitFileImpl(filename));
+                        CommitFileImpl file = new CommitFileImpl(filename);
+                        file.setRevision(commitId);
+                        commitFile.add(file);
                     } catch (Exception e) {
+                        comment.append(line).append("\n");
                     }
                 } else {
                     if (line.length() > 0 && !"\n".equals(line)) {

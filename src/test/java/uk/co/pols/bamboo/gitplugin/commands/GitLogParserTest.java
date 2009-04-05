@@ -87,7 +87,22 @@ public class GitLogParserTest extends TestCase {
         assertEquals(1, updatedFiles.size());
         CommitFile commitFile = updatedFiles.get(0);
         assertEquals("src/main/java/uk/co/pols/bamboo/gitplugin/GitRepository.java", commitFile.getName());
-//        assertEquals("The commit hash identifies the version", "264438f6f9e7a3cb341eb8270a0e520e91f10db5", commitFile.getRevision());
+        assertEquals("The commit hash identifies the version", "264438f6f9e7a3cb341eb8270a0e520e91f10db5", commitFile.getRevision());
+    }
+
+    public void testKnowsWhenACommitHasMultipleFileChanges() {
+        GitLogParser parser = new GitLogParser(sampleLog);
+        List<Commit> commits = parser.extractCommits();
+
+        List<CommitFile> updatedFiles = commits.get(5).getFiles();
+        assertEquals(2, updatedFiles.size());
+        CommitFile commitFile = updatedFiles.get(0);
+        assertEquals("src/main/java/uk/co/pols/bamboo/gitplugin/GitRepository.java", commitFile.getName());
+        assertEquals("The commit hash identifies the version", "016d94c83c3697773f64f51c0b2e5a652093b2c6", commitFile.getRevision());
+
+        commitFile = updatedFiles.get(1);
+        assertEquals("src/test/java/uk.co.pols.bamboo.gitplugin/GitRepositoryTest.java", commitFile.getName());
+        assertEquals("The commit hash identifies the version", "016d94c83c3697773f64f51c0b2e5a652093b2c6", commitFile.getRevision());
     }
 
     private String sampleLog = "commit 264438f6f9e7a3cb341eb8270a0e520e91f10db5\n" +
