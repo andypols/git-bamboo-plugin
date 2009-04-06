@@ -67,7 +67,7 @@ public class GitLogParser {
         private List<CommitFile> commitFiles = new ArrayList<CommitFile>();
         private String commitId;
         private Author author = null;
-        DateTime date = null;
+        private DateTime date = null;
 
         public GitCommitLogEntry(String commitId) {
             this.commitId = commitId;
@@ -78,7 +78,6 @@ public class GitLogParser {
             try {
                 skipLinesAdded(stringTokenizer);
                 skipLinesDeleted(stringTokenizer);
-
                 commitFiles.add(fileWithinCurrentCommit(stringTokenizer.nextToken(), commitId));
             } catch (Exception e) {
                 // can't parse, so lets add it to the comment, so we don't lose it
