@@ -1,23 +1,10 @@
 package uk.co.pols.bamboo.gitplugin;
 
-import junit.framework.TestCase;
-import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.utils.error.SimpleErrorCollection;
-import com.atlassian.bamboo.repository.AbstractRepository;
-import com.atlassian.bamboo.repository.Repository;
-import com.atlassian.bamboo.repository.RepositoryException;
-import com.atlassian.bamboo.repository.cvsimpl.CVSRepository;
-import com.atlassian.bamboo.v2.build.BuildChanges;
-import com.atlassian.bamboo.build.BuildLoggerManager;
-import com.atlassian.bamboo.build.logger.BuildLogger;
-import com.atlassian.bamboo.commit.Commit;
+import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.jmock.integration.junit3.MockObjectTestCase;
-import org.jmock.Expectations;
-
-import java.io.File;
-import java.util.ArrayList;
 
 public class GitRepositoryConfigTest extends MockObjectTestCase {
     private GitRepositoryConfig repositoryConfig = new GitRepositoryConfig();
@@ -80,6 +67,14 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
 
         assertEquals("TheSpecialBranch", repositoryConfig.getBranch());
         assertEquals("TheTopSecretBuildRepoUrl", repositoryConfig.getRepositoryUrl());
+    }
+
+    public void testDefaultsToUsingTheMasterBranchOnNewPlans() {
+        BuildConfiguration buildConfiguration = new BuildConfiguration();
+
+        repositoryConfig.addDefaultValues(buildConfiguration);
+
+        assertEquals("master", buildConfiguration.getProperty(GitRepositoryConfig.GIT_BRANCH));
     }
 
     private void assertHasError(ErrorCollection errorCollection, String fieldKey, String errorMessage) {

@@ -1,11 +1,11 @@
-<atlassian-plugin key="com.atlassian.bamboo.plugin.git" name="Git Plugin">
+<atlassian-plugin key="uk.co.pols.bamboo.gitplugin" name="GitHub Repository Plugin">
     <plugin-info>
-        <description>Git Repository Plugin</description>
+        <description>GitHub Repository Plugin</description>
         <version>1.0</version>
         <vendor name="Pols Consulting" url="http://www.pols.co.uk"/>
     </plugin-info>
 
-    <repository key="git" name="Git Repository"
+    <repository key="github" name="Git Repository"
                 class="uk.co.pols.bamboo.gitplugin.GitRepository">
         <description>A Git Repository</description>
         <resource type="freemarker" name="edit" location="uk/co/pols/bamboo/gitplugin/gitRepositoryEdit.ftl"/>

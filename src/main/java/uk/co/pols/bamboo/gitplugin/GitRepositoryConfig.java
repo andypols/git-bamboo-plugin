@@ -9,8 +9,11 @@ import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import java.io.Serializable;
 
 public class GitRepositoryConfig implements Serializable {
-    public static final String GIT_REPO_URL = GitRepository.REPO_PREFIX + "repositoryUrl";
-    public static final String GIT_BRANCH = GitRepository.REPO_PREFIX + "branch";
+    public static final String REPO_PREFIX = "repository.github.";
+
+    public static final String GIT_REPO_URL = REPO_PREFIX + "repositoryUrl";
+    public static final String GIT_BRANCH = REPO_PREFIX + "branch";
+    private static final String DEFAULT_BRANCH = "master";
 
     private String repositoryUrl;
     private String branch;
@@ -62,5 +65,10 @@ public class GitRepositoryConfig implements Serializable {
         if (StringUtils.isEmpty(buildConfiguration.getString(fieldKey))) {
             errorCollection.addError(fieldKey, errorMessage);
         }
+    }
+
+    public void addDefaultValues(BuildConfiguration buildConfiguration) {
+ // SystemProperty.DEFAULT_CVS_ROOT.getValue() do the same for the git exe
+        buildConfiguration.setProperty(GIT_BRANCH, DEFAULT_BRANCH);
     }
 }

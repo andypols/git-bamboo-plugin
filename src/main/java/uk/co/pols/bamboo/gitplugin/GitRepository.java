@@ -1,6 +1,5 @@
 package uk.co.pols.bamboo.gitplugin;
 
-import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.repository.AbstractRepository;
 import com.atlassian.bamboo.repository.InitialBuildAwareRepository;
@@ -12,12 +11,10 @@ import com.atlassian.bamboo.v2.build.BuildChangesImpl;
 import com.atlassian.bamboo.v2.build.BuildContext;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,10 +36,6 @@ import java.util.List;
 public class GitRepository extends AbstractRepository implements /*SelectableAuthenticationRepository, WebRepositoryEnabledRepository,*/ InitialBuildAwareRepository /*, RepositoryEventAware*/ {
     private static final String GIT_HOME = "/opt/local/bin";
     private static final String GIT_EXE = GIT_HOME + "/git";
-
-    public static final String NAME = "Git";
-    public static final String KEY = "git";
-    public static final String REPO_PREFIX = "repository.git.";
 
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
@@ -87,6 +80,11 @@ public class GitRepository extends AbstractRepository implements /*SelectableAut
         return true;
     }
 
+    public void addDefaultValues(BuildConfiguration buildConfiguration) {
+        super.addDefaultValues(buildConfiguration);
+        gitRepositoryConfig.addDefaultValues(buildConfiguration);
+    }
+
     public void prepareConfigObject(BuildConfiguration buildConfiguration) {
     }
 
@@ -106,7 +104,7 @@ public class GitRepository extends AbstractRepository implements /*SelectableAut
     }
 
     public String getName() {
-        return NAME;
+        return "GitHub";
     }
 
     public String getUrl() {
