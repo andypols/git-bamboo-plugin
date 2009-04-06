@@ -2,8 +2,8 @@ h1. A Git Plugin for the Bamboo builder server
 
 Build your git and GitHub repositories on the Amazon Cloud using Bamboo...
 
-1. Adds the option “GitHub” to the repository provider when you add or edit a plan.
-2. Shows the changes that triggered the build.
+* Adds the option “GitHub” to the repository provider when you add or edit a plan.
+* Shows the changes that triggered the build.
 
 h2. Installation
 
