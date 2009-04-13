@@ -1,10 +1,8 @@
 package uk.co.pols.bamboo.gitplugin;
 
 import com.atlassian.bamboo.commit.Commit;
-import com.atlassian.bamboo.repository.AbstractRepository;
-import com.atlassian.bamboo.repository.InitialBuildAwareRepository;
-import com.atlassian.bamboo.repository.Repository;
-import com.atlassian.bamboo.repository.RepositoryException;
+import com.atlassian.bamboo.commit.CommitFile;
+import com.atlassian.bamboo.repository.*;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.v2.build.BuildChanges;
 import com.atlassian.bamboo.v2.build.BuildChangesImpl;
@@ -18,11 +16,11 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.pols.bamboo.gitplugin.commands.GitCommandDiscoverer;
+
 /**
  * Provides GIT and GITHUB support for the Bamboo Build Server
  * <p/>
- * TODO Let user define the location of the git exe
- * TODO run a which git command to guess the location of git
  * TODO Add hook for github callback triggering the build
  * TODO work out if the repository url has changed...
  * TODO can link to the commits using https://github.com/andypols/git-bamboo-plugin/commit/5d87fb199040eb77db5056dd7a2bab435d5f05b0
@@ -33,10 +31,7 @@ import java.util.List;
  * <p/>
  * So if I can do a remote history I'm laughing...
  */
-public class GitRepository extends AbstractRepository implements /*SelectableAuthenticationRepository, WebRepositoryEnabledRepository,*/ InitialBuildAwareRepository /*, RepositoryEventAware*/ {
-    private static final String GIT_HOME = "/opt/local/bin";
-    private static final String GIT_EXE = GIT_HOME + "/git";
-
+public class GitRepository extends AbstractRepository implements /*SelectableAuthenticationRepository,*/ WebRepositoryEnabledRepository, InitialBuildAwareRepository {
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
@@ -127,6 +122,28 @@ public class GitRepository extends AbstractRepository implements /*SelectableAut
         gitRepositoryConfig.setBranch(branch);
     }
 
+    public boolean hasWebBasedRepositoryAccess() {
+        return false;
+    }
+
+    public void setWebRepositoryUrl(String string) {
+    }
+
+    public void setWebRepositoryUrlRepoName(String string) {
+    }
+
+    public String getWebRepositoryUrl() {
+        return null;
+    }
+
+    public String getWebRepositoryUrlRepoName() {
+        return null;
+    }
+
+    public String getWebRepositoryUrlForFile(CommitFile commitFile) {
+        return null;
+    }
+
     @Override
     public String getWebRepositoryUrlForCommit(Commit commit) {
         return "noidea";
@@ -173,7 +190,7 @@ public class GitRepository extends AbstractRepository implements /*SelectableAut
 //    }
 
     protected GitClient gitClient() {
-        return new CmdLineGitClient(GIT_EXE);
+        return new CmdLineGitClient();
     }
 
     protected GitRepositoryConfig gitRepositoryConfig() {

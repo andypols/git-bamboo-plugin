@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="git-bamboo-plugin" default="all">
 
-    <property name="release.version" value="0.1"/>
+    <property name="release.version" value="0.2"/>
 
     <patternset id="compiler.resources">
         <include name="**/?*.properties"/>
@@ -16,16 +16,17 @@
         <include name="**/?*.ftl"/>
     </patternset>
 
-    <dirname property="module.git-bamboo-plugin.basedir" file="${ant.file}"/>
+    <dirname property="basedir" file="${ant.file}"/>
 
     <path id="classpath">
         <fileset dir="lib">
+            <!-- TODO pass in the location of the build server jars ... so I can run this on bamboo too -->
             <include name="**/*.jar"/>
         </fileset>
     </path>
 
-    <path id="git-bamboo-plugin.module.sourcepath">
-        <dirset dir="${module.git-bamboo-plugin.basedir}">
+    <path id="sourcepath">
+        <dirset dir="${basedir}">
             <include name="src/main/java"/>
             <include name="src/main/resources"/>
         </dirset>
@@ -33,22 +34,22 @@
 
     <target name="clean" description="Remove all build files">
         <delete dir="classes"/>
-        <delete file="git-repository.jar"/>
+        <delete file="git-repository-${release.version}.jar"/>
     </target>
 
     <target name="compile" description="compile the source">
         <mkdir dir="classes"/>
         <javac destdir="classes" fork="true" debug="true" >
             <classpath refid="classpath"/>
-            <src refid="git-bamboo-plugin.module.sourcepath"/>
+            <src refid="sourcepath"/>
         </javac>
 
         <copy todir="classes">
-            <fileset dir="${module.git-bamboo-plugin.basedir}/src/main/java">
+            <fileset dir="${basedir}/src/main/java">
                 <patternset refid="compiler.resources"/>
                 <type type="file"/>
             </fileset>
-            <fileset dir="${module.git-bamboo-plugin.basedir}/src/main/resources">
+            <fileset dir="${basedir}/src/main/resources">
                 <patternset refid="compiler.resources"/>
                 <type type="file"/>
             </fileset>

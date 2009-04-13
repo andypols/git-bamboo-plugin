@@ -18,6 +18,8 @@ import org.jmock.Expectations;
 import java.io.File;
 import java.util.ArrayList;
 
+import uk.co.pols.bamboo.gitplugin.commands.GitCommandDiscoverer;
+
 public class GitRepositoryTest extends MockObjectTestCase {
     private static final String PLAN_KEY = "plan-key";
     private static final File SRC_CODE_DIR = new File("test/src/code/directory");
@@ -27,6 +29,7 @@ public class GitRepositoryTest extends MockObjectTestCase {
     private GitClient gitClient = mock(GitClient.class);
     private BuildLoggerManager buildLoggerManager = mock(BuildLoggerManager.class);
     private BuildLogger buildLogger = mock(BuildLogger.class);
+    private GitCommandDiscoverer commandDiscoverer = mock(GitCommandDiscoverer.class);
     private GitRepository gitRepository = gitRepository(false);
 
     public void testProvidesANameToAppearInTheGuiRepositoryDrownDown() {
@@ -113,6 +116,15 @@ public class GitRepositoryTest extends MockObjectTestCase {
         assertTrue(gitRepository.isRepositoryDifferent(differentRepository));
     }
 
+//    public void testStoresTheRepositoryUrlInTheProjectConfig() {
+//        fail("TODO - the UI lets you add it, but then forgets as we're not saving it! ");
+//        fail("Looks like all the other extra repo options may be broken too!??");
+//    }
+//
+//    public void testInfersTheUrlFromTheProjectInformation() {
+//        fail("TODO - may have to be some wizzy javascript??");
+//    }
+
     private GitRepository gitRepository(final boolean isWorkspaceEmpty) {
         gitRepository = new GitRepository() {
             protected GitClient gitClient() {
@@ -129,6 +141,10 @@ public class GitRepositoryTest extends MockObjectTestCase {
 
             protected GitRepositoryConfig gitRepositoryConfig() {
                 return gitRepositoryConfig;
+            }
+
+            protected GitCommandDiscoverer gitCommandDiscoverer() {
+                return commandDiscoverer;
             }
         };
 

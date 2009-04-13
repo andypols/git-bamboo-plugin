@@ -17,7 +17,6 @@ import uk.co.pols.bamboo.gitplugin.commands.GitInitCommand;
 import uk.co.pols.bamboo.gitplugin.commands.GitRemoteCommand;
 
 public class CmdLineGitClientTest extends MockObjectTestCase {
-    private static final String GIT_EXE = "git";
     private static final String LAST_REVISION_CHECKED = "2009-03-22 01:09:25 +0000";
     private static final String REPOSITORY_URL = "repository.url";
     private static final String PLAN_KEY = "plankey";
@@ -128,7 +127,7 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
     }
 
     private CmdLineGitClient gitClient() {
-        return new CmdLineGitClient(GIT_EXE) {
+        return new CmdLineGitClient() {
             protected GitPullCommand pullCommand(File sourceCodeDirectory) {
                 return gitPullCommand;
             }

@@ -14,11 +14,7 @@ import java.util.List;
 
 public class CmdLineGitClient implements GitClient {
     private static final Log log = LogFactory.getLog(CmdLineGitClient.class);
-    private String gitExe;
-
-    public CmdLineGitClient(String gitExe) {
-        this.gitExe = gitExe;
-    }
+    private GitCommandDiscoverer gitCommandDiscoverer = gitCommandDiscoverer();
 
     public String getLatestUpdate(BuildLogger buildLogger, String repositoryUrl, String planKey, String lastRevisionChecked, List<Commit> commits, File sourceCodeDirectory) throws RepositoryException {
         try {
@@ -51,20 +47,20 @@ public class CmdLineGitClient implements GitClient {
     }
 
     protected GitPullCommand pullCommand(File sourceCodeDirectory) {
-        return new ExecutorGitPullCommand(gitExe, sourceCodeDirectory, new AntCommandExecutor());
+        return new ExecutorGitPullCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, new AntCommandExecutor());
     }
 
     protected GitLogCommand logCommand(File sourceCodeDirectory, String lastRevisionChecked) {
         // todo this is an executor NOT an Extractor!!!! come back and rename
-        return new ExtractorGitLogCommand(gitExe, sourceCodeDirectory, lastRevisionChecked, new AntCommandExecutor());
+        return new ExtractorGitLogCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, lastRevisionChecked, new AntCommandExecutor());
     }
 
     protected GitInitCommand initCommand(File sourceCodeDirectory) {
-        return new ExecutorGitInitCommand(gitExe, sourceCodeDirectory, new AntCommandExecutor());
+        return new ExecutorGitInitCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, new AntCommandExecutor());
     }
 
     protected GitRemoteCommand remoteCommand(File sourceCodeDirectory) {
-        return new ExecutorGitRemoteCommand(gitExe, sourceCodeDirectory, new AntCommandExecutor());
+        return new ExecutorGitRemoteCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, new AntCommandExecutor());
     }
 
     private void initialiseRemoteRepository(File sourceDirectory, String repositoryUrl, BuildLogger buildLogger) throws RepositoryException {
@@ -76,5 +72,9 @@ public class CmdLineGitClient implements GitClient {
         } catch (IOException e) {
             throw new RepositoryException("Failed to initialise repository", e);
         }
+    }
+
+    protected GitCommandDiscoverer gitCommandDiscoverer() {
+        return new BestGuessGitCommandDiscoverer();
     }
 }
