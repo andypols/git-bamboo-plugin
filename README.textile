@@ -13,6 +13,9 @@ Copy the git-repository jar to @$BAMBOO_INSTALL_DIR/webapp/WEB-INF/lib@.
 
 Restart Bamboo.
 
+You can tell bamboo where the git executable is located using the @GIT_HOME@ environment variable.  If this is not set,
+Bamboo will try and discover the git executable using the @which git@ unix command.
+
 h2. Build from source
 
 Copy the jmock2 (http://www.jmock.org/) and atlassian bamboo jars into the lib directory (Bamboo is commercial, so I can't include them the github repository).
