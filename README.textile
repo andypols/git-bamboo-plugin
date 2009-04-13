@@ -13,8 +13,8 @@ Copy the git-repository jar to @$BAMBOO_INSTALL_DIR/webapp/WEB-INF/lib@.
 
 Restart Bamboo.
 
-You can tell bamboo where the git executable is located using the @GIT_HOME@ environment variable.  If this is not set,
-Bamboo will try and discover the git executable using the @which git@ unix command.
+You can tell bamboo where the git executable is located using the @GIT_HOME@ environment variable. If you do not define
+ @GIT_HOME@, Bamboo will try and work it for itself using the @which git@ unix command.
 
 h2. Build from source
 
