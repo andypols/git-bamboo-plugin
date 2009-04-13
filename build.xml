@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="git-bamboo-plugin" default="all">
-    
+
+    <property name="release.version" value="0.1"/>
+
     <patternset id="compiler.resources">
         <include name="**/?*.properties"/>
         <include name="**/?*.xml"/>
@@ -54,7 +56,7 @@
     </target>
 
     <target name="jar" description="Create the bamboo plugin jar">
-        <jar destfile="git-repository.jar" basedir="classes"/>
+        <jar destfile="git-repository-${release.version}.jar" basedir="classes"/>
     </target>
 
     <target name="all" depends="clean, compile, jar" description="build all"/>
