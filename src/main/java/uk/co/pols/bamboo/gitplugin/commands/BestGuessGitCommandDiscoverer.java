@@ -1,12 +1,14 @@
 package uk.co.pols.bamboo.gitplugin.commands;
 
-import uk.co.pols.bamboo.gitplugin.commands.GitCommandDiscoverer;
-
 public class BestGuessGitCommandDiscoverer implements GitCommandDiscoverer {
-    private static final String GIT_HOME = "/opt/local/bin";
-    private static final String GIT_EXE = GIT_HOME + "/git";
+    public static final String DEFAULT_GIT_EXE = "/opt/local/bin/git";
+    public static final String GIT_HOME = "GIT_HOME";
 
     public String gitCommand() {
-        return GIT_EXE;
+        if(System.getProperty(GIT_HOME) != null) {
+            return System.getProperty(GIT_HOME);
+        }
+
+        return DEFAULT_GIT_EXE;
     }
 }
