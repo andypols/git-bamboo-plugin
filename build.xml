@@ -31,6 +31,13 @@
         </dirset>
     </path>
 
+    <path id="sourcepath.test">
+        <dirset dir="${basedir}">
+            <include name="src/test/java"/>
+            <include name="src/test/resources"/>
+        </dirset>
+    </path>
+
     <target name="clean" description="Remove all build files">
         <delete dir="build"/>
         <delete file="git-repository-${release.version}.jar"/>
@@ -56,7 +63,9 @@
         </copy>
     </target>
 
-    <target name="compile" depends="copy-dependencies" description="compile the source">
+    <target name="compile" depends="copy-dependencies, src.compile, test.compile" description="compile the source"/>
+
+    <target name="src.compile" description="compile the source">
         <mkdir dir="build/classes"/>
         <javac destdir="build/classes" fork="true" debug="true">
             <classpath refid="classpath"/>
@@ -75,11 +84,20 @@
         </copy>
     </target>
 
-    <target name="jar" description="Create the bamboo plugin jar">
-        <jar destfile="git-repository-${release.version}.jar" basedir="build/classes"/>
+    <target name="test.compile">
+        <mkdir dir="build/test-classes"/>
+        <javac destdir="build/test-classes" debug="true" fork="true">
+            <classpath refid="classpath"/>
+            <classpath location="build/classes"/>
+            <src refid="sourcepath.test"/>
+        </javac>
     </target>
 
     <target name="test" depends="compile">
+    </target>
+
+    <target name="jar" description="Create the bamboo plugin jar">
+        <jar destfile="git-repository-${release.version}.jar" basedir="build/classes"/>
     </target>
 
     <target name="all" depends="clean, test, jar" description="build all"/>
