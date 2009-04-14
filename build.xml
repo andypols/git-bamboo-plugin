@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="git-bamboo-plugin" default="all">
-
+    <property name="bamboo.server.lib" value="/Applications/Bamboo/webapp/WEB-INF/lib/"/>
     <property name="release.version" value="0.2"/>
 
     <patternset id="compiler.resources">
@@ -20,7 +20,6 @@
 
     <path id="classpath">
         <fileset dir="lib">
-            <!-- TODO pass in the location of the build server jars ... so I can run this on bamboo too -->
             <include name="**/*.jar"/>
         </fileset>
     </path>
@@ -37,9 +36,30 @@
         <delete file="git-repository-${release.version}.jar"/>
     </target>
 
+    <target name="copy-dependencies">
+        <echo message="Copying Bamboo jars from ${bamboo.server.lib}"/>
+        <copy todir="lib">
+            <fileset dir="${bamboo.server.lib}">
+                <include name="atlassian-core-*.jar"/>
+                <include name="atlassian-bamboo-api-*.jar"/>
+                <include name="atlassian-bamboo-core-*.jar"/>
+                <include name="atlassian-bamboo-persistence-*.jar"/>
+                <include name="atlassian-bamboo-charts-*.jar"/>
+                <!--<include name="atlassian-bamboo-web-*.jar"/>-->
+                <include name="joda-time-*.jar"/>
+                <include name="commons-logging-*.jar"/>
+                <include name="commons-lang-*.jar"/>
+                <include name="commons-configuration-*.jar"/>
+                <include name="commons-collections-*.jar"/>
+                <include name="log4j-*.jar"/>
+                <include name="junit-*.jar"/>
+            </fileset>
+        </copy>
+    </target>
+
     <target name="compile" description="compile the source">
         <mkdir dir="classes"/>
-        <javac destdir="classes" fork="true" debug="true" >
+        <javac destdir="classes" fork="true" debug="true">
             <classpath refid="classpath"/>
             <src refid="sourcepath"/>
         </javac>
@@ -60,6 +80,6 @@
         <jar destfile="git-repository-${release.version}.jar" basedir="classes"/>
     </target>
 
-    <target name="all" depends="clean, compile, jar" description="build all"/>
+    <target name="all" depends="clean, copy-dependencies, compile, jar" description="build all"/>
 
 </project>

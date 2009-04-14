@@ -1,24 +1,20 @@
 package uk.co.pols.bamboo.gitplugin;
 
-import junit.framework.TestCase;
-import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
-import com.atlassian.bamboo.utils.error.ErrorCollection;
+import com.atlassian.bamboo.build.BuildLoggerManager;
+import com.atlassian.bamboo.build.logger.BuildLogger;
+import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.repository.AbstractRepository;
 import com.atlassian.bamboo.repository.Repository;
 import com.atlassian.bamboo.repository.RepositoryException;
 import com.atlassian.bamboo.repository.cvsimpl.CVSRepository;
 import com.atlassian.bamboo.v2.build.BuildChanges;
-import com.atlassian.bamboo.build.BuildLoggerManager;
-import com.atlassian.bamboo.build.logger.BuildLogger;
-import com.atlassian.bamboo.commit.Commit;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.jmock.integration.junit3.MockObjectTestCase;
+import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.jmock.Expectations;
+import org.jmock.integration.junit3.MockObjectTestCase;
+import uk.co.pols.bamboo.gitplugin.commands.GitCommandDiscoverer;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import uk.co.pols.bamboo.gitplugin.commands.GitCommandDiscoverer;
 
 public class GitRepositoryTest extends MockObjectTestCase {
     private static final String PLAN_KEY = "plan-key";

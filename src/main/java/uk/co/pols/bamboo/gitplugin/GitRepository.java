@@ -16,11 +16,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.co.pols.bamboo.gitplugin.commands.GitCommandDiscoverer;
-
 /**
  * Provides GIT and GITHUB support for the Bamboo Build Server
  * <p/>
+ * TODO Check for "fatal: The remote end hung up unexpectedly" in the output from a fetch and report an error...
  * TODO Add hook for github callback triggering the build
  * TODO work out if the repository url has changed...
  * TODO can link to the commits using https://github.com/andypols/git-bamboo-plugin/commit/5d87fb199040eb77db5056dd7a2bab435d5f05b0
