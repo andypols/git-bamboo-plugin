@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="git-bamboo-plugin" default="all">
+
+    <!-- Change this to the location of your Bamboo lib directory or -Dbamboo.server.lib=your-path to override it -->
     <property name="bamboo.server.lib" value="/Applications/Bamboo/webapp/WEB-INF/lib/"/>
     <property name="release.version" value="0.2"/>
 
@@ -94,6 +96,20 @@
     </target>
 
     <target name="test" depends="compile">
+        <mkdir dir="build/test-reports"/>
+        <junit printsummary="yes" haltonfailure="yes" forkmode="once">
+            <classpath refid="classpath"/>
+            <classpath location="build/classes"/>
+            <classpath location="build/test-classes"/>
+
+            <formatter type="xml"/>
+
+            <batchtest fork="yes" todir="build/test-reports">
+                <fileset dir="${basedir}/src/test/java">
+                    <include name="**/*Test*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
     </target>
 
     <target name="jar" description="Create the bamboo plugin jar">
