@@ -32,7 +32,7 @@
     </path>
 
     <target name="clean" description="Remove all build files">
-        <delete dir="classes"/>
+        <delete dir="build"/>
         <delete file="git-repository-${release.version}.jar"/>
     </target>
 
@@ -56,14 +56,14 @@
         </copy>
     </target>
 
-    <target name="compile" description="compile the source">
-        <mkdir dir="classes"/>
-        <javac destdir="classes" fork="true" debug="true">
+    <target name="compile" depends="copy-dependencies" description="compile the source">
+        <mkdir dir="build/classes"/>
+        <javac destdir="build/classes" fork="true" debug="true">
             <classpath refid="classpath"/>
             <src refid="sourcepath"/>
         </javac>
 
-        <copy todir="classes">
+        <copy todir="build/classes">
             <fileset dir="${basedir}/src/main/java">
                 <patternset refid="compiler.resources"/>
                 <type type="file"/>
@@ -76,9 +76,12 @@
     </target>
 
     <target name="jar" description="Create the bamboo plugin jar">
-        <jar destfile="git-repository-${release.version}.jar" basedir="classes"/>
+        <jar destfile="git-repository-${release.version}.jar" basedir="build/classes"/>
     </target>
 
-    <target name="all" depends="clean, copy-dependencies, compile, jar" description="build all"/>
+    <target name="test" depends="compile">
+    </target>
+
+    <target name="all" depends="clean, test, jar" description="build all"/>
 
 </project>
