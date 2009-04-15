@@ -67,7 +67,6 @@ public class GitRepositoryConfig implements Serializable {
     }
 
     public void addDefaultValues(BuildConfiguration buildConfiguration) {
- // SystemProperty.DEFAULT_CVS_ROOT.getValue() do the same for the git exe
         buildConfiguration.setProperty(GIT_BRANCH, DEFAULT_BRANCH);
     }
 }
