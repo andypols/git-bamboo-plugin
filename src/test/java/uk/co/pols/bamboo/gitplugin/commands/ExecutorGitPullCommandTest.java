@@ -19,7 +19,7 @@ public class ExecutorGitPullCommandTest extends MockObjectTestCase {
         ExecutorGitPullCommand gitPullCommand = new ExecutorGitPullCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, commandExecutor);
 
         checking(new Expectations() {{
-            one(buildLogger).addBuildLogEntry("Pulling source from 'gitReopsitoryUrl' into '/Users/andy/projects/git/git-bamboo-plugin/source/directory'.");
+            one(buildLogger).addBuildLogEntry("Pulling source from 'gitReopsitoryUrl' into '" + SOURCE_CODE_DIRECTORY.getAbsolutePath() + "'.");
             one(commandExecutor).execute(new String[]{GIT_EXE, "pull", "origin", "master"}, SOURCE_CODE_DIRECTORY); will(returnValue(""));
         }});
 
