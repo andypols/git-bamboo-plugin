@@ -44,7 +44,6 @@ public class GitRepositoryConfig implements Serializable {
             return Repository.UNKNOWN_HOST;
         }
 
-        // TODO work out how to extract the host form the various forms of git url
         return "github.com";
     }
 
