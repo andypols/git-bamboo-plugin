@@ -7,6 +7,8 @@ import org.apache.commons.logging.LogFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class ExtractorGitLogCommand implements GitLogCommand {
     private static final Log log = LogFactory.getLog(ExtractorGitLogCommand.class);
@@ -31,6 +33,12 @@ public class ExtractorGitLogCommand implements GitLogCommand {
 
         List<Commit> commits = logParser.extractCommits();
         lastRevisionChecked = logParser.getMostRecentCommitDate();
+
+        Collections.sort(commits, new Comparator<Commit>() {
+            public int compare(Commit o1, Commit o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
 
         return commits;
     }
