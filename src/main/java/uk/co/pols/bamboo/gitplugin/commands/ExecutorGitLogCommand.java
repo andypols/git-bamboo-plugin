@@ -28,17 +28,17 @@ public class ExecutorGitLogCommand implements GitLogCommand {
     public List<Commit> extractCommits() throws IOException {
         String logText = commandExecutor.execute(getCommandLine(), sourceCodeDirectory);
 
-        log.info(logText);
+        log.info("**************>>" + logText + "<<**************");
         GitLogParser logParser = new GitLogParser(logText);
 
         List<Commit> commits = logParser.extractCommits();
         lastRevisionChecked = logParser.getMostRecentCommitDate();
 
-        Collections.sort(commits, new Comparator<Commit>() {
-            public int compare(Commit o1, Commit o2) {
-                return o1.getDate().compareTo(o2.getDate());
-            }
-        });
+//        Collections.sort(commits, new Comparator<Commit>() {
+//            public int compare(Commit o1, Commit o2) {
+//                return o1.getDate().compareTo(o2.getDate());
+//            }
+//        });
 
         return commits;
     }
@@ -49,8 +49,10 @@ public class ExecutorGitLogCommand implements GitLogCommand {
 
     private String[] getCommandLine() {
         if (lastRevisionChecked != null) {
+            log.info("RUNNING ***** " + gitExe + " log --numstat --date=iso8601 --since=\"" + lastRevisionChecked + "\"");
             return new String[]{gitExe, "log", "--numstat", "--date=iso8601", "--since=\"" + lastRevisionChecked + "\""};
         }
+        log.info("RUNNING ***** " + gitExe + " log -1 --numstat --date=iso8601");                    
         return new String[]{gitExe, "log", "-1", "--numstat", "--date=iso8601"};
     }
 }
