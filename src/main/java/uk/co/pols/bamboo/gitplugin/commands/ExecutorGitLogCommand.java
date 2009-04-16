@@ -34,6 +34,9 @@ public class ExecutorGitLogCommand implements GitLogCommand {
         List<Commit> commits = logParser.extractCommits();
         lastRevisionChecked = logParser.getMostRecentCommitDate();
 
+        for (Commit commit : commits) {
+            log.info("commit.getComment() = " + commit.getComment());
+        }
 //        Collections.sort(commits, new Comparator<Commit>() {
 //            public int compare(Commit o1, Commit o2) {
 //                return o1.getDate().compareTo(o2.getDate());
@@ -52,7 +55,7 @@ public class ExecutorGitLogCommand implements GitLogCommand {
             log.info("RUNNING ***** " + gitExe + " log --numstat --date=iso8601 --since=\"" + lastRevisionChecked + "\"");
             return new String[]{gitExe, "log", "--numstat", "--date=iso8601", "--since=\"" + lastRevisionChecked + "\""};
         }
-        log.info("RUNNING ***** " + gitExe + " log -1 --numstat --date=iso8601");                    
+        log.info("RUNNING ***** " + gitExe + " log -1 --numstat --date=iso8601");
         return new String[]{gitExe, "log", "-1", "--numstat", "--date=iso8601"};
     }
 }
