@@ -51,7 +51,6 @@ public class CmdLineGitClient implements GitClient {
     }
 
     protected GitLogCommand logCommand(File sourceCodeDirectory, String lastRevisionChecked) {
-        // todo this is an executor NOT an Extractor!!!! come back and rename
         return new ExecutorGitLogCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, lastRevisionChecked, new AntCommandExecutor());
     }
 
