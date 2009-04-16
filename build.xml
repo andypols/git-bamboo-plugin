@@ -3,18 +3,14 @@
 
     <!-- Change this to the location of your Bamboo lib directory or -Dbamboo.server.lib=your-path to override it -->
     <property name="bamboo.server.lib" value="/Applications/Bamboo/webapp/WEB-INF/lib/"/>
+
     <property name="release.version" value="0.2"/>
 
     <patternset id="compiler.resources">
         <include name="**/?*.properties"/>
         <include name="**/?*.xml"/>
         <include name="**/?*.gif"/>
-        <include name="**/?*.png"/>
-        <include name="**/?*.jpeg"/>
         <include name="**/?*.jpg"/>
-        <include name="**/?*.html"/>
-        <include name="**/?*.dtd"/>
-        <include name="**/?*.tld"/>
         <include name="**/?*.ftl"/>
     </patternset>
 
