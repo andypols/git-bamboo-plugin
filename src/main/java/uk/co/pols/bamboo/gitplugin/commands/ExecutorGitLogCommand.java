@@ -10,15 +10,15 @@ import java.util.List;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class ExtractorGitLogCommand implements GitLogCommand {
-    private static final Log log = LogFactory.getLog(ExtractorGitLogCommand.class);
+public class ExecutorGitLogCommand implements GitLogCommand {
+    private static final Log log = LogFactory.getLog(ExecutorGitLogCommand.class);
 
     private String gitExe;
     private File sourceCodeDirectory;
     private String lastRevisionChecked;
     private CommandExecutor commandExecutor;
 
-    public ExtractorGitLogCommand(String gitExe, File sourceCodeDirectory, String lastRevisionChecked, CommandExecutor commandExecutor) {
+    public ExecutorGitLogCommand(String gitExe, File sourceCodeDirectory, String lastRevisionChecked, CommandExecutor commandExecutor) {
         this.gitExe = gitExe;
         this.sourceCodeDirectory = sourceCodeDirectory;
         this.lastRevisionChecked = lastRevisionChecked;

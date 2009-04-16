@@ -17,7 +17,7 @@ public class ExecutorGitLogCommandTest extends MockObjectTestCase {
     private final CommandExecutor commandExecutor = mock(CommandExecutor.class);
 
     public void testGetsTheMostRecentLogItemIfNotCheckedLogBefore() throws IOException {
-        GitLogCommand gitLogCommand = new ExtractorGitLogCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, null, commandExecutor);
+        GitLogCommand gitLogCommand = new ExecutorGitLogCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, null, commandExecutor);
 
         checking(new Expectations() {{
             one(commandExecutor).execute(new String[]{GIT_EXE, "log", "-1", "--numstat", "--date=iso8601"}, SOURCE_CODE_DIRECTORY); will(returnValue(mostRecentCommitLog));
@@ -30,7 +30,7 @@ public class ExecutorGitLogCommandTest extends MockObjectTestCase {
     }
 
     public void testGetsTheLogsSinceTheLastBuild() throws IOException {
-        GitLogCommand gitLogCommand = new ExtractorGitLogCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, DATE_OF_LAST_BUILD, commandExecutor);
+        GitLogCommand gitLogCommand = new ExecutorGitLogCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, DATE_OF_LAST_BUILD, commandExecutor);
 
         checking(new Expectations() {{
             one(commandExecutor).execute(new String[]{GIT_EXE, "log", "--numstat", "--date=iso8601", "--since=\"" + DATE_OF_LAST_BUILD + "\""}, SOURCE_CODE_DIRECTORY); will(returnValue(sampleLog));
