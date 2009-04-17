@@ -28,7 +28,7 @@ public class ExecutorGitLogCommand implements GitLogCommand {
     public List<Commit> extractCommits() throws IOException {
         String logText = commandExecutor.execute(getCommandLine(), sourceCodeDirectory);
 
-        log.info("**************>>" + logText + "<<**************");
+        log.info(logText);
         GitLogParser logParser = new GitLogParser(logText);
 
         List<Commit> commits = logParser.extractCommits(lastRevisionChecked
@@ -37,6 +37,8 @@ public class ExecutorGitLogCommand implements GitLogCommand {
 
         for (Commit commit : commits) {
             log.info("commit.getComment() = " + commit.getComment());
+            log.info("commit.getDate()    = " + commit.getDate());
+            log.info("commit.getId()      = " + commit.getId());
         }
 //        Collections.sort(commits, new Comparator<Commit>() {
 //            public int compare(Commit o1, Commit o2) {
