@@ -49,7 +49,6 @@ public class ExecutorGitLogCommand implements GitLogCommand {
         if (lastRevisionChecked != null) {
             return new String[]{gitExe, "log", "--numstat", "--date=iso8601", "--since=\"" + lastRevisionChecked + "\""};
         }
-        log.info("RUNNING ***** " + gitExe + " log -1 --numstat --date=iso8601");
         return new String[]{gitExe, "log", "-1", "--numstat", "--date=iso8601"};
     }
 }
