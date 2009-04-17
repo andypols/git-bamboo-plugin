@@ -7,8 +7,6 @@ import org.apache.commons.logging.LogFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class ExecutorGitLogCommand implements GitLogCommand {
     private static final Log log = LogFactory.getLog(ExecutorGitLogCommand.class);
@@ -31,8 +29,7 @@ public class ExecutorGitLogCommand implements GitLogCommand {
         log.info(logText);
         GitLogParser logParser = new GitLogParser(logText);
 
-        List<Commit> commits = logParser.extractCommits(lastRevisionChecked
-        );
+        List<Commit> commits = logParser.extractCommits(lastRevisionChecked);
         lastRevisionChecked = logParser.getMostRecentCommitDate();
 
         for (Commit commit : commits) {
@@ -40,11 +37,6 @@ public class ExecutorGitLogCommand implements GitLogCommand {
             log.info("commit.getDate()    = " + commit.getDate());
             log.info("commit.getId()      = " + commit.getId());
         }
-//        Collections.sort(commits, new Comparator<Commit>() {
-//            public int compare(Commit o1, Commit o2) {
-//                return o1.getDate().compareTo(o2.getDate());
-//            }
-//        });
 
         return commits;
     }
