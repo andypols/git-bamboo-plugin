@@ -29,13 +29,13 @@ public class GitLogParser {
         this.log = (log == null) ? "" : log;
     }
 
-    public List<Commit> extractCommits() {
+    public List<Commit> extractCommits(String notOnlastRevisionChecked) {
         List<Commit> commits = new ArrayList<Commit>();
         GitCommitLogEntry commitLogEntry = new GitCommitLogEntry("Unknown");
 
         for (String line : log.split("\n")) {
             if (line.startsWith(NEW_COMMIT_LINE_PREFIX)) {
-                if (commitLogEntry.isValidCommit()) {
+                if (commitLogEntry.isValidCommit(notOnlastRevisionChecked)) {
                     commits.add(commitLogEntry.toBambooCommit());
                 }
                 commitLogEntry = new GitCommitLogEntry(line.substring(NEW_COMMIT_LINE_PREFIX.length() + 1));
@@ -52,7 +52,7 @@ public class GitLogParser {
             }
         }
 
-        if (commitLogEntry.isValidCommit()) {
+        if (commitLogEntry.isValidCommit(notOnlastRevisionChecked)) {
             commits.add(commitLogEntry.toBambooCommit());
         }
         return commits;
@@ -101,8 +101,17 @@ public class GitLogParser {
             date = GIT_ISO_DATE_FORMAT.parseDateTime(commitDate);
         }
 
-        public boolean isValidCommit() {
-            return author != null && date != null;
+        public boolean isValidCommit(String dateOfLastRecordCommit) {
+            return author != null && date != null && !sameDateStampAsThePreviouslyProcessedCommit(dateOfLastRecordCommit);
+        }
+
+        private boolean sameDateStampAsThePreviouslyProcessedCommit(String dateOfLastRecordCommit) {
+            if(dateOfLastRecordCommit == null) {
+                return false;
+            }
+
+            DateTime dateTime = GIT_ISO_DATE_FORMAT.parseDateTime(dateOfLastRecordCommit);
+            return dateTime.equals(date);
         }
 
         public Commit toBambooCommit() {

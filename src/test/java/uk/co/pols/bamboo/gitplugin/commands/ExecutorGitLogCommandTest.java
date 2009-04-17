@@ -11,7 +11,7 @@ import com.atlassian.bamboo.commit.Commit;
 
 public class ExecutorGitLogCommandTest extends MockObjectTestCase {
     private static final File SOURCE_CODE_DIRECTORY = new File("source/directory");
-    private static final String DATE_OF_LAST_BUILD = "2009-03-13 01:27:52 +0000";
+    private static final String DATE_OF_LAST_BUILD = "2009-03-13 01:24:44 +0000";
     private static final String GIT_EXE = "git";
 
     private final CommandExecutor commandExecutor = mock(CommandExecutor.class);
@@ -38,7 +38,7 @@ public class ExecutorGitLogCommandTest extends MockObjectTestCase {
 
         List<Commit> commits = gitLogCommand.extractCommits();
 
-        assertEquals(3, commits.size());
+        assertEquals(2, commits.size());
         assertEquals("2009-03-13 01:27:52 +0000", gitLogCommand.getLastRevisionChecked());
     }
 

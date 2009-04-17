@@ -10,29 +10,29 @@ import java.util.List;
 
 public class GitLogParserTest extends TestCase {
     private static final int MOST_RECENT_COMMIT = 0;
-    private static final int FIRST_COMMIT = 29;
+    private static final int FIRST_COMMIT = 28;
 
     public void testReturnsAnEmptyListOfCommitsIfTheLogIsEmpty() {
         GitLogParser parser = new GitLogParser("");
 
-        assertTrue(parser.extractCommits().isEmpty());
+        assertTrue(parser.extractCommits("lastRevisionDate").isEmpty());
     }
 
     public void testReturnsAnEmptyListOfCommitsIfTheLogIsNull() {
         GitLogParser parser = new GitLogParser(null);
 
-        assertTrue(parser.extractCommits().isEmpty());
+        assertTrue(parser.extractCommits("lastRevisionDate").isEmpty());
     }
 
     public void testKnowsTheNumberOfCommitsInTheGitLog() {
         GitLogParser parser = new GitLogParser(sampleLog);
 
-        assertEquals(30, parser.extractCommits().size());
+        assertEquals(29, parser.extractCommits("2009-03-13 01:24:44 +0000").size());
     }
 
     public void testKnowsTheAuthorOfEachCommit() {
         GitLogParser parser = new GitLogParser(sampleLog);
-        List<Commit> commits = parser.extractCommits();
+        List<Commit> commits = parser.extractCommits("2009-03-13 01:24:44 +0000");
 
         assertEquals("Andy Pols", commits.get(0).getAuthor().getName());
         assertEquals("Fred", commits.get(1).getAuthor().getName());
@@ -41,25 +41,25 @@ public class GitLogParserTest extends TestCase {
 
     public void testKnowsTheDateOfEachCommit() throws ParseException {
         GitLogParser parser = new GitLogParser(sampleLog);
-        List<Commit> commits = parser.extractCommits();
+        List<Commit> commits = parser.extractCommits("2009-03-13 01:24:44 +0000");
 
         assertEquals(new DateTime(2009, 3, 22, 11, 21, 21, 0).toDate(), commits.get(MOST_RECENT_COMMIT).getDate());
         assertEquals(new DateTime(2009, 3, 22, 1, 9, 25, 0).toDate(), commits.get(1).getDate());
-        assertEquals(new DateTime(2009, 3, 13, 1, 24, 44, 0).toDate(), commits.get(FIRST_COMMIT).getDate());
+        assertEquals(new DateTime(2009, 3, 13, 1, 26, 14, 0).toDate(), commits.get(FIRST_COMMIT).getDate());
     }
 
     public void testKnowsTheCommentOfEachCommit() throws ParseException {
         GitLogParser parser = new GitLogParser(sampleLog);
-        List<Commit> commits = parser.extractCommits();
+        List<Commit> commits = parser.extractCommits("2009-03-13 01:24:44 +0000");
 
         assertEquals("    adding some notes about what to do next\n", commits.get(MOST_RECENT_COMMIT).getComment());
         assertEquals("    Using parent's isWorkspaceEmpty to know when to initialise the repository and create a link to the remote repo url\n    \n    More removing of interfaces I don't care about\n", commits.get(1).getComment());
-        assertEquals("    first commit\n", commits.get(FIRST_COMMIT).getComment());
+        assertEquals("    ignore the java build files\n", commits.get(FIRST_COMMIT).getComment());
     }
 
     public void testKnowsTheDateOfTheMostRecentCommit() {
         GitLogParser parser = new GitLogParser(sampleLog);
-        parser.extractCommits();
+        parser.extractCommits("2009-03-13 01:24:44 +0000");
 
         assertEquals("2009-03-22 11:21:21 +0000", parser.getMostRecentCommitDate());
     }
@@ -73,15 +73,21 @@ public class GitLogParserTest extends TestCase {
                 "    Merge branch 'new-ui'\n" +
                 "\n");
 
-        List<Commit> commits = parser.extractCommits();
+        List<Commit> commits = parser.extractCommits("2009-03-21 12:50:56 +0000");
 
         assertEquals(1, commits.size());
         assertEquals("    Merge branch 'new-ui'\n", commits.get(0).getComment());
     }
 
+    public void testIgoresTheCommit() {
+        GitLogParser parser = new GitLogParser(sampleLog);
+
+        assertEquals(29, parser.extractCommits("2009-03-13 01:24:44 +0000").size());
+    }
+
     public void testKnowsWhichFilesHaveChangedInTheCommit() {
         GitLogParser parser = new GitLogParser(sampleLog);
-        List<Commit> commits = parser.extractCommits();
+        List<Commit> commits = parser.extractCommits("2009-03-13 01:24:44 +0000");
 
         List<CommitFile> updatedFiles = commits.get(MOST_RECENT_COMMIT).getFiles();
         assertEquals(1, updatedFiles.size());
@@ -92,7 +98,7 @@ public class GitLogParserTest extends TestCase {
 
     public void testKnowsWhenACommitHasMultipleFileChanges() {
         GitLogParser parser = new GitLogParser(sampleLog);
-        List<Commit> commits = parser.extractCommits();
+        List<Commit> commits = parser.extractCommits("2009-03-13 01:24:44 +0000");
 
         List<CommitFile> updatedFiles = commits.get(5).getFiles();
         assertEquals(2, updatedFiles.size());
