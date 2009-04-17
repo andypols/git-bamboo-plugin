@@ -32,12 +32,6 @@ public class ExecutorGitLogCommand implements GitLogCommand {
         List<Commit> commits = logParser.extractCommits(lastRevisionChecked);
         lastRevisionChecked = logParser.getMostRecentCommitDate();
 
-        for (Commit commit : commits) {
-            log.info("commit.getComment() = " + commit.getComment());
-            log.info("commit.getDate()    = " + commit.getDate());
-            log.info("commit.getId()      = " + commit.getId());
-        }
-
         return commits;
     }
 
