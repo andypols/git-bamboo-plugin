@@ -24,11 +24,11 @@ public class CmdLineGitClient implements GitClient {
             List<Commit> gitCommits = gitLogCommand.extractCommits();
             String latestRevisionOnServer = gitLogCommand.getLastRevisionChecked();
             if (lastRevisionChecked == null) {
-                log.info("Never checked logs for '" + planKey + "' on path '" + repositoryUrl + "'  setting latest revision to " + latestRevisionOnServer);
+                log.info(buildLogger.addBuildLogEntry("Never checked logs for '" + planKey + "' on path '" + repositoryUrl + "'  setting latest revision to " + latestRevisionOnServer));
                 return latestRevisionOnServer;
             }
             if (!latestRevisionOnServer.equals(lastRevisionChecked)) {
-                log.info("Collecting changes for '" + planKey + "' on path '" + repositoryUrl + "' since " + lastRevisionChecked);
+                log.info(buildLogger.addBuildLogEntry("Collecting changes for '" + planKey + "' on path '" + repositoryUrl + "' since " + lastRevisionChecked));
                 commits.addAll(gitCommits);
             }
 

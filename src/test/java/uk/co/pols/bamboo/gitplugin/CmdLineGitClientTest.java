@@ -33,6 +33,7 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
 
     public void testSetsTheLatestUpdateToTheMostRecentCommitTheFirstTimeTheBuildIsRun() throws RepositoryException, IOException {
         checking(new Expectations() {{
+            one(buildLogger).addBuildLogEntry("Never checked logs for 'plankey' on path 'repository.url'  setting latest revision to 2009-03-22 01:09:25 +0000");
             one(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL);
             one(gitLogCommand).extractCommits(); will(returnValue(new ArrayList<Commit>()));
             one(gitLogCommand).getLastRevisionChecked(); will(returnValue(LAST_REVISION_CHECKED));
@@ -63,9 +64,10 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
         latestCommits.add(new CommitImpl());
 
         checking(new Expectations() {{
+            one(gitLogCommand).getLastRevisionChecked(); will(returnValue("2009-03-25 01:09:25 +0000"));
+            one(buildLogger).addBuildLogEntry("Collecting changes for 'plankey' on path 'repository.url' since 2009-03-22 01:09:25 +0000");
             one(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL);
             one(gitLogCommand).extractCommits(); will(returnValue(latestCommits));
-            one(gitLogCommand).getLastRevisionChecked(); will(returnValue("2009-03-25 01:09:25 +0000"));
         }});
 
         String latestUpdate = gitClient.getLatestUpdate(buildLogger, REPOSITORY_URL, PLAN_KEY, LAST_REVISION_CHECKED, commits, SOURCE_CODE_DIRECTORY);
@@ -97,6 +99,7 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
             allowing(gitPullCommand);
             allowing(gitLogCommand);
 
+            one(buildLogger).addBuildLogEntry("Never checked logs for 'plankey' on path 'repository.url'  setting latest revision to ");
             one(buildLogger).addBuildLogEntry(SOURCE_CODE_DIRECTORY.getAbsolutePath() + " is empty. Creating new git repository");
             one(gitInitCommand).init(buildLogger);
             one(gitRemoteCommand).add_origin(REPOSITORY_URL, buildLogger);
