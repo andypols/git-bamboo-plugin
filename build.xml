@@ -4,7 +4,7 @@
     <!-- Change this to the location of your Bamboo lib directory or -Dbamboo.server.lib=your-path to override it -->
     <property name="bamboo.server.lib" value="/Applications/Bamboo/webapp/WEB-INF/lib/"/>
 
-    <property name="release.version" value="0.2"/>
+    <property name="release.version" value="0.3"/>
 
     <patternset id="compiler.resources">
         <include name="**/?*.properties"/>
