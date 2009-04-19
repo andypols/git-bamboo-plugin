@@ -11,6 +11,7 @@ import com.atlassian.bamboo.commit.Commit;
 import com.opensymphony.util.UrlUtils;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class GitRepositoryConfig implements Serializable {
     public static final String REPO_PREFIX = "repository.github.";
@@ -96,10 +97,18 @@ public class GitRepositoryConfig implements Serializable {
     }
 
     public String getWebRepositoryUrlForFile(CommitFile commitFile) {
-        return webRepositoryUrl + "/commit/" + commitFile.getRevision() + "/" + commitFile.getName();
+        return webRepositoryUrl + "/blob/" + commitFile.getRevision() + "/" + commitFile.getName();
     }
 
     public String getWebRepositoryUrlForCommit(Commit commit) {
-        return webRepositoryUrl + "/commit/" + commit.getId();
+        return webRepositoryUrl + "/tree/master/commit/" + commitIdFor(commit);
+    }
+
+    private String commitIdFor(Commit commit) {
+        List<CommitFile> files = commit.getFiles();
+        if(files.isEmpty()) {
+            return "UNKNOWN";
+        }
+        return files.get(0).getRevision();
     }
 }
