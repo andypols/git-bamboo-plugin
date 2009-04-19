@@ -1,6 +1,6 @@
 h1. A Git Plugin for the Bamboo builder server
 
-Build your git and GitHub repositories on the Amazon Cloud using Bamboo...
+Build your git and GitHub repositories on the Amazon Cloud using Bamboo (version 2.2 or greater)...
 
 * Adds the option “GitHub” to the list of available repositories when you add or edit a plan.
 * Shows the changes that triggered the build.
@@ -19,6 +19,6 @@ You can tell bamboo where the git executable is located using the @GIT_HOME@ env
 
 h2. Build from source
 
-Copy the jmock2 (http://www.jmock.org/) and atlassian bamboo jars into the lib directory (Bamboo is commercial, so I can't include them the github repository).
+Define the @bamboo.server.lib@ value in the @build.xml@ so the build has access to the bamboo jars (Bamboo is commercial, so I can't include them the github repository).
 
 Run the @ant all@ task.
