@@ -69,7 +69,7 @@ public class GitRepositoryConfig implements Serializable {
     public HierarchicalConfiguration toConfiguration(HierarchicalConfiguration configuration) {
         configuration.setProperty(GIT_REPO_URL, getRepositoryUrl());
         configuration.setProperty(GIT_BRANCH, getBranch());
-        configuration.setProperty(WEB_REPO_URL, getWebRepositoryUrl());  // test me
+        configuration.setProperty(WEB_REPO_URL, getWebRepositoryUrl());
 
         return configuration;
     }
