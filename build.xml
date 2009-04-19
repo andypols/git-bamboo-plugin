@@ -119,4 +119,6 @@
 
     <target name="all" depends="clean, test, jar" description="build all"/>
 
+    <target name="ci" depends="clean, test" description="Continuous Integration"/>
+
 </project>
