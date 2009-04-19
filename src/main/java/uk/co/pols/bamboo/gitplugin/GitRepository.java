@@ -18,19 +18,8 @@ import java.util.List;
 
 /**
  * Provides GIT and GITHUB support for the Bamboo Build Server
- * <p/>
- * TODO Check for "fatal: The remote end hung up unexpectedly" in the output from a fetch and report an error...
- * TODO Add hook for github callback triggering the build
- * TODO work out if the repository url has changed...
- * TODO can link to the commits using https://github.com/andypols/git-bamboo-plugin/commit/5d87fb199040eb77db5056dd7a2bab435d5f05b0
- * <p/>
- * This is what capistarno does....
- * git reset -q --hard 10e162370493a984c279ffc7ca59e18d7850e844;
- * git checkout -q -b deploy 10e162370493a984c279ffc7ca59e18d7850e844;
- * <p/>
- * So if I can do a remote history I'm laughing...
  */
-public class GitRepository extends AbstractRepository implements /*SelectableAuthenticationRepository,*/ WebRepositoryEnabledRepository, InitialBuildAwareRepository {
+public class GitRepository extends AbstractRepository implements WebRepositoryEnabledRepository, InitialBuildAwareRepository {
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
@@ -122,17 +111,18 @@ public class GitRepository extends AbstractRepository implements /*SelectableAut
     }
 
     public boolean hasWebBasedRepositoryAccess() {
-        return false;
+        return gitRepositoryConfig.hasWebBasedRepositoryAccess(); // test me
     }
 
-    public void setWebRepositoryUrl(String string) {
+    public void setWebRepositoryUrl(String url) {
+        gitRepositoryConfig.setWebRepositoryUrl(url);   // test me
     }
 
-    public void setWebRepositoryUrlRepoName(String string) {
+    public void setWebRepositoryUrlRepoName(String url) {
     }
 
     public String getWebRepositoryUrl() {
-        return null;
+        return gitRepositoryConfig.getWebRepositoryUrl(); // test me
     }
 
     public String getWebRepositoryUrlRepoName() {
@@ -140,12 +130,12 @@ public class GitRepository extends AbstractRepository implements /*SelectableAut
     }
 
     public String getWebRepositoryUrlForFile(CommitFile commitFile) {
-        return null;
+        return gitRepositoryConfig.getWebRepositoryUrlForFile(commitFile);  // test me
     }
 
     @Override
     public String getWebRepositoryUrlForCommit(Commit commit) {
-        return "noidea";
+        return gitRepositoryConfig.getWebRepositoryUrlForCommit(commit);   // test me
     }
 
     public String getHost() {

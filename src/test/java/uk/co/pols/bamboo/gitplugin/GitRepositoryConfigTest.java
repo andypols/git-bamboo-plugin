@@ -3,6 +3,7 @@ package uk.co.pols.bamboo.gitplugin;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.utils.error.SimpleErrorCollection;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
+import com.atlassian.bamboo.repository.AbstractRepository;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.jmock.integration.junit3.MockObjectTestCase;
 
@@ -27,10 +28,22 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         assertHasError(errorCollection, GitRepositoryConfig.GIT_BRANCH, "Please specify which branch you want to build");
     }
 
+    public void testEnsuresThatTheRepositoryUrlIsAWellFormedUrl() {
+        BuildConfiguration buildConfiguration = new BuildConfiguration();
+        buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "TheBranch");
+        buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "The Rep Url");
+        buildConfiguration.setProperty(AbstractRepository.WEB_REPO_URL, "An Invalid Url");
+
+        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
+
+        assertHasError(errorCollection, AbstractRepository.WEB_REPO_URL, "This is not a valid url");
+    }
+
     public void testAcceptsARepositoryAndBranchWithoutReportingAnyErrors() {
         BuildConfiguration buildConfiguration = new BuildConfiguration();
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "The Rep Url");
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "The Branch");
+        buildConfiguration.setProperty(AbstractRepository.WEB_REPO_URL, "https://github.com/andypols/git-bamboo-plugin/tree/master");
 
         ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
 
@@ -50,23 +63,27 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
 
     public void testSavesTheRepositorySettingsInTheBuildConfiguration() {
         repositoryConfig.setRepositoryUrl("TheTopSecretBuildRepoUrl");
+        repositoryConfig.setWebRepositoryUrl("TheRepoWebUrl");
         repositoryConfig.setBranch("TheBranch");
 
         HierarchicalConfiguration hierarchicalConfiguration = repositoryConfig.toConfiguration(new HierarchicalConfiguration());
 
         assertEquals("TheTopSecretBuildRepoUrl", hierarchicalConfiguration.getProperty(GitRepositoryConfig.GIT_REPO_URL));
         assertEquals("TheBranch", hierarchicalConfiguration.getProperty(GitRepositoryConfig.GIT_BRANCH));
+        assertEquals("TheRepoWebUrl", hierarchicalConfiguration.getProperty(AbstractRepository.WEB_REPO_URL));
     }
 
     public void testLoadsTheRepositorySettingsFromTheBuildConfiguration() {
         HierarchicalConfiguration buildConfiguration = new HierarchicalConfiguration();
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "TheTopSecretBuildRepoUrl");
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "TheSpecialBranch");
+        buildConfiguration.setProperty(AbstractRepository.WEB_REPO_URL, "WebRepositoryUrl");
 
         repositoryConfig.populateFromConfig(buildConfiguration);
 
         assertEquals("TheSpecialBranch", repositoryConfig.getBranch());
         assertEquals("TheTopSecretBuildRepoUrl", repositoryConfig.getRepositoryUrl());
+        assertEquals("WebRepositoryUrl", repositoryConfig.getWebRepositoryUrl());
     }
 
     public void testDefaultsToUsingTheMasterBranchOnNewPlans() {
@@ -75,6 +92,28 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         repositoryConfig.addDefaultValues(buildConfiguration);
 
         assertEquals("master", buildConfiguration.getProperty(GitRepositoryConfig.GIT_BRANCH));
+    }
+
+    public void testTrimsWhiteSpaceOffTheRepositoryUrl() {
+        repositoryConfig.setRepositoryUrl(" git@github.com:andypols/git-bamboo-plugin.git  ");
+
+        assertEquals("git@github.com:andypols/git-bamboo-plugin.git", repositoryConfig.getRepositoryUrl());
+    }
+
+    public void testTrimsWhiteSpaceOffTheWebRepositoryUrl() {
+        repositoryConfig.setWebRepositoryUrl(" https://github.com/andypols/git-bamboo-plugin/tree/master  ");
+
+        assertEquals("https://github.com/andypols/git-bamboo-plugin/tree/master", repositoryConfig.getWebRepositoryUrl());
+    }
+
+    public void testHasWebBasedRepositoryAccessIfTheUserHasSpecifiedTheWebUrl() {
+        repositoryConfig.setWebRepositoryUrl("https://github.com/andypols/git-bamboo-plugin/tree/master");
+
+        assertTrue(repositoryConfig.hasWebBasedRepositoryAccess());
+    }
+
+    public void testDoesNotHaveWebBasedRepositoryAccessIfTheUserHasSpecifiedTheWebUrl() {
+        assertFalse(repositoryConfig.hasWebBasedRepositoryAccess());
     }
 
     private void assertHasError(ErrorCollection errorCollection, String fieldKey, String errorMessage) {

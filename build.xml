@@ -59,6 +59,7 @@
                 <include name="commons-lang-*.jar"/>
                 <include name="commons-configuration-*.jar"/>
                 <include name="commons-collections-*.jar"/>
+                <include name="oscore-*.jar"/>
                 <include name="log4j-*.jar"/>
                 <include name="junit-*.jar"/>
             </fileset>
