@@ -101,7 +101,7 @@ public class GitRepositoryConfig implements Serializable {
     }
 
     public String getWebRepositoryUrlForCommit(Commit commit) {
-        return webRepositoryUrl + "/tree/master/commit/" + commitIdFor(commit);
+        return webRepositoryUrl + "/commit/" + commitIdFor(commit);
     }
 
     private String commitIdFor(Commit commit) {

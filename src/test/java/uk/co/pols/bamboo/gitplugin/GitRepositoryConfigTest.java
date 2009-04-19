@@ -121,7 +121,7 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
     public void testDerivesTheTheCommitUrlFromTheRepositoryUrl() {
         repositoryConfig.setWebRepositoryUrl("https://github.com/andypols/git-bamboo-plugin");
 
-        assertEquals("https://github.com/andypols/git-bamboo-plugin/tree/master/commit/71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6", repositoryConfig.getWebRepositoryUrlForCommit(commitWithFile("71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6")));
+        assertEquals("https://github.com/andypols/git-bamboo-plugin/commit/71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6", repositoryConfig.getWebRepositoryUrlForCommit(commitWithFile("71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6")));
     }
 
     public void testDerivesTheTheCommitFileUrlFromTheRepositoryUrl() {
