@@ -5,6 +5,7 @@ Build your git and GitHub repositories on the Amazon Cloud using Bamboo (version
 * Adds the option “GitHub” to the list of available repositories when you add or edit a plan.
 * Shows the changes that triggered the build.
 * Trigger the build via a GitHub Service Hook (Fires service hook on each commit)
+* Links the commit code changes back to the giyhub page containing the diff.
 
 h2. Installation
 

@@ -1,11 +1,11 @@
 package uk.co.pols.bamboo.gitplugin;
 
+import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitWithFile;
+import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitFile;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.utils.error.SimpleErrorCollection;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import com.atlassian.bamboo.repository.AbstractRepository;
-import com.atlassian.bamboo.commit.CommitImpl;
-import com.atlassian.bamboo.commit.CommitFileImpl;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.jmock.integration.junit3.MockObjectTestCase;
 
@@ -128,18 +128,6 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         repositoryConfig.setWebRepositoryUrl("https://github.com/andypols/git-bamboo-plugin");
 
         assertEquals("https://github.com/andypols/git-bamboo-plugin/blob/71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6/src/main/java/uk/co/pols/bamboo/gitplugin/GitRepository.java", repositoryConfig.getWebRepositoryUrlForFile(commitFile("71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6")));
-    }
-
-    private CommitImpl commitWithFile(String revision) {
-        CommitImpl commit = new CommitImpl();
-        commit.addFile(commitFile(revision));
-        return commit;
-    }
-
-    private CommitFileImpl commitFile(String revision) {
-        CommitFileImpl commitFile = new CommitFileImpl("src/main/java/uk/co/pols/bamboo/gitplugin/GitRepository.java");
-        commitFile.setRevision(revision);
-        return commitFile;
     }
 
     private void assertHasError(ErrorCollection errorCollection, String fieldKey, String errorMessage) {

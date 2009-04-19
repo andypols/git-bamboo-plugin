@@ -1,5 +1,7 @@
 package uk.co.pols.bamboo.gitplugin;
 
+import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitFile;
+import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitWithFile;
 import com.atlassian.bamboo.build.BuildLoggerManager;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.commit.Commit;
@@ -112,14 +114,14 @@ public class GitRepositoryTest extends MockObjectTestCase {
         assertTrue(gitRepository.isRepositoryDifferent(differentRepository));
     }
 
-//    public void testStoresTheRepositoryUrlInTheProjectConfig() {
-//        fail("TODO - the UI lets you add it, but then forgets as we're not saving it! ");
-//        fail("Looks like all the other extra repo options may be broken too!??");
-//    }
-//
-//    public void testInfersTheUrlFromTheProjectInformation() {
-//        fail("TODO - may have to be some wizzy javascript??");
-//    }
+    public void testProvidesBambooWithWebUrlAllowingTheCodeChangePageLinkBackToGitHub() {
+        GitRepository gitRepository = gitRepository(false);
+        gitRepository.setWebRepositoryUrl("https://github.com/andypols/git-bamboo-plugin");
+
+        assertTrue(gitRepository.hasWebBasedRepositoryAccess());
+        assertEquals("https://github.com/andypols/git-bamboo-plugin/tree/master/commit/71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6", gitRepository.getWebRepositoryUrlForCommit(commitWithFile("71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6")));
+        assertEquals("https://github.com/andypols/git-bamboo-plugin/blob/71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6/src/main/java/uk/co/pols/bamboo/gitplugin/GitRepository.java", gitRepository.getWebRepositoryUrlForFile(commitFile("71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6")));
+    }
 
     private GitRepository gitRepository(final boolean isWorkspaceEmpty) {
         gitRepository = new GitRepository() {

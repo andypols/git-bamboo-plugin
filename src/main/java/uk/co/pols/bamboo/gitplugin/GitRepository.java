@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Provides GIT and GITHUB support for the Bamboo Build Server
  */
-public class GitRepository extends AbstractRepository implements WebRepositoryEnabledRepository, InitialBuildAwareRepository {
+public class GitRepository extends AbstractRepository implements WebRepositoryEnabledRepository {
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
     public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
@@ -82,10 +82,6 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
         return gitRepositoryConfig.toConfiguration(super.toConfiguration());
     }
 
-    public void onInitialBuild(BuildContext buildContext) {
-        // do nothing
-    }
-
     public String getName() {
         return "GitHub";
     }
@@ -93,6 +89,7 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
     public String getUrl() {
         return "http://github.com/guides/home";
     }
+
 
     public void setRepositoryUrl(String repositoryUrl) {
         gitRepositoryConfig.setRepositoryUrl(repositoryUrl);
@@ -111,18 +108,18 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
     }
 
     public boolean hasWebBasedRepositoryAccess() {
-        return gitRepositoryConfig.hasWebBasedRepositoryAccess(); // test me
+        return gitRepositoryConfig.hasWebBasedRepositoryAccess();
     }
 
     public void setWebRepositoryUrl(String url) {
-        gitRepositoryConfig.setWebRepositoryUrl(url);   // test me
+        gitRepositoryConfig.setWebRepositoryUrl(url);
     }
 
     public void setWebRepositoryUrlRepoName(String url) {
     }
 
     public String getWebRepositoryUrl() {
-        return gitRepositoryConfig.getWebRepositoryUrl(); // test me
+        return gitRepositoryConfig.getWebRepositoryUrl();
     }
 
     public String getWebRepositoryUrlRepoName() {
@@ -130,13 +127,17 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
     }
 
     public String getWebRepositoryUrlForFile(CommitFile commitFile) {
-        return gitRepositoryConfig.getWebRepositoryUrlForFile(commitFile);  // test me
+        return gitRepositoryConfig.getWebRepositoryUrlForFile(commitFile);
     }
 
     @Override
     public String getWebRepositoryUrlForCommit(Commit commit) {
-        return gitRepositoryConfig.getWebRepositoryUrlForCommit(commit);   // test me
+        return gitRepositoryConfig.getWebRepositoryUrlForCommit(commit);
     }
+
+//    public String getWebRepositoryUrlForRevision(CommitFile file) {
+//        return "www.pols.co.uk";
+//    }
 
     public String getHost() {
         return gitRepositoryConfig.getHost();
