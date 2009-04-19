@@ -135,9 +135,13 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
         return gitRepositoryConfig.getWebRepositoryUrlForCommit(commit);
     }
 
-//    public String getWebRepositoryUrlForRevision(CommitFile file) {
-//        return "www.pols.co.uk";
-//    }
+    public String getWebRepositoryUrlForDiff(CommitFile file) {
+        return gitRepositoryConfig.getWebRepositoryUrlForDiff(file);
+    }
+
+    public String getWebRepositoryUrlForRevision(CommitFile file) {
+        return gitRepositoryConfig.getWebRepositoryUrlForRevision(file);
+    }
 
     public String getHost() {
         return gitRepositoryConfig.getHost();

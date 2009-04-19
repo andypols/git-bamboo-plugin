@@ -104,6 +104,15 @@ public class GitRepositoryConfig implements Serializable {
         return webRepositoryUrl + "/commit/" + commitIdFor(commit);
     }
 
+    public String getWebRepositoryUrlForRevision(CommitFile file) {
+        return getWebRepositoryUrlForFile(file);
+    }
+
+    public String getWebRepositoryUrlForDiff(CommitFile file) {
+        // wish I had access to the commit then I'd know the order of the files and could link directly to the diff (diff-<order_number>)
+        return webRepositoryUrl + "/commit/" + file.getRevision();
+    }
+
     private String commitIdFor(Commit commit) {
         List<CommitFile> files = commit.getFiles();
         if(files.isEmpty()) {
