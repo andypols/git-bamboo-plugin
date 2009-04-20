@@ -48,40 +48,6 @@ public class SshSession {
         return session;
     }
 
-    /**
-     * feeds in password silently into JSch
-     */
-    private static class SshUser implements UserInfo {
-        private String passphrase;
-
-        public SshUser(String passphrase) {
-            this.passphrase = passphrase;
-        }
-
-        public void showMessage(String message) {
-        }
-
-        public boolean promptYesNo(String message) {
-            return true;
-        }
-
-        public boolean promptPassword(String message) {
-            return false;
-        }
-
-        public boolean promptPassphrase(String message) {
-            return true;
-        }
-
-        public String getPassword() {
-            throw new UnsupportedOperationException("Don't support password authentication");
-        }
-
-        public String getPassphrase() {
-            return passphrase;
-        }
-    }
-
     public static void main(String[] args) throws IOException, RepositoryException {
 
 
