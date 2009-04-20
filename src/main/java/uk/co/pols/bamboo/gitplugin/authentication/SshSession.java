@@ -17,10 +17,9 @@ public class SshSession {
      *
      * @param pemFile     File to use for public key authentication
      * @param pemPassword to use for accessing the pemFile (optional)
-     * @param passFile    to store credentials
      * @return session or null if not successful
      */
-    public Session getSession(File pemFile, String pemPassword, File passFile) throws IOException {
+    public Session getSession(File pemFile, String pemPassword) throws IOException {
         if (session == null || !session.isConnected()) {
             System.out.println("Authenticating with github.com");
             try {
@@ -33,9 +32,6 @@ public class SshSession {
                 session.connect();
                 System.out.println("SSH :: connected to " + GIT_HUB_HOST + " using " + pemFile);
             } catch (JSchException e) {
-                if (passFile != null && passFile.exists()) {
-                    passFile.delete();
-                }
                 IOException ex = new IOException(e.getMessage());
                 ex.initCause(e);
                 throw ex;
@@ -47,15 +43,14 @@ public class SshSession {
     /**
      * feeds in password silently into JSch
      */
-    private static class SshUser implements UserInfo, UIKeyboardInteractive {
-        private String pemPassword;
+    private static class SshUser implements UserInfo {
+        private String passphrase;
 
-        public SshUser(String pemPassword) {
-            this.pemPassword = pemPassword;
+        public SshUser(String passphrase) {
+            this.passphrase = passphrase;
         }
 
         public void showMessage(String message) {
-            System.out.println("message = " + message);
         }
 
         public boolean promptYesNo(String message) {
@@ -63,7 +58,7 @@ public class SshSession {
         }
 
         public boolean promptPassword(String message) {
-            return true;
+            return false;
         }
 
         public boolean promptPassphrase(String message) {
@@ -71,23 +66,17 @@ public class SshSession {
         }
 
         public String getPassword() {
-            // not used as we use the passphrase
-            return null;
+            throw new UnsupportedOperationException("Don't support password authentication");
         }
 
         public String getPassphrase() {
-            return pemPassword;
-        }
-
-        public String[] promptKeyboardInteractive(String destination, String name,
-                                                  String instruction, String[] prompt, boolean[] echo) {
-            return new String[]{getPassword()};
+            return passphrase;
         }
     }
 
     public static void main(String[] args) throws IOException {
         SshSession sshSession = new SshSession();
-        Session session = sshSession.getSession(new File("/Users/andy/.ssh/bamboo-gbp"), "bamboo-gbp", new File("passfile.txt"));
+        Session session = sshSession.getSession(new File("/Users/andy/.ssh/bamboo-gbp"), "bamboo-gbp");
 
         session.disconnect();
     }
