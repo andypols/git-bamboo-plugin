@@ -10,6 +10,8 @@ public class SshSession {
     private static final String GIT_HUB_USER = "git";
     private static final String USERNAME = GIT_HUB_USER;
 
+    private Session session = null;
+
     /**
      * Gets a session from the cache or establishes a new session if necessary
      *
@@ -19,19 +21,17 @@ public class SshSession {
      * @return session or null if not successful
      */
     public Session getSession(File pemFile, String pemPassword, File passFile) throws IOException {
-        Session session = null;
-
         if (session == null || !session.isConnected()) {
-            System.out.println("SSH :: connecting to github.com" + "...");
+            System.out.println("Authenticating with github.com");
             try {
                 JSch jsch = new JSch();
                 session = jsch.getSession(USERNAME, GIT_HUB_HOST, 22);
                 if (pemFile != null) {
                     jsch.addIdentity(pemFile.getAbsolutePath(), pemPassword);
                 }
-                session.setUserInfo(new SshUser(GIT_HUB_HOST, USERNAME, "", pemFile, pemPassword, passFile));
+                session.setUserInfo(new SshUser(pemPassword));
                 session.connect();
-                System.out.println("SSH :: connected to " + GIT_HUB_HOST + "!");
+                System.out.println("SSH :: connected to " + GIT_HUB_HOST + " using " + pemFile);
             } catch (JSchException e) {
                 if (passFile != null && passFile.exists()) {
                     passFile.delete();
@@ -48,20 +48,10 @@ public class SshSession {
      * feeds in password silently into JSch
      */
     private static class SshUser implements UserInfo, UIKeyboardInteractive {
-        private String userPassword;
         private String pemPassword;
-        private String userName;
-        private final File pemFile;
-        private final String host;
-        private final File passfile;
 
-        public SshUser(String host, String userName, String userPassword, File pemFile, String pemPassword, File passfile) {
-            this.userPassword = userPassword;
+        public SshUser(String pemPassword) {
             this.pemPassword = pemPassword;
-            this.host = host;
-            this.passfile = passfile;
-            this.userName = userName;
-            this.pemFile = pemFile;
         }
 
         public void showMessage(String message) {
@@ -81,7 +71,8 @@ public class SshSession {
         }
 
         public String getPassword() {
-            return userPassword;
+            // not used as we use the passphrase
+            return null;
         }
 
         public String getPassphrase() {
@@ -92,5 +83,12 @@ public class SshSession {
                                                   String instruction, String[] prompt, boolean[] echo) {
             return new String[]{getPassword()};
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        SshSession sshSession = new SshSession();
+        Session session = sshSession.getSession(new File("/Users/andy/.ssh/bamboo-gbp"), "bamboo-gbp", new File("passfile.txt"));
+
+        session.disconnect();
     }
 }
