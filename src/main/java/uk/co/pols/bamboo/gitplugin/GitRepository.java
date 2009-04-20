@@ -176,13 +176,6 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
                 .toComparison();
     }
 
-//    public List<NameValuePair> getAuthenticationTypes() {
-//        List<NameValuePair> types = new ArrayList<NameValuePair>();
-//        types.add(AuthenticationType.PASSWORD.getNameValue());
-//        types.add(AuthenticationType.SSH.getNameValue());
-//        return types;
-//    }
-
     protected GitClient gitClient() {
         return new CmdLineGitClient();
     }
