@@ -13,7 +13,7 @@ Install git (http://git-scm.com/).
 
 Copy the git-repository jar to @$BAMBOO_INSTALL_DIR/webapp/WEB-INF/lib@.
 
-Restart Bamboo.
+Run @exec ssh-agent bash@ and @ssh-add deployment-key@ before running Bamboo.  Bamboo will use the key stored in the agent to fetch the changes from GitHub.
 
 You can tell bamboo where the git executable is located using the @GIT_HOME@ environment variable.
 
