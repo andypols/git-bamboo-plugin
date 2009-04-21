@@ -1,4 +1,4 @@
-h1. A Git Plugin for the Bamboo builder server
+h1. A Git Plugin for the Bamboo build server
 
 Build your GitHub repositories on the Amazon Cloud using "Atlassian's Bamboo":http://atlassian.com/bamboo (version 2.2 or greater)...
 
