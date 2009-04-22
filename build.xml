@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="git-bamboo-plugin" default="all">
 
-	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
-	<!--                                                                                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+    <!--                                                                                                          -->
     <!-- Change this to the location of your Bamboo lib directory or -Dbamboo.server.lib=your-path to override it -->
-	<!--                                                                                                          -->
-	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
+    <!--                                                                                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
     <property name="bamboo.server.lib" value="/Applications/Bamboo/webapp/WEB-INF/lib/"/>
 
     <property name="release.version" value="0.4"/>
@@ -123,4 +123,10 @@
 
     <target name="ci" depends="clean, test" description="Continuous Integration"/>
 
+    <target name="spike">
+        <exec executable="/usr/bin/ssh-add">
+            <arg value="/Users/andy/.ssh/bamboo-gbp"/>
+            <redirector inputstring="bamboo-gbp"/>
+        </exec>
+    </target>
 </project>
