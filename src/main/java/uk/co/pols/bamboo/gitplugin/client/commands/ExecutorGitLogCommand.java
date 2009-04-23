@@ -1,4 +1,4 @@
-package uk.co.pols.bamboo.gitplugin.commands;
+package uk.co.pols.bamboo.gitplugin.client.commands;
 
 import com.atlassian.bamboo.commit.Commit;
 import org.apache.commons.logging.Log;

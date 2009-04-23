@@ -13,7 +13,8 @@ import com.atlassian.bamboo.v2.build.BuildChanges;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
-import uk.co.pols.bamboo.gitplugin.commands.GitCommandDiscoverer;
+import uk.co.pols.bamboo.gitplugin.client.commands.GitCommandDiscoverer;
+import uk.co.pols.bamboo.gitplugin.client.GitClient;
 
 import java.io.File;
 import java.util.ArrayList;

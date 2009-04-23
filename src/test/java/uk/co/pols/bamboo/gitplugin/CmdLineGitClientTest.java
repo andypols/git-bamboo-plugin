@@ -11,10 +11,11 @@ import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.commit.CommitImpl;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.repository.RepositoryException;
-import uk.co.pols.bamboo.gitplugin.commands.GitPullCommand;
-import uk.co.pols.bamboo.gitplugin.commands.GitLogCommand;
-import uk.co.pols.bamboo.gitplugin.commands.GitInitCommand;
-import uk.co.pols.bamboo.gitplugin.commands.GitRemoteCommand;
+import uk.co.pols.bamboo.gitplugin.client.commands.GitPullCommand;
+import uk.co.pols.bamboo.gitplugin.client.commands.GitLogCommand;
+import uk.co.pols.bamboo.gitplugin.client.commands.GitInitCommand;
+import uk.co.pols.bamboo.gitplugin.client.commands.GitRemoteCommand;
+import uk.co.pols.bamboo.gitplugin.client.CmdLineGitClient;
 
 public class CmdLineGitClientTest extends MockObjectTestCase {
     private static final String LAST_REVISION_CHECKED = "2009-03-22 01:09:25 +0000";

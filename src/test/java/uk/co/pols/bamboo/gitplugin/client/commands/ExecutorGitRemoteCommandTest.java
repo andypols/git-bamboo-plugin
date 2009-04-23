@@ -1,13 +1,11 @@
-package uk.co.pols.bamboo.gitplugin.commands;
+package uk.co.pols.bamboo.gitplugin.client.commands;
 
 import org.jmock.integration.junit3.MockObjectTestCase;
 import org.jmock.Expectations;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
-import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 
 public class ExecutorGitRemoteCommandTest extends MockObjectTestCase {

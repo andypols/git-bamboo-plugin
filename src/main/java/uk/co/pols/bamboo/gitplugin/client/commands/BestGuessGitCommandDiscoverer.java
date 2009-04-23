@@ -1,4 +1,4 @@
-package uk.co.pols.bamboo.gitplugin.commands;
+package uk.co.pols.bamboo.gitplugin.client.commands;
 
 public class BestGuessGitCommandDiscoverer implements GitCommandDiscoverer {
     public static final String DEFAULT_GIT_EXE = "/opt/local/bin/git";

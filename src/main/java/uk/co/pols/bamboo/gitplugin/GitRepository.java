@@ -6,7 +6,6 @@ import com.atlassian.bamboo.repository.*;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.v2.build.BuildChanges;
 import com.atlassian.bamboo.v2.build.BuildChangesImpl;
-import com.atlassian.bamboo.v2.build.BuildContext;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.builder.CompareToBuilder;
@@ -16,35 +15,52 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Provides GIT and GITHUB support for the Bamboo Build Server
- */
+import uk.co.pols.bamboo.gitplugin.authentication.SshAuthenticatedRunner;
+import uk.co.pols.bamboo.gitplugin.authentication.AuthenticationRunner;
+import uk.co.pols.bamboo.gitplugin.client.CmdLineGitClient;
+import uk.co.pols.bamboo.gitplugin.client.GitClient;
+
 public class GitRepository extends AbstractRepository implements WebRepositoryEnabledRepository {
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
-    public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
-        List<Commit> commits = new ArrayList<Commit>();
+    public synchronized BuildChanges collectChangesSinceLastBuild(final String planKey, final String lastVcsRevisionKey) throws RepositoryException {
+        final BuildChangesImpl[] buildChanges = new BuildChangesImpl[]{null};
 
-        String latestCommitTime = gitClient().getLatestUpdate(
-                buildLoggerManager.getBuildLogger(planKey),
-                gitRepositoryConfig.getRepositoryUrl(),
-                planKey,
-                lastVcsRevisionKey,
-                commits,
-                getSourceCodeDirectory(planKey)
-        );
+        new SshAuthenticatedRunner() {
+            public void task() throws RepositoryException {
+                List<Commit> commits = new ArrayList<Commit>();
 
-        return new BuildChangesImpl(String.valueOf(latestCommitTime), commits);
+                String latestCommitTime = gitClient().getLatestUpdate(
+                        buildLoggerManager.getBuildLogger(planKey),
+                        gitRepositoryConfig.getRepositoryUrl(),
+                        planKey,
+                        lastVcsRevisionKey,
+                        commits,
+                        getSourceCodeDirectory(planKey)
+                );
+
+                buildChanges[0] = new BuildChangesImpl(String.valueOf(latestCommitTime), commits);
+            }
+        }.run(gitRepositoryConfig);
+
+        return buildChanges[0];
     }
 
-    public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
-        return gitClient().initialiseRepository(
-                getSourceCodeDirectory(planKey),
-                planKey,
-                vcsRevisionKey,
-                gitRepositoryConfig,
-                isWorkspaceEmpty(getSourceCodeDirectory(planKey)),
-                buildLoggerManager.getBuildLogger(planKey));
+    public String retrieveSourceCode(final String planKey, final String vcsRevisionKey) throws RepositoryException {
+        final String[] latestRevisionKey = new String[]{vcsRevisionKey};
+        new SshAuthenticatedRunner() {
+            public void task() throws RepositoryException {
+                latestRevisionKey[0] = gitClient().initialiseRepository(
+                        getSourceCodeDirectory(planKey),
+                        planKey,
+                        vcsRevisionKey,
+                        gitRepositoryConfig,
+                        isWorkspaceEmpty(getSourceCodeDirectory(planKey)),
+                        buildLoggerManager.getBuildLogger(planKey));
+            }
+        }.run(gitRepositoryConfig);
+
+        return latestRevisionKey[0];
     }
 
     @Override
