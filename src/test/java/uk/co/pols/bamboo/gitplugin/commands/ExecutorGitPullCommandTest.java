@@ -20,7 +20,8 @@ public class ExecutorGitPullCommandTest extends MockObjectTestCase {
 
         checking(new Expectations() {{
             one(buildLogger).addBuildLogEntry("Pulling source from 'gitReopsitoryUrl' into '" + SOURCE_CODE_DIRECTORY.getAbsolutePath() + "'.");
-            one(commandExecutor).execute(new String[]{GIT_EXE, "pull", "origin", "master"}, SOURCE_CODE_DIRECTORY); will(returnValue(""));
+            one(commandExecutor).execute(new String[]{GIT_EXE, "pull", "origin", "master"}, SOURCE_CODE_DIRECTORY); will(returnValue("COMMAND OUTPUT"));
+            one(buildLogger).addBuildLogEntry("COMMAND OUTPUT");
         }});
 
         gitPullCommand.pullUpdatesFromRemoteRepository(buildLogger, "gitReopsitoryUrl");
