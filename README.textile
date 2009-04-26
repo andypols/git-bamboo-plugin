@@ -1,5 +1,7 @@
 h1. A Git Plugin for the Bamboo build server
 
+Version 0.3
+
 Build your GitHub repositories on the Amazon Cloud using "Atlassian's Bamboo":http://atlassian.com/bamboo.
 
 * Adds the option “GitHub” to the list of available repositories when you add or edit a plan.
