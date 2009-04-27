@@ -53,19 +53,19 @@ public class GitRepositoryConfig implements Serializable {
     }
 
     public String getKeyFile() {
-        return keyFile;
+        return StringUtils.trim(keyFile);
     }
 
     public void setKeyFile(String keyFile) {
-        this.keyFile = keyFile;
+        this.keyFile = StringUtils.trim(keyFile);
     }
 
     public String getPassphrase() {
-        return passphrase;
+        return StringUtils.trim(passphrase);
     }
 
     public void setPassphrase(String passphrase) {
-        this.passphrase = passphrase;
+        this.passphrase = StringUtils.trim(passphrase);
     }
 
     public String getHost() {
