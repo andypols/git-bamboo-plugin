@@ -25,3 +25,4 @@ h2. Build from source
 Define the @bamboo.server.lib@ value in the @build.xml@ so the build has access to the bamboo jars (Bamboo is commercial, so I can't include them the github repository).
 
 Run the @ant all@ task.
+
