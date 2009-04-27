@@ -23,6 +23,12 @@ public class ExecutorGitPullCommand implements GitPullCommand {
     public void pullUpdatesFromRemoteRepository(BuildLogger buildLogger, String repositoryUrl) throws IOException {
         log.info(buildLogger.addBuildLogEntry("Pulling source from '" + repositoryUrl + "' into '" + sourceCodeDirectory.getAbsolutePath() + "'."));
 
-        commandExecutor.execute(new String[]{gitExe, "pull", "origin", "master"}, sourceCodeDirectory);
+        String output = commandExecutor.execute(new String[]{gitExe, "pull", "origin", "master"}, sourceCodeDirectory);
+
+        if(output.contains("fatal:")) {
+            log.error(buildLogger.addErrorLogEntry(output));
+        } else {
+            log.info(buildLogger.addBuildLogEntry(output));
+        }
     }
 }
