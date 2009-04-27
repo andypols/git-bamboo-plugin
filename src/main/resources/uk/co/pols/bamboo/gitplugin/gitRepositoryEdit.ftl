@@ -14,10 +14,10 @@
 			   description= 'Enter the absolute path of the private GitHub deploy key'
         	   required='true' /]
 
-[@ww.textfield labelKey='Passphrase'
-               name='repository.github.passphrase'
-			   description= 'Enter the passphrase for your private GitHub deploy key'
-        	   required='true' /]
+[@ww.password labelKey='Passphrase'
+              name='repository.github.passphrase'
+			  description= 'Enter the passphrase for your private GitHub deploy key'
+        	  required='true' /]
 
 <SCRIPT TYPE="text/javascript">
 <!--
