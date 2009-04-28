@@ -17,9 +17,9 @@ public class CmdLineGitClient implements GitClient {
     private static final Log log = LogFactory.getLog(CmdLineGitClient.class);
     private GitCommandDiscoverer gitCommandDiscoverer = gitCommandDiscoverer();
 
-    public String getLatestUpdate(BuildLogger buildLogger, String repositoryUrl, String planKey, String lastRevisionChecked, List<Commit> commits, File sourceCodeDirectory) throws RepositoryException {
+    public String getLatestUpdate(BuildLogger buildLogger, String repositoryUrl, String branch, String planKey, String lastRevisionChecked, List<Commit> commits, File sourceCodeDirectory) throws RepositoryException {
         try {
-            pullCommand(sourceCodeDirectory).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl);
+            pullCommand(sourceCodeDirectory).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl, branch);
 
             GitLogCommand gitLogCommand = logCommand(sourceCodeDirectory, lastRevisionChecked);
             List<Commit> gitCommits = gitLogCommand.extractCommits();
@@ -41,10 +41,10 @@ public class CmdLineGitClient implements GitClient {
 
     public String initialiseRepository(File sourceCodeDirectory, String planKey, String vcsRevisionKey, GitRepositoryConfig gitRepositoryConfig, boolean isWorkspaceEmpty, BuildLogger buildLogger) throws RepositoryException {
         if (isWorkspaceEmpty) {
-            initialiseRemoteRepository(sourceCodeDirectory, gitRepositoryConfig.getRepositoryUrl(), buildLogger);
+            initialiseRemoteRepository(sourceCodeDirectory, gitRepositoryConfig.getRepositoryUrl(), gitRepositoryConfig.getBranch(), buildLogger);
         }
 
-        return getLatestUpdate(buildLogger, gitRepositoryConfig.getRepositoryUrl(), planKey, vcsRevisionKey, new ArrayList<Commit>(), sourceCodeDirectory);
+        return getLatestUpdate(buildLogger, gitRepositoryConfig.getRepositoryUrl(), gitRepositoryConfig.getBranch(), planKey, vcsRevisionKey, new ArrayList<Commit>(), sourceCodeDirectory);
     }
 
     protected GitPullCommand pullCommand(File sourceCodeDirectory) {
@@ -63,12 +63,12 @@ public class CmdLineGitClient implements GitClient {
         return new ExecutorGitRemoteCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, new AntCommandExecutor());
     }
 
-    private void initialiseRemoteRepository(File sourceDirectory, String repositoryUrl, BuildLogger buildLogger) throws RepositoryException {
+    private void initialiseRemoteRepository(File sourceDirectory, String repositoryUrl, String branch, BuildLogger buildLogger) throws RepositoryException {
         log.info(buildLogger.addBuildLogEntry(sourceDirectory.getAbsolutePath() + " is empty. Creating new git repository"));
         try {
             sourceDirectory.mkdirs();
             initCommand(sourceDirectory).init(buildLogger);
-            remoteCommand(sourceDirectory).add_origin(repositoryUrl, buildLogger);
+            remoteCommand(sourceDirectory).add_origin(repositoryUrl, branch, buildLogger);
         } catch (IOException e) {
             throw new RepositoryException("Failed to initialise repository", e);
         }

@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.co.pols.bamboo.gitplugin.authentication.SshAuthenticatedRunner;
-import uk.co.pols.bamboo.gitplugin.authentication.AuthenticationRunner;
 import uk.co.pols.bamboo.gitplugin.client.CmdLineGitClient;
 import uk.co.pols.bamboo.gitplugin.client.GitClient;
 
@@ -33,6 +32,7 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
                 String latestCommitTime = gitClient().getLatestUpdate(
                         buildLoggerManager.getBuildLogger(planKey),
                         gitRepositoryConfig.getRepositoryUrl(),
+                        gitRepositoryConfig.getBranch(),
                         planKey,
                         lastVcsRevisionKey,
                         commits,

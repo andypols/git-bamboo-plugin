@@ -5,5 +5,5 @@ import com.atlassian.bamboo.build.logger.BuildLogger;
 import java.io.IOException;
 
 public interface GitPullCommand {
-    void pullUpdatesFromRemoteRepository(BuildLogger buildLogger, String repositoryUrl) throws IOException;
+    void pullUpdatesFromRemoteRepository(BuildLogger buildLogger, String repositoryUrl, String branch) throws IOException;
 }
