@@ -1,4 +1,4 @@
-package uk.co.pols.bamboo.gitplugin.commands;
+package uk.co.pols.bamboo.gitplugin.client.commands;
 
 import org.jmock.integration.junit3.MockObjectTestCase;
 import org.jmock.Expectations;
@@ -19,11 +19,11 @@ public class ExecutorGitPullCommandTest extends MockObjectTestCase {
         ExecutorGitPullCommand gitPullCommand = new ExecutorGitPullCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, commandExecutor);
 
         checking(new Expectations() {{
-            one(buildLogger).addBuildLogEntry("Pulling source from 'gitReopsitoryUrl' into '" + SOURCE_CODE_DIRECTORY.getAbsolutePath() + "'.");
-            one(commandExecutor).execute(new String[]{GIT_EXE, "pull", "origin", "master"}, SOURCE_CODE_DIRECTORY); will(returnValue("COMMAND OUTPUT"));
+            one(buildLogger).addBuildLogEntry("Pulling source from branch 'some-branch' @ 'gitReopsitoryUrl' into '" + SOURCE_CODE_DIRECTORY.getAbsolutePath() + "'.");
+            one(commandExecutor).execute(new String[]{GIT_EXE, "pull", "origin", "some-branch"}, SOURCE_CODE_DIRECTORY); will(returnValue("COMMAND OUTPUT"));
             one(buildLogger).addBuildLogEntry("COMMAND OUTPUT");
         }});
 
-        gitPullCommand.pullUpdatesFromRemoteRepository(buildLogger, "gitReopsitoryUrl");
+        gitPullCommand.pullUpdatesFromRemoteRepository(buildLogger, "gitReopsitoryUrl", "some-branch");
     }
 }

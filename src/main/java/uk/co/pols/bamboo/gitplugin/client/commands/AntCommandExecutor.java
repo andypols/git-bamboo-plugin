@@ -1,4 +1,4 @@
-package uk.co.pols.bamboo.gitplugin.commands;
+package uk.co.pols.bamboo.gitplugin.client.commands;
 
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;

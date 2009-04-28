@@ -6,7 +6,6 @@ import com.atlassian.bamboo.repository.*;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.v2.build.BuildChanges;
 import com.atlassian.bamboo.v2.build.BuildChangesImpl;
-import com.atlassian.bamboo.v2.build.BuildContext;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.builder.CompareToBuilder;
@@ -16,18 +15,19 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Provides GIT and GITHUB support for the Bamboo Build Server
- */
+import uk.co.pols.bamboo.gitplugin.client.CmdLineGitClient;
+import uk.co.pols.bamboo.gitplugin.client.GitClient;
+
 public class GitRepository extends AbstractRepository implements WebRepositoryEnabledRepository {
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
-    public synchronized BuildChanges collectChangesSinceLastBuild(String planKey, String lastVcsRevisionKey) throws RepositoryException {
+    public synchronized BuildChanges collectChangesSinceLastBuild(final String planKey, final String lastVcsRevisionKey) throws RepositoryException {
         List<Commit> commits = new ArrayList<Commit>();
 
         String latestCommitTime = gitClient().getLatestUpdate(
                 buildLoggerManager.getBuildLogger(planKey),
                 gitRepositoryConfig.getRepositoryUrl(),
+                gitRepositoryConfig.getBranch(),
                 planKey,
                 lastVcsRevisionKey,
                 commits,
@@ -37,7 +37,7 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
         return new BuildChangesImpl(String.valueOf(latestCommitTime), commits);
     }
 
-    public String retrieveSourceCode(String planKey, String vcsRevisionKey) throws RepositoryException {
+    public String retrieveSourceCode(final String planKey, final String vcsRevisionKey) throws RepositoryException {
         return gitClient().initialiseRepository(
                 getSourceCodeDirectory(planKey),
                 planKey,

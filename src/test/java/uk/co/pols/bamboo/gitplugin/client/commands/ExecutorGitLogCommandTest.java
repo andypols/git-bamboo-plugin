@@ -1,4 +1,4 @@
-package uk.co.pols.bamboo.gitplugin.commands;
+package uk.co.pols.bamboo.gitplugin.client.commands;
 
 import org.jmock.integration.junit3.MockObjectTestCase;
 import org.jmock.Expectations;
