@@ -25,7 +25,7 @@ public class ExecutorGitPullCommand implements GitPullCommand {
 
         String output = commandExecutor.execute(new String[]{gitExe, "pull", "origin", branch}, sourceCodeDirectory);
 
-        if(output.contains("fatal:")) {
+        if (output.contains("fatal:")) {
             log.error(buildLogger.addErrorLogEntry(output));
         } else {
             log.info(buildLogger.addBuildLogEntry(output));
