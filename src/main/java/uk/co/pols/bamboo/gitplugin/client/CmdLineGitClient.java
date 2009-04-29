@@ -75,6 +75,6 @@ public class CmdLineGitClient implements GitClient {
     }
 
     protected GitCommandDiscoverer gitCommandDiscoverer() {
-        return new BestGuessGitCommandDiscoverer();
+        return new BestGuessGitCommandDiscoverer(new AntCommandExecutor());
     }
 }
