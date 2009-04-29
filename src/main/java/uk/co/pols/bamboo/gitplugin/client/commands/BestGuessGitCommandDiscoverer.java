@@ -8,9 +8,9 @@ import java.io.IOException;
 
 /**
  * First look for the "GIT_HOME" environment variable. Set -DGIT_HOME=/your/path/git when starting Bamboo.
- *
+ * <p/>
  * Then, iff you are running bamboo on a unix, if will try and find it by running a "which git" command.
- *
+ * <p/>
  * If all else fails it assumes it's in "/opt/local/bin/git" (cos that's where it's locatted on my MacBookPro!)
  */
 public class BestGuessGitCommandDiscoverer implements GitCommandDiscoverer {
@@ -25,21 +25,31 @@ public class BestGuessGitCommandDiscoverer implements GitCommandDiscoverer {
     }
 
     public String gitCommand() {
-        if(System.getProperty(GIT_HOME) != null) {
+        String gitPath = discoverLocationOfGitCommandLineBinary();
+        log.info("Using git: '" + gitPath + "'");
+        return gitPath;
+    }
+
+    private String discoverLocationOfGitCommandLineBinary() {
+        if (System.getProperty(GIT_HOME) != null) {
             return System.getProperty(GIT_HOME);
         }
 
-        try {
-            WhichCommand whichCommand = new ExecutorWhichCommand(executor);
-            String gitBinary = whichCommand.which("git");
-
-            if(StringUtils.isNotBlank(gitBinary)) {
-                return gitBinary.trim();
-            }
-        } catch (IOException e) {
-            log.error("Failed to execute the git command", e);
+        String gitPath = whichGitIsInThePath();
+        if (StringUtils.isNotBlank(gitPath)) {
+            return gitPath.trim();
         }
 
         return DEFAULT_GIT_EXE;
+    }
+
+    private String whichGitIsInThePath() {
+        try {
+            WhichCommand whichCommand = new ExecutorWhichCommand(executor);
+            return whichCommand.which("git");
+        } catch (IOException e) {
+            log.error("Failed to execute the git command", e);
+            return null;
+        }
     }
 }
