@@ -111,7 +111,7 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
         gitClient.initialiseRepository(SOURCE_CODE_DIRECTORY, PLAN_KEY, null, gitRepositoryConfig, true, buildLogger);
     }
 
-    public void testInitialisationExcetpionsAreWrappedInRepositoryExceptions() throws RepositoryException, IOException {
+    public void testInitialisationExceptionsAreWrappedInRepositoryExceptions() throws RepositoryException, IOException {
         final IOException ioException = new IOException("EXPECTED EXCEPTION");
         GitRepositoryConfig gitRepositoryConfig = new GitRepositoryConfig();
         gitRepositoryConfig.setRepositoryUrl(REPOSITORY_URL);
