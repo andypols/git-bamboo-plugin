@@ -85,7 +85,7 @@ public class GitRepositoryConfig implements Serializable {
     }
 
     public boolean hasWebBasedRepositoryAccess() {
-        return StringUtils.isNotBlank(webRepositoryUrl);
+        return StringUtils.isNotBlank(webRepositoryUrl) && webRepositoryUrl.contains("github.com");
     }
 
     public HierarchicalConfiguration toConfiguration(HierarchicalConfiguration configuration) {

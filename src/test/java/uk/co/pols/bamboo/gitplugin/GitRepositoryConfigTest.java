@@ -1,14 +1,13 @@
 package uk.co.pols.bamboo.gitplugin;
 
-import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitWithFile;
-import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitFile;
+import com.atlassian.bamboo.repository.AbstractRepository;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.utils.error.SimpleErrorCollection;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
-import com.atlassian.bamboo.repository.AbstractRepository;
-import com.atlassian.bamboo.commit.CommitFile;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.jmock.integration.junit3.MockObjectTestCase;
+import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitFile;
+import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitWithFile;
 
 public class GitRepositoryConfigTest extends MockObjectTestCase {
     private GitRepositoryConfig repositoryConfig = new GitRepositoryConfig();
@@ -176,6 +175,22 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         repositoryConfig.setWebRepositoryUrl("https://github.com/andypols/git-bamboo-plugin");
 
         assertEquals("https://github.com/andypols/git-bamboo-plugin/commit/71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6", repositoryConfig.getWebRepositoryUrlForDiff(commitFile("71b2bf41fb82a12ca3d4d34bd62568d9167dc6d6")));
+    }
+
+    public void testKnowIfUserSpecifiedABasedRepositoryAccess() {
+        assertFalse(repositoryConfig.hasWebBasedRepositoryAccess());
+    }
+
+    public void testOnlySupportsGitHubWebRepositories() {
+        repositoryConfig.setWebRepositoryUrl("https://some.private.repo.com/andypols/git-bamboo-plugin/tree/master");
+
+        assertFalse(repositoryConfig.hasWebBasedRepositoryAccess());
+    }
+
+    public void testSupportsGitHubWebRepositoryLinks() {
+        repositoryConfig.setWebRepositoryUrl(" https://github.com/andypols/git-bamboo-plugin/tree/master  ");
+
+        assertTrue(repositoryConfig.hasWebBasedRepositoryAccess());
     }
 
     private void assertHasError(ErrorCollection errorCollection, String fieldKey, String errorMessage) {
