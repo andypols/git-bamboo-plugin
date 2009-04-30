@@ -1,6 +1,6 @@
 h1. A Git Plugin for the Bamboo build server
 
-Version 0.5
+Version 1.0
 
 Build your GitHub repositories on the Amazon Cloud using "Atlassian's Bamboo":http://atlassian.com/bamboo.
 
@@ -25,4 +25,3 @@ h2. Build from source
 Define the @bamboo.server.lib@ value in the @build.xml@ so the build has access to the bamboo jars (Bamboo is commercial, so I can't include them the github repository).
 
 Run the @ant all@ task.
-

@@ -13,7 +13,16 @@
 <!--
 function populateGitHubWebUrl(textForm) {
     var newString = textForm.value.replace('git@github.com:', 'https://github.com/').replace('.git', '');
-    document.getElementById('createBuildRepository_repository_common_webRepositoryUrl').value = newString;
+
+    //
+    // the field is called different things on different pages
+    //
+    var repoWebUrlField = document.getElementById('updateBuildRepository_repository_common_webRepositoryUrl');
+    if(repoWebUrlField == null) {
+        repoWebUrlField = document.getElementById('createBuildRepository_repository_common_webRepositoryUrl');
+    }
+
+    repoWebUrlField.value = newString;
 }
 //-->
 </SCRIPT>
