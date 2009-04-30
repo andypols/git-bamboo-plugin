@@ -2,6 +2,8 @@
 build/**/*
 build/*
 build/classes/uk/co/pols/bamboo/gitplugin/GitRepository$1.class
+classes/*
+classes/**/*
 git-bamboo-plugin.iws
 lib/ant-1.7.1.jar
 lib/ant-launcher-1.7.1.jar
@@ -20,3 +22,4 @@ lib/jsch-0.1.31.jar
 lib/junit-3.8.1.jar
 lib/log4j-1.2.12.jar
 lib/oscore-2.2.7.jar
+classes/atlassian-plugin.xml
