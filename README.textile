@@ -1,4 +1,4 @@
-	h1. A Git Plugin for the Bamboo build server
+h1. A Git Plugin for the Bamboo build server
 
 Version 0.5
 
