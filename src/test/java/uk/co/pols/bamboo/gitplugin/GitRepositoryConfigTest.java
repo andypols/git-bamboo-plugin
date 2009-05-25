@@ -15,8 +15,6 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
     public void testEnsuresThatTheUserSpecifiesTheRepositoryUrl() {
         BuildConfiguration buildConfiguration = new BuildConfiguration();
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "TheBranch");
-        buildConfiguration.setProperty(GitRepositoryConfig.PASSPHRASE, "passphrase");
-        buildConfiguration.setProperty(GitRepositoryConfig.KEY_FILE, "some/key/file");
 
         ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
 
@@ -26,8 +24,6 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
     public void testEnsuresThatTheUserSpecifiesTheRepositoryBranch() {
         BuildConfiguration buildConfiguration = new BuildConfiguration();
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "The Rep Url");
-        buildConfiguration.setProperty(GitRepositoryConfig.PASSPHRASE, "passphrase");
-        buildConfiguration.setProperty(GitRepositoryConfig.KEY_FILE, "some/key/file");
 
         ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
 
@@ -39,34 +35,10 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "TheBranch");
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "The Rep Url");
         buildConfiguration.setProperty(AbstractRepository.WEB_REPO_URL, "An Invalid Url");
-        buildConfiguration.setProperty(GitRepositoryConfig.PASSPHRASE, "passphrase");
-        buildConfiguration.setProperty(GitRepositoryConfig.KEY_FILE, "some/key/file");
 
         ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
 
         assertHasError(errorCollection, AbstractRepository.WEB_REPO_URL, "This is not a valid url");
-    }
-
-    public void testEnsuresThatTheUserSpecifiesTheDeploymentKeyFile() {
-        BuildConfiguration buildConfiguration = new BuildConfiguration();
-        buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "The Rep Url");
-        buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "TheBranch");
-        buildConfiguration.setProperty(GitRepositoryConfig.PASSPHRASE, "passphrase");
-
-        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
-
-        assertHasError(errorCollection, GitRepositoryConfig.KEY_FILE, "Please specify the GitHub deploy keyfile");
-    }
-
-    public void testEnsuresThatTheUserSpecifiesTheDeploymentKeyPassphrase() {
-        BuildConfiguration buildConfiguration = new BuildConfiguration();
-        buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "The Rep Url");
-        buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "TheBranch");
-        buildConfiguration.setProperty(GitRepositoryConfig.KEY_FILE, "some/key/file");
-
-        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
-
-        assertHasError(errorCollection, GitRepositoryConfig.PASSPHRASE, "Please specify the deploy keyfile passphrase");
     }
 
     public void testAcceptsARepositoryAndBranchWithoutReportingAnyErrors() {
@@ -74,8 +46,6 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "The Rep Url");
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "The Branch");
         buildConfiguration.setProperty(AbstractRepository.WEB_REPO_URL, "https://github.com/andypols/git-bamboo-plugin/tree/master");
-        buildConfiguration.setProperty(GitRepositoryConfig.PASSPHRASE, "passphrase");
-        buildConfiguration.setProperty(GitRepositoryConfig.KEY_FILE, "some/key/file");
 
         ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
 
@@ -88,11 +58,9 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
 
         assertTrue(errorCollection.hasAnyErrors());
-        assertEquals(4, errorCollection.getTotalErrors());
+        assertEquals(2, errorCollection.getTotalErrors());
         assertEquals("Please specify where the repository is located", errorCollection.getFieldErrors().get(GitRepositoryConfig.GIT_REPO_URL));
         assertEquals("Please specify which branch you want to build", errorCollection.getFieldErrors().get(GitRepositoryConfig.GIT_BRANCH));
-        assertEquals("Please specify the GitHub deploy keyfile", errorCollection.getFieldErrors().get(GitRepositoryConfig.KEY_FILE));
-        assertEquals("Please specify the deploy keyfile passphrase", errorCollection.getFieldErrors().get(GitRepositoryConfig.PASSPHRASE));
     }
 
     public void testSavesTheRepositorySettingsInTheBuildConfiguration() {
@@ -107,8 +75,6 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         assertEquals("TheTopSecretBuildRepoUrl", hierarchicalConfiguration.getProperty(GitRepositoryConfig.GIT_REPO_URL));
         assertEquals("TheBranch", hierarchicalConfiguration.getProperty(GitRepositoryConfig.GIT_BRANCH));
         assertEquals("TheRepoWebUrl", hierarchicalConfiguration.getProperty(AbstractRepository.WEB_REPO_URL));
-        assertEquals("the/key/file", hierarchicalConfiguration.getProperty(GitRepositoryConfig.KEY_FILE));
-        assertEquals("passphrase", hierarchicalConfiguration.getProperty(GitRepositoryConfig.PASSPHRASE));
     }
 
     public void testLoadsTheRepositorySettingsFromTheBuildConfiguration() {
@@ -116,16 +82,12 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "TheTopSecretBuildRepoUrl");
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "TheSpecialBranch");
         buildConfiguration.setProperty(AbstractRepository.WEB_REPO_URL, "WebRepositoryUrl");
-        buildConfiguration.setProperty(GitRepositoryConfig.PASSPHRASE, "ThePassphrase");
-        buildConfiguration.setProperty(GitRepositoryConfig.KEY_FILE, "TheKeyFile");
 
         repositoryConfig.populateFromConfig(buildConfiguration);
 
         assertEquals("TheSpecialBranch", repositoryConfig.getBranch());
         assertEquals("TheTopSecretBuildRepoUrl", repositoryConfig.getRepositoryUrl());
         assertEquals("WebRepositoryUrl", repositoryConfig.getWebRepositoryUrl());
-        assertEquals("ThePassphrase", repositoryConfig.getPassphrase());
-        assertEquals("TheKeyFile", repositoryConfig.getKeyFile());
     }
 
     public void testDefaultsToUsingTheMasterBranchOnNewPlans() {

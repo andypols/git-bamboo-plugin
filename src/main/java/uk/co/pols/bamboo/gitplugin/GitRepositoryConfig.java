@@ -18,8 +18,6 @@ public class GitRepositoryConfig implements Serializable {
 
     public static final String GIT_REPO_URL = REPO_PREFIX + "repositoryUrl";
     public static final String GIT_BRANCH = REPO_PREFIX + "branch";
-    public static final String KEY_FILE = REPO_PREFIX + "keyFile";
-    public static final String PASSPHRASE = REPO_PREFIX + "passphrase";
     private static final String DEFAULT_BRANCH = "master";
 
     private String repositoryUrl;
@@ -32,8 +30,6 @@ public class GitRepositoryConfig implements Serializable {
         repositoryUrl = config.getString(GIT_REPO_URL);
         branch = config.getString(GIT_BRANCH);
         webRepositoryUrl = config.getString(WEB_REPO_URL);
-        keyFile = config.getString(KEY_FILE);
-        passphrase = config.getString(PASSPHRASE);
     }
 
     public String getRepositoryUrl() {
@@ -92,8 +88,6 @@ public class GitRepositoryConfig implements Serializable {
         configuration.setProperty(GIT_REPO_URL, getRepositoryUrl());
         configuration.setProperty(GIT_BRANCH, getBranch());
         configuration.setProperty(WEB_REPO_URL, getWebRepositoryUrl());
-        configuration.setProperty(KEY_FILE, getKeyFile());
-        configuration.setProperty(PASSPHRASE, getPassphrase());
 
         return configuration;
     }
@@ -101,8 +95,6 @@ public class GitRepositoryConfig implements Serializable {
     public ErrorCollection validate(ErrorCollection errorCollection, BuildConfiguration buildConfiguration) {
         validateMandatoryField(buildConfiguration, errorCollection, GIT_REPO_URL, "Please specify where the repository is located");
         validateMandatoryField(buildConfiguration, errorCollection, GIT_BRANCH, "Please specify which branch you want to build");
-        validateMandatoryField(buildConfiguration, errorCollection, KEY_FILE, "Please specify the GitHub deploy keyfile");
-        validateMandatoryField(buildConfiguration, errorCollection, PASSPHRASE, "Please specify the deploy keyfile passphrase");
 
         String webRepoUrl = buildConfiguration.getString(WEB_REPO_URL);
         if (!StringUtils.isBlank(webRepoUrl) && !UrlUtils.verifyHierachicalURI(webRepoUrl)) {
