@@ -4,6 +4,7 @@ import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.commit.CommitFile;
 import junit.framework.TestCase;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.text.ParseException;
 import java.util.List;
@@ -52,7 +53,7 @@ public class GitLogParserTest extends TestCase {
         GitLogParser parser = new GitLogParser(gitHubEditLog);
         List<Commit> commits = parser.extractCommits("2009-03-13 01:24:44 +0000");
 
-        assertEquals(new DateTime(2009, 5, 20, 13, 13, 39, 0).toDate(), commits.get(2).getDate());
+        assertEquals(new DateTime(2009, 5, 20, 13, 13, 39, 0, DateTimeZone.forID("Europe/London")).toDate(), commits.get(2).getDate());
         assertEquals("Added note about unix", commits.get(2).getComment().trim());
     }
 
