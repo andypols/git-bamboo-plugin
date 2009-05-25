@@ -8,7 +8,7 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
     <property name="bamboo.server.lib" value="/Applications/Bamboo/webapp/WEB-INF/lib/"/>
 
-    <property name="release.version" value="1.0"/>
+    <property name="release.version" value="1.0.1"/>
 
     <patternset id="compiler.resources">
         <include name="**/?*.properties"/>
