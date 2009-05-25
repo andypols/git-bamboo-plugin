@@ -33,7 +33,7 @@ h2. Release Notes
 
 1.0.1 Bug Fix
 
-* Fixed a silly bug. I validating some fields that I had removed from the UI, so bamboo would not let the user move past the guthub page. 
+* Fixed a silly bug. I was validating some fields that I had removed from the UI, so bamboo would not let the user progress past the guthub page when creating a new repository. 
 * Handle timezone information in the git logs correctly
 
 1.0 First Release
