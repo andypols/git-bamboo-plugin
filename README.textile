@@ -28,3 +28,11 @@ h2. Build from source
 Define the @bamboo.server.lib@ value in the @build.xml@ so the build has access to the bamboo jars (Bamboo is commercial, so I can't include them the github repository).
 
 Run the @ant all@ task.
+
+h2. Release Notes
+
+1.0.1 Bug Fix
+
+* Fixed a silly bug. I validating some fields that I had removed from the UI, so bamboo would not let the user move past the guthub page.  
+
+1.0 First Release
