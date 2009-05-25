@@ -10,6 +10,7 @@ import com.atlassian.bamboo.author.Author;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import java.text.SimpleDateFormat;
 
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormat;
@@ -18,7 +19,7 @@ import org.joda.time.DateTime;
 public class GitLogParser {
     private static final String AUTHOR_LINE_PREFIX = "Author:";
     private static final String NEW_COMMIT_LINE_PREFIX = "commit";
-    private static final DateTimeFormatter GIT_ISO_DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss +SSSS");
+    private static final DateTimeFormatter GIT_ISO_DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss Z");
     private static final String DATE_LINE_PREFIX = "Date:";
     private static final String MERGE_LINE_PREFIX = "Merge";
 
@@ -106,7 +107,7 @@ public class GitLogParser {
         }
 
         private boolean sameDateStampAsThePreviouslyProcessedCommit(String dateOfLastRecordCommit) {
-            if(dateOfLastRecordCommit == null) {
+            if (dateOfLastRecordCommit == null) {
                 return false;
             }
 

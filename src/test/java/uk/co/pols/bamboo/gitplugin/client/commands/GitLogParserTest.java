@@ -48,6 +48,14 @@ public class GitLogParserTest extends TestCase {
         assertEquals(new DateTime(2009, 3, 13, 1, 26, 14, 0).toDate(), commits.get(FIRST_COMMIT).getDate());
     }
 
+    public void testCanHandleDatesSubmittedFromAGitHubWebEditWithoutThrowingAnException() throws ParseException {
+        GitLogParser parser = new GitLogParser(gitHubEditLog);
+        List<Commit> commits = parser.extractCommits("2009-03-13 01:24:44 +0000");
+
+        assertEquals(new DateTime(2009, 5, 20, 13, 13, 39, 0).toDate(), commits.get(2).getDate());
+        assertEquals("Added note about unix", commits.get(2).getComment().trim());
+    }
+
     public void testKnowsTheCommentOfEachCommit() throws ParseException {
         GitLogParser parser = new GitLogParser(sampleLog);
         List<Commit> commits = parser.extractCommits("2009-03-13 01:24:44 +0000");
@@ -377,4 +385,39 @@ public class GitLogParserTest extends TestCase {
             "    first commit\n" +
             "\n" +
             "3\t0\tREADME.textile";
+
+
+    private String gitHubEditLog = "commit 6d20781fd7a80a23ac227429519143d7ac30da8d\n" +
+            "Author: Andy Pols <andy@pols.co.uk>\n" +
+            "Date:   2009-05-25 16:49:59 +0100\n" +
+            "\n" +
+            "    Added some release notes\n" +
+            "\n" +
+            "8\t0\tREADME.textile\n" +
+            "\n" +
+            "commit 6f73d8a6564959742b8acb2612e269bf28ffbfe4\n" +
+            "Author: Andy Pols <andy@pols.co.uk>\n" +
+            "Date:   2009-05-25 16:42:07 +0100\n" +
+            "\n" +
+            "    Removed key_file and passphrase validation as they don't exit on UI.  This was a stupid bug that prevented bamboo from progressing off the github page (without telling the user why!!:(\n" +
+            "\n" +
+            "0\t8\tsrc/main/java/uk/co/pols/bamboo/gitplugin/GitRepositoryConfig.java\n" +
+            "1\t39\tsrc/test/java/uk/co/pols/bamboo/gitplugin/GitRepositoryConfigTest.java\n" +
+            "\n" +
+            "commit daadb40b7f39f74d9e424600b4a7e3de3bfe2fa7\n" +
+            "Author: andypols <andy@pols.co.uk>\n" +
+            "Date:   2009-05-20 05:13:39 -0700\n" +
+            "\n" +
+            "    Added note about unix\n" +
+            "\n" +
+            "1\t1\tREADME.textile\n" +
+            "\n" +
+            "commit e762e2da207d198b9b2f31d44c00f85e5fdf6fc5\n" +
+            "Author: Andy Pols <andy@pols.co.uk>\n" +
+            "Date:   2009-05-01 01:40:48 +0100\n" +
+            "\n" +
+            "    added link to wiki\n" +
+            "\n" +
+            "4\t1\tREADME.textile\n";
+
 }
