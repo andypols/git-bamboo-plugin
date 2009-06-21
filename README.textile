@@ -1,6 +1,6 @@
 h1. A Git Plugin for the Bamboo build server
 
-Version 1.0.1
+Version 1.0.2
 
 Build your GitHub repositories on the Amazon Cloud using "Atlassian's Bamboo":http://atlassian.com/bamboo.
 
@@ -30,6 +30,10 @@ Define the @bamboo.server.lib@ value in the @build.xml@ so the build has access 
 Run the @ant all@ task.
 
 h2. Release Notes
+
+1.0.2 Bug Fix
+
+* Handle case where we had a date for the previous build, but can't extract the lastest update from the logs...
 
 1.0.1 Bug Fix
 

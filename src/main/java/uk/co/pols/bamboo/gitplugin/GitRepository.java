@@ -22,6 +22,7 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
     public synchronized BuildChanges collectChangesSinceLastBuild(final String planKey, final String lastVcsRevisionKey) throws RepositoryException {
+
         List<Commit> commits = new ArrayList<Commit>();
 
         String latestCommitTime = gitClient().getLatestUpdate(
