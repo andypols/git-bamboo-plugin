@@ -44,9 +44,10 @@ public class GitLogParserTest extends TestCase {
         GitLogParser parser = new GitLogParser(sampleLog);
         List<Commit> commits = parser.extractCommits("2009-03-13 01:24:44 +0000");
 
-        assertEquals(new DateTime(2009, 3, 22, 11, 21, 21, 0).toDate(), commits.get(MOST_RECENT_COMMIT).getDate());
-        assertEquals(new DateTime(2009, 3, 22, 1, 9, 25, 0).toDate(), commits.get(1).getDate());
-        assertEquals(new DateTime(2009, 3, 13, 1, 26, 14, 0).toDate(), commits.get(FIRST_COMMIT).getDate());
+        final DateTimeZone utc = DateTimeZone.forID("UTC");
+        assertEquals(new DateTime(2009, 3, 22, 11, 21, 21, 0, utc).toDate(), commits.get(MOST_RECENT_COMMIT).getDate());
+        assertEquals(new DateTime(2009, 3, 22, 1, 9, 25, 0, utc).toDate(), commits.get(1).getDate());
+        assertEquals(new DateTime(2009, 3, 13, 1, 26, 14, 0, utc).toDate(), commits.get(FIRST_COMMIT).getDate());
     }
 
     public void testCanHandleDatesSubmittedFromAGitHubWebEditWithoutThrowingAnException() throws ParseException {
