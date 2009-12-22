@@ -1,7 +1,7 @@
 <atlassian-plugin key="uk.co.pols.bamboo.gitplugin" name="GitHub Repository Plugin">
     <plugin-info>
         <description>GitHub Repository Plugin</description>
-        <version>1.0.2</version>
+        <version>@@VERSION@@</version>
         <vendor name="Pols Consulting Ltd." url="http://www.pols.co.uk"/>
     </plugin-info>
 

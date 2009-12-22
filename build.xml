@@ -118,6 +118,7 @@
     </target>
 
     <target name="jar" description="Create the bamboo plugin jar">
+        <replace file="${basedir}/build/classes/atlassian-plugin.xml" token="@@VERSION@@" value="${release.version}"/>
         <jar destfile="git-repository-${release.version}.jar" basedir="build/classes"/>
     </target>
 
