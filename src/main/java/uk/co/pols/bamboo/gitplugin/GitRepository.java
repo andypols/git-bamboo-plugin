@@ -23,7 +23,8 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
 
     /*
      * This is called by bamboo when a build has been triggered to calculate the changes since the previous build.
-     * It is executed on the server
+     * It is executed on the server.  It does not get run on the intial build, so may have to handle an empty git repo 
+     * when the sencond build is triggered
      */
     public synchronized BuildChanges collectChangesSinceLastBuild(final String planKey, final String lastVcsRevisionKey) throws RepositoryException {
 
