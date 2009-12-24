@@ -23,11 +23,10 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
 
     /*
      * This is called by bamboo when a build has been triggered to calculate the changes since the previous build.
-     * It is executed on the server.  It does not get run on the intial build, so may have to handle an empty git repo 
+     * It is executed on the server.  It does not get run on the intial build, so may have to handle an empty git repo
      * when the sencond build is triggered
      */
     public synchronized BuildChanges collectChangesSinceLastBuild(final String planKey, final String lastVcsRevisionKey) throws RepositoryException {
-
         List<Commit> commits = new ArrayList<Commit>();
 
         String latestCommitTime = gitClient().getLatestUpdate(
@@ -45,6 +44,9 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
 
     /**
      * This is called by the agent to get the latest code.
+     *
+     * TODO: There is a race condition where the agent could check out a more recent commit from the change set
+     * detected by the build server - Yuck.
      */
     public String retrieveSourceCode(final String planKey, final String vcsRevisionKey) throws RepositoryException {
         return gitClient().initialiseRepository(
