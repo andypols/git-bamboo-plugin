@@ -17,6 +17,7 @@ import uk.co.pols.bamboo.gitplugin.client.commands.GitInitCommand;
 import uk.co.pols.bamboo.gitplugin.client.commands.GitRemoteCommand;
 import uk.co.pols.bamboo.gitplugin.client.CmdLineGitClient;
 
+// check this in to get the CI build!
 public class CmdLineGitClientTest extends MockObjectTestCase {
     private static final String LAST_REVISION_CHECKED = "2009-03-22 01:09:25 +0000";
     private static final String REPOSITORY_URL = "repository.url";
