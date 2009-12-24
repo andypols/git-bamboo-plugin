@@ -21,6 +21,10 @@ import uk.co.pols.bamboo.gitplugin.client.GitClient;
 public class GitRepository extends AbstractRepository implements WebRepositoryEnabledRepository {
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
+    /*
+     * This is called by bamboo when a build has been triggered to calculate the changes since the previous build.
+     * It is executed on the server
+     */
     public synchronized BuildChanges collectChangesSinceLastBuild(final String planKey, final String lastVcsRevisionKey) throws RepositoryException {
 
         List<Commit> commits = new ArrayList<Commit>();
@@ -38,6 +42,9 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
         return new BuildChangesImpl(String.valueOf(latestCommitTime), commits);
     }
 
+    /**
+     * This is called by the agent to get the latest code.
+     */
     public String retrieveSourceCode(final String planKey, final String vcsRevisionKey) throws RepositoryException {
         return gitClient().initialiseRepository(
                 getSourceCodeDirectory(planKey),
