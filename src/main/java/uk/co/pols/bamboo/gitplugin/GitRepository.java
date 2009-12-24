@@ -49,13 +49,14 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
      * detected by the build server - Yuck.
      */
     public String retrieveSourceCode(final String planKey, final String vcsRevisionKey) throws RepositoryException {
-        return gitClient().initialiseRepository(
-                getSourceCodeDirectory(planKey),
+        return gitClient().getLatestUpdate(
+                buildLoggerManager.getBuildLogger(planKey),
+                gitRepositoryConfig.getRepositoryUrl(),
+                gitRepositoryConfig.getBranch(),
                 planKey,
                 vcsRevisionKey,
-                gitRepositoryConfig,
-                isWorkspaceEmpty(getSourceCodeDirectory(planKey)),
-                buildLoggerManager.getBuildLogger(planKey));
+                new ArrayList<Commit>(),
+                getSourceCodeDirectory(planKey));
     }
 
     @Override

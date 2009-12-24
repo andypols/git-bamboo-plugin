@@ -6,11 +6,11 @@ import com.atlassian.bamboo.repository.RepositoryException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.co.pols.bamboo.gitplugin.client.commands.*;
-import uk.co.pols.bamboo.gitplugin.GitRepositoryConfig;
+import uk.co.pols.bamboo.gitplugin.client.utils.GitRepositoryDetector;
+import uk.co.pols.bamboo.gitplugin.client.utils.FileBasedGitRepositoryDetector;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CmdLineGitClient implements GitClient {
@@ -19,6 +19,10 @@ public class CmdLineGitClient implements GitClient {
 
     public String getLatestUpdate(BuildLogger buildLogger, String repositoryUrl, String branch, String planKey, String lastRevisionChecked, List<Commit> commits, File sourceCodeDirectory) throws RepositoryException {
         try {
+            if (!gitRepositoryDetector().containsValidRepo(sourceCodeDirectory)) {
+                initialiseRemoteRepository(sourceCodeDirectory, repositoryUrl, branch, buildLogger);
+            }
+
             pullCommand(sourceCodeDirectory).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl, branch);
 
             GitLogCommand gitLogCommand = logCommand(sourceCodeDirectory, lastRevisionChecked);
@@ -40,14 +44,6 @@ public class CmdLineGitClient implements GitClient {
         }
     }
 
-    public String initialiseRepository(File sourceCodeDirectory, String planKey, String vcsRevisionKey, GitRepositoryConfig gitRepositoryConfig, boolean isWorkspaceEmpty, BuildLogger buildLogger) throws RepositoryException {
-        if (isWorkspaceEmpty) {
-            initialiseRemoteRepository(sourceCodeDirectory, gitRepositoryConfig.getRepositoryUrl(), gitRepositoryConfig.getBranch(), buildLogger);
-        }
-
-        return getLatestUpdate(buildLogger, gitRepositoryConfig.getRepositoryUrl(), gitRepositoryConfig.getBranch(), planKey, vcsRevisionKey, new ArrayList<Commit>(), sourceCodeDirectory);
-    }
-
     protected GitPullCommand pullCommand(File sourceCodeDirectory) {
         return new ExecutorGitPullCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, new AntCommandExecutor());
     }
@@ -62,6 +58,10 @@ public class CmdLineGitClient implements GitClient {
 
     protected GitRemoteCommand remoteCommand(File sourceCodeDirectory) {
         return new ExecutorGitRemoteCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, new AntCommandExecutor());
+    }
+
+    protected GitRepositoryDetector gitRepositoryDetector() {
+        return new FileBasedGitRepositoryDetector();
     }
 
     private void initialiseRemoteRepository(File sourceDirectory, String repositoryUrl, String branch, BuildLogger buildLogger) throws RepositoryException {
