@@ -103,11 +103,11 @@
     <target name="test" depends="compile">
         <mkdir dir="build/test-reports"/>
         <junit printsummary="yes" haltonfailure="yes" forkmode="once">
+            <formatter type="brief" usefile= "no"/>
+            <formatter type="xml"/>
             <classpath refid="classpath"/>
             <classpath location="build/classes"/>
             <classpath location="build/test-classes"/>
-
-            <formatter type="xml"/>
 
             <batchtest fork="yes" todir="build/test-reports">
                 <fileset dir="${basedir}/src/test/java">
