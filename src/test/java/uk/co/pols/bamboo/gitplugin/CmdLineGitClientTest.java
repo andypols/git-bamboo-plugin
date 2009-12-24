@@ -143,7 +143,7 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
                 return gitRemoteCommand;
             }
 
-            protected GitRepositoryDetector gitRepositoryDetector() {
+            protected GitRepositoryDetector gitRepositoryDetectory() {
                 return gitRepositoryDetector;
             }
         };
