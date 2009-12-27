@@ -1,6 +1,6 @@
 h1. A Git Plugin for the Bamboo build server
 
-Version 1.0.2
+Version 1.0.3
 
 Build your GitHub repositories on the Amazon Cloud using "Atlassian's Bamboo":http://atlassian.com/bamboo.
 
@@ -33,9 +33,13 @@ Run the @ant all@ task.
 
 h2. Release Notes
 
+1.0.3 Bug Fix
+
+* Now works correctly with remote agents (the server didn't have a local copy of the repository and therefore failed to calculate the change set).  Thanks to "Michael Rowe":http://mikerowecode.com for spotting this.
+
 1.0.2 Bug Fix
 
-* Handle case where we had a date for the previous build, but can't extract the lastest update from the logs...
+* Handle case where we had a date for the previous build, but can't extract the latest update from the logs...
 
 1.0.1 Bug Fix
 
