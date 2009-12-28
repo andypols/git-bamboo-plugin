@@ -23,10 +23,11 @@ public class ExecutorGitPullCommand implements GitPullCommand {
     public void pullUpdatesFromRemoteRepository(BuildLogger buildLogger, String repositoryUrl, String branch) throws IOException {
         log.info(buildLogger.addBuildLogEntry("Pulling source from branch '" + branch + "' @ '" + repositoryUrl + "' into '" + sourceCodeDirectory.getAbsolutePath() + "'."));
 
-        String output = commandExecutor.execute(new String[]{gitExe, "pull", "origin", branch}, sourceCodeDirectory);
+        String output = commandExecutor.execute(new String[]{gitExe, "pull", repositoryUrl, branch + ":" + branch}, sourceCodeDirectory);
 
+        // FIXME this really should check the exit code rather than looking for errors in the text
         if (output.contains("fatal:")) {
-            log.error(buildLogger.addErrorLogEntry(output));
+            throw new IOException("Could not pull from '" + repositoryUrl + "'. git-pull: " + output);
         } else {
             log.info(buildLogger.addBuildLogEntry(output));
         }

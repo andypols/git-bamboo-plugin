@@ -16,14 +16,28 @@ public class ExecutorGitPullCommandTest extends MockObjectTestCase {
     private final BuildLogger buildLogger = mock(BuildLogger.class);
 
     public void testExecuteAPullCommandAgainstTheRemoteBranch() throws IOException {
-        ExecutorGitPullCommand gitPullCommand = new ExecutorGitPullCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, commandExecutor);
-
         checking(new Expectations() {{
-            one(buildLogger).addBuildLogEntry("Pulling source from branch 'some-branch' @ 'gitReopsitoryUrl' into '" + SOURCE_CODE_DIRECTORY.getAbsolutePath() + "'.");
-            one(commandExecutor).execute(new String[]{GIT_EXE, "pull", "origin", "some-branch"}, SOURCE_CODE_DIRECTORY); will(returnValue("COMMAND OUTPUT"));
+            one(buildLogger).addBuildLogEntry("Pulling source from branch 'some-branch' @ 'gitRepositoryUrl' into '" + SOURCE_CODE_DIRECTORY.getAbsolutePath() + "'.");
+            one(commandExecutor).execute(new String[]{GIT_EXE, "pull", "gitRepositoryUrl", "some-branch:some-branch"}, SOURCE_CODE_DIRECTORY); will(returnValue("COMMAND OUTPUT"));
             one(buildLogger).addBuildLogEntry("COMMAND OUTPUT");
         }});
 
-        gitPullCommand.pullUpdatesFromRemoteRepository(buildLogger, "gitReopsitoryUrl", "some-branch");
+        ExecutorGitPullCommand gitPullCommand = new ExecutorGitPullCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, commandExecutor);
+        gitPullCommand.pullUpdatesFromRemoteRepository(buildLogger, "gitRepositoryUrl", "some-branch");
+    }
+
+    public void testThrowsAnIOExceptionIfGitReturnsAnError() throws IOException {
+        checking(new Expectations() {{
+            one(buildLogger).addBuildLogEntry("Pulling source from branch 'some-branch' @ 'gitRepositoryUrl' into '" + SOURCE_CODE_DIRECTORY.getAbsolutePath() + "'.");
+            one(commandExecutor).execute(new String[]{GIT_EXE, "pull", "gitRepositoryUrl", "some-branch:some-branch"}, SOURCE_CODE_DIRECTORY); will(returnValue("fatal: something bad happened"));
+        }});
+
+        ExecutorGitPullCommand gitPullCommand = new ExecutorGitPullCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, commandExecutor);
+        try {
+            gitPullCommand.pullUpdatesFromRemoteRepository(buildLogger, "gitRepositoryUrl", "some-branch");
+            fail("Should throw an IOException");
+        } catch (IOException e) {
+            assertEquals("Could not pull from 'gitRepositoryUrl'. git-pull: fatal: something bad happened", e.getMessage());
+        }
     }
 }

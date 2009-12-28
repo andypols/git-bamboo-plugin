@@ -25,9 +25,7 @@ public class BestGuessGitCommandDiscoverer implements GitCommandDiscoverer {
     }
 
     public String gitCommand() {
-        String gitPath = discoverLocationOfGitCommandLineBinary();
-        log.info("Using git: '" + gitPath + "'");
-        return gitPath;
+        return discoverLocationOfGitCommandLineBinary();
     }
 
     private String discoverLocationOfGitCommandLineBinary() {
