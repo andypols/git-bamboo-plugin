@@ -23,9 +23,18 @@ public class ExecutorGitPullCommand implements GitPullCommand {
     public void pullUpdatesFromRemoteRepository(BuildLogger buildLogger, String repositoryUrl, String branch) throws IOException {
         log.info(buildLogger.addBuildLogEntry("Pulling source from branch '" + branch + "' @ '" + repositoryUrl + "' into '" + sourceCodeDirectory.getAbsolutePath() + "'."));
 
-        String output = commandExecutor.execute(new String[]{gitExe, "pull", repositoryUrl, branch + ":" + branch}, sourceCodeDirectory);
+        String pullOutput = commandExecutor.execute(new String[]{gitExe, "pull", repositoryUrl, branch + ":" + branch}, sourceCodeDirectory);
+        checkCommandOutput(buildLogger, repositoryUrl, pullOutput);
 
-        // FIXME this really should check the exit code rather than looking for errors in the text
+        // git submodule commands will silently do nothing if no submodules are configured
+        String submoduleInitOutput = commandExecutor.execute(new String[]{gitExe, "submodule", "init"}, sourceCodeDirectory);
+        checkCommandOutput(buildLogger, repositoryUrl, submoduleInitOutput);
+
+        String submoduleUpdateOutput = commandExecutor.execute(new String[]{gitExe, "submodule", "update"}, sourceCodeDirectory);
+        checkCommandOutput(buildLogger, repositoryUrl, submoduleUpdateOutput);
+    }
+
+    private void checkCommandOutput(BuildLogger buildLogger, String repositoryUrl, String output) throws IOException {
         if (output.contains("fatal:")) {
             throw new IOException("Could not pull from '" + repositoryUrl + "'. git-pull: " + output);
         } else {
