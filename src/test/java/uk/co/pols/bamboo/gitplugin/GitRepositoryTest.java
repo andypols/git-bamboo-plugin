@@ -23,6 +23,7 @@ public class GitRepositoryTest extends MockObjectTestCase {
     private static final String PLAN_KEY = "plan-key";
     private static final File SRC_CODE_DIR = new File("test/src/code/directory");
     private static final String RESPOSITORY_URL = "RepositoryUrl";
+    private static final String BRANCH = "Branch";
 
     private GitRepositoryConfig gitRepositoryConfig = new GitRepositoryConfig();
     private GitClient gitClient = mock(GitClient.class);
@@ -66,39 +67,27 @@ public class GitRepositoryTest extends MockObjectTestCase {
     }
 
     public void testUsesAGitClientToDetectTheChangesSinceTheLastBuild() throws RepositoryException {
-//        checking(new Expectations() {{
-//            one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
-//            one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, PLAN_KEY, "time of previous build", new ArrayList<Commit>(), SRC_CODE_DIR);
-//            will(returnValue("time of this build"));
-//        }});
-//
-//        BuildChanges buildChanges = gitRepository.collectChangesSinceLastBuild(PLAN_KEY, "time of previous build");
-//
-//        assertEquals("time of this build", buildChanges.getVcsRevisionKey());
+        checking(new Expectations() {{
+            one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
+            one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, BRANCH, PLAN_KEY, "time of previous build", new ArrayList<Commit>(), SRC_CODE_DIR);
+            will(returnValue("time of this build"));
+        }});
+
+        BuildChanges buildChanges = gitRepository.collectChangesSinceLastBuild(PLAN_KEY, "time of previous build");
+
+        assertEquals("time of this build", buildChanges.getVcsRevisionKey());
     }
 
-    public void testInitialisesTheRepositoryIfTheWorkspaceIsEmpty() throws RepositoryException {
-//        checking(new Expectations() {{
-//            one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
-//            one(gitClient).initialiseRepository(SRC_CODE_DIR, PLAN_KEY, null, gitRepositoryConfig, true, buildLogger);
-//            will(returnValue("time of this build"));
-//        }});
-//
-//        String timeOfLastCommmit = gitRepository(true).retrieveSourceCode(PLAN_KEY, null);
-//
-//        assertEquals("time of this build", timeOfLastCommmit);
-    }
+    public void testGetsLatestCodeRetrievingLatestSourceCode() throws RepositoryException {
+        checking(new Expectations() {{
+            one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
+            one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, BRANCH, PLAN_KEY, null, new ArrayList<Commit>(), SRC_CODE_DIR);
+            will(returnValue("time of this build"));
+        }});
 
-    public void testChecksOutTheSourceCodeIfTheIfTheWorkspaceIsNotEmpty() throws RepositoryException {
-//        checking(new Expectations() {{
-//            one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
-//            one(gitClient).initialiseRepository(SRC_CODE_DIR, PLAN_KEY, null, gitRepositoryConfig, false, buildLogger);
-//            will(returnValue("time of this build"));
-//        }});
-//
-//        String timeOfLastCommmit = gitRepository(false).retrieveSourceCode(PLAN_KEY, null);
-//
-//        assertEquals("time of this build", timeOfLastCommmit);
+        String timeOfLastCommmit = gitRepository(true).retrieveSourceCode(PLAN_KEY, null);
+
+        assertEquals("time of this build", timeOfLastCommmit);
     }
 
     public void testARepositoryThatIsNotAGitRepositoryIsClearlyDifferent() {
@@ -149,6 +138,7 @@ public class GitRepositoryTest extends MockObjectTestCase {
 
         gitRepository.setBuildLoggerManager(buildLoggerManager);
         gitRepository.setRepositoryUrl(RESPOSITORY_URL);
+        gitRepository.setBranch(BRANCH);
         return gitRepository;
     }
 
