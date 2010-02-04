@@ -19,7 +19,7 @@ public class ExecutorGitLogCommand implements GitLogCommand {
     public ExecutorGitLogCommand(String gitExe, File sourceCodeDirectory, String lastRevisionChecked, CommandExecutor commandExecutor) {
         this.gitExe = gitExe;
         this.sourceCodeDirectory = sourceCodeDirectory;
-        this.lastRevisionChecked = lastRevisionChecked;
+        this.lastRevisionChecked = "null".equals(lastRevisionChecked) ? null : lastRevisionChecked;
         this.commandExecutor = commandExecutor;
     }
 
@@ -40,9 +40,9 @@ public class ExecutorGitLogCommand implements GitLogCommand {
     }
 
     private String[] getCommandLine() {
-        if (lastRevisionChecked != null) {
-            return new String[]{gitExe, "log", "--numstat", "--date=iso8601", "--since=\"" + lastRevisionChecked + "\""};
+        if (lastRevisionChecked == null) {
+            return new String[]{gitExe, "log", "-1", "--numstat", "--date=iso8601"};
         }
-        return new String[]{gitExe, "log", "-1", "--numstat", "--date=iso8601"};
+        return new String[]{gitExe, "log", "--numstat", "--date=iso8601", "--since=\"" + lastRevisionChecked + "\""};
     }
 }
