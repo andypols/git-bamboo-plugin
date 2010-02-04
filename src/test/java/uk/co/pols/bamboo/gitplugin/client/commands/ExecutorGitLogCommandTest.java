@@ -29,6 +29,19 @@ public class ExecutorGitLogCommandTest extends MockObjectTestCase {
         assertEquals("2008-03-13 01:27:52 +0000", gitLogCommand.getLastRevisionChecked());
     }
 
+    public void testGetsTheMostRecentLogItemIfBambooTellsUsTheTheLastRevisionIsAStringWithTheValueNull() throws IOException {
+        GitLogCommand gitLogCommand = new ExecutorGitLogCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, "null", commandExecutor);
+
+        checking(new Expectations() {{
+            one(commandExecutor).execute(new String[]{GIT_EXE, "log", "-1", "--numstat", "--date=iso8601"}, SOURCE_CODE_DIRECTORY); will(returnValue(mostRecentCommitLog));
+        }});
+
+        List<Commit> commits = gitLogCommand.extractCommits();
+
+        assertEquals(1, commits.size());
+        assertEquals("2008-03-13 01:27:52 +0000", gitLogCommand.getLastRevisionChecked());
+    }
+
     public void testGetsTheLogsSinceTheLastBuild() throws IOException {
         GitLogCommand gitLogCommand = new ExecutorGitLogCommand(GIT_EXE, SOURCE_CODE_DIRECTORY, DATE_OF_LAST_BUILD, commandExecutor);
 
