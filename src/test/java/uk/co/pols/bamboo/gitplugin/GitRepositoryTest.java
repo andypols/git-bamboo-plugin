@@ -33,7 +33,7 @@ public class GitRepositoryTest extends MockObjectTestCase {
     private GitRepository gitRepository = gitRepository(false);
 
     public void testProvidesANameToAppearInTheGuiRepositoryDrownDown() {
-        assertEquals("GitHub", gitRepository.getName());
+        assertEquals("Git", gitRepository.getName());
     }
 
     public void testProvidesALinkToTheGitHubGuidesPage() {

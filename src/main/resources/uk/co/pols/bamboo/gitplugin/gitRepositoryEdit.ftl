@@ -12,17 +12,23 @@
 <SCRIPT TYPE="text/javascript">
 <!--
 function populateGitHubWebUrl(textForm) {
-    var newString = textForm.value.replace('git@github.com:', 'https://github.com/').replace('.git', '');
+    if(isGitHubRepository(textForm.value) {
+        var newString = textForm.value.replace('git@github.com:', 'https://github.com/').replace('.git', '');
 
-    //
-    // the field is called different things on different pages
-    //
-    var repoWebUrlField = document.getElementById('updateBuildRepository_repository_common_webRepositoryUrl');
-    if(repoWebUrlField == null) {
-        repoWebUrlField = document.getElementById('createBuildRepository_repository_common_webRepositoryUrl');
+        //
+        // the field is called different things on different pages
+        //
+        var repoWebUrlField = document.getElementById('updateBuildRepository_repository_common_webRepositoryUrl');
+        if(repoWebUrlField == null) {
+            repoWebUrlField = document.getElementById('createBuildRepository_repository_common_webRepositoryUrl');
+        }
+
+        repoWebUrlField.value = newString;
     }
+}
 
-    repoWebUrlField.value = newString;
+function isGitHubRepository(repositoryUrl) {
+    return textForm.value.indexOf("git@github.com") > -1;
 }
 //-->
 </SCRIPT>
