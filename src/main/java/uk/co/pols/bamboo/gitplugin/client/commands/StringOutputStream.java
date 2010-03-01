@@ -1,5 +1,7 @@
 package uk.co.pols.bamboo.gitplugin.client.commands;
 
+import uk.co.pols.bamboo.gitplugin.client.utils.CharUtil;
+
 import java.io.Serializable;
 import java.io.OutputStream;
 

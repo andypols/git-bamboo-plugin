@@ -1,4 +1,4 @@
-package uk.co.pols.bamboo.gitplugin.client.commands;
+package uk.co.pols.bamboo.gitplugin.client.utils;
 
 public class CharUtil {
 

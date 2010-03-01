@@ -1,6 +1,7 @@
-package uk.co.pols.bamboo.gitplugin.client.commands;
+package uk.co.pols.bamboo.gitplugin.client.utils;
 
 import junit.framework.TestCase;
+import uk.co.pols.bamboo.gitplugin.client.utils.CharUtil;
 
 public class CharUtilTest extends TestCase {
     private static final String TEST_STRING = "Test ...";
