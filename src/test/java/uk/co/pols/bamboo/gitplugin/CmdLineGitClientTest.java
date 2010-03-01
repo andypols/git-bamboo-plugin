@@ -11,11 +11,11 @@ import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.commit.CommitImpl;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.repository.RepositoryException;
-import uk.co.pols.bamboo.gitplugin.client.commands.GitPullCommand;
-import uk.co.pols.bamboo.gitplugin.client.commands.GitLogCommand;
-import uk.co.pols.bamboo.gitplugin.client.commands.GitInitCommand;
-import uk.co.pols.bamboo.gitplugin.client.commands.GitRemoteCommand;
+import uk.co.pols.bamboo.gitplugin.client.git.commands.GitRemoteCommand;
 import uk.co.pols.bamboo.gitplugin.client.CmdLineGitClient;
+import uk.co.pols.bamboo.gitplugin.client.git.commands.GitInitCommand;
+import uk.co.pols.bamboo.gitplugin.client.git.commands.GitPullCommand;
+import uk.co.pols.bamboo.gitplugin.client.git.commands.*;
 import uk.co.pols.bamboo.gitplugin.client.utils.GitRepositoryDetector;
 
 public class CmdLineGitClientTest extends MockObjectTestCase {

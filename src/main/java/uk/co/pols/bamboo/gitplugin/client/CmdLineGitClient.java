@@ -5,9 +5,9 @@ import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.repository.RepositoryException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.co.pols.bamboo.gitplugin.client.commands.*;
 import uk.co.pols.bamboo.gitplugin.client.utils.GitRepositoryDetector;
 import uk.co.pols.bamboo.gitplugin.client.utils.FileBasedGitRepositoryDetector;
+import uk.co.pols.bamboo.gitplugin.client.git.commands.*;
 
 import java.io.File;
 import java.io.IOException;
