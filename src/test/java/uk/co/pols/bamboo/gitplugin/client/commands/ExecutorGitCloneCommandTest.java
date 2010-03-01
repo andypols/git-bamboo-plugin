@@ -32,7 +32,7 @@ public class ExecutorGitCloneCommandTest extends MockObjectTestCase {
 
     public void testRemovesTheSourceDirectoryBeforeCloningAsCannotCloneIntoAnExistingDirectory() throws IOException {
         ExecutorGitCloneCommand cloneCommand = new ExecutorGitCloneCommand(GIT_EXE, commandExecutor);
-        assertTrue(SOURCE_CODE_DIRECTORY.exists());
+        SOURCE_CODE_DIRECTORY.mkdirs();
 
         checking(new Expectations() {{
             allowing(buildLogger);
@@ -51,9 +51,6 @@ public class ExecutorGitCloneCommandTest extends MockObjectTestCase {
         int randomInt = 1 + rand.nextInt();
 
         File tempDir = new File(baseTempPath + File.separator + "tempDir" + randomInt);
-        if (!tempDir.exists()) {
-            tempDir.mkdir();
-        }
 
         tempDir.deleteOnExit();
         return tempDir;
