@@ -16,6 +16,7 @@ import uk.co.pols.bamboo.gitplugin.client.CmdLineGitClient;
 import uk.co.pols.bamboo.gitplugin.client.git.commands.GitInitCommand;
 import uk.co.pols.bamboo.gitplugin.client.git.commands.GitPullCommand;
 import uk.co.pols.bamboo.gitplugin.client.git.commands.*;
+import uk.co.pols.bamboo.gitplugin.client.git.Git;
 import uk.co.pols.bamboo.gitplugin.client.utils.GitRepositoryDetector;
 
 public class CmdLineGitClientTest extends MockObjectTestCase {
@@ -30,17 +31,32 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
     private GitPullCommand gitPullCommand = mock(GitPullCommand.class);
     private GitLogCommand gitLogCommand = mock(GitLogCommand.class);
     private GitInitCommand gitInitCommand = mock(GitInitCommand.class);
+    private GitCloneCommand gitCloneCommand = mock(GitCloneCommand.class);
+    private GitCheckoutCommand gitCheckoutCommand = mock(GitCheckoutCommand.class);
     private GitRemoteCommand gitRemoteCommand = mock(GitRemoteCommand.class);
     private GitRepositoryDetector gitRepositoryDetector = mock(GitRepositoryDetector.class);
+    private Git git = mock(Git.class);
     private ArrayList<Commit> commits = new ArrayList<Commit>();
-    private CmdLineGitClient gitClient = gitClient();
+    private CmdLineGitClient gitClient = new CmdLineGitClient(git);
+    private static final boolean CREATE_NEW_BRANCH = true;
+    private static final boolean USE_EXISTING_BRANCH = false;
+
+    protected void setUp() throws Exception {
+        checking(new Expectations() {{
+            allowing(git).repositoryClone(); will(returnValue(gitCloneCommand));
+            allowing(git).checkout(); will(returnValue(gitCheckoutCommand));
+            allowing(git).pull(SOURCE_CODE_DIRECTORY); will(returnValue(gitPullCommand));
+        }});
+    }
 
     public void testSetsTheLatestUpdateToTheMostRecentCommitTheFirstTimeTheBuildIsRun() throws RepositoryException, IOException {
         checking(new Expectations() {{
-            oneOf(gitRepositoryDetector).containsValidRepo(SOURCE_CODE_DIRECTORY); will(returnValue(false));
+            allowing(git).isValidRepo(SOURCE_CODE_DIRECTORY); will(returnValue(USE_EXISTING_BRANCH));
+            allowing(git).log(SOURCE_CODE_DIRECTORY, null); will(returnValue(gitLogCommand));
+
             one(buildLogger).addBuildLogEntry(SOURCE_CODE_DIRECTORY.getAbsolutePath() + " is empty. Creating new git repository");
-            one(gitInitCommand).init(buildLogger);
-            one(gitRemoteCommand).add_origin(REPOSITORY_URL, REPOSITORY_BRANCH, buildLogger);
+            one(gitCloneCommand).cloneUrl(buildLogger, REPOSITORY_URL, SOURCE_CODE_DIRECTORY);
+            one(gitCheckoutCommand).checkoutBranch(buildLogger, REPOSITORY_BRANCH, CREATE_NEW_BRANCH, SOURCE_CODE_DIRECTORY);
 
             one(buildLogger).addBuildLogEntry("Never checked logs for 'plankey' on path 'repository.url'  setting latest revision to 2009-03-22 01:09:25 +0000");
             one(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL, REPOSITORY_BRANCH);
@@ -56,11 +72,12 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
 
     public void testDoesNotReturnAnyCommitsIfThereHaveNotBeenAnyCommentsSinceTheLastCheck() throws RepositoryException, IOException {
         checking(new Expectations() {{
-            oneOf(gitRepositoryDetector).containsValidRepo(SOURCE_CODE_DIRECTORY); will(returnValue(true));
-
-            one(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL, REPOSITORY_BRANCH);
-            one(gitLogCommand).extractCommits(); will(returnValue(new ArrayList<Commit>()));
-            one(gitLogCommand).getLastRevisionChecked(); will(returnValue(LAST_REVISION_CHECKED));
+            allowing(git).isValidRepo(SOURCE_CODE_DIRECTORY); will(returnValue(true));
+            oneOf(gitCheckoutCommand).checkoutBranch(buildLogger, REPOSITORY_BRANCH, USE_EXISTING_BRANCH, SOURCE_CODE_DIRECTORY);
+            oneOf(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL, REPOSITORY_BRANCH);
+            oneOf(git).log(SOURCE_CODE_DIRECTORY, LAST_REVISION_CHECKED); will(returnValue(gitLogCommand));
+            oneOf(gitLogCommand).extractCommits(); will(returnValue(new ArrayList<Commit>()));
+            oneOf(gitLogCommand).getLastRevisionChecked(); will(returnValue(LAST_REVISION_CHECKED));
         }});
 
         String latestUpdate = gitClient.getLatestUpdate(buildLogger, REPOSITORY_URL, REPOSITORY_BRANCH, PLAN_KEY, LAST_REVISION_CHECKED, commits, SOURCE_CODE_DIRECTORY);
@@ -75,12 +92,15 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
         latestCommits.add(new CommitImpl());
 
         checking(new Expectations() {{
-            oneOf(gitRepositoryDetector).containsValidRepo(SOURCE_CODE_DIRECTORY); will(returnValue(true));
+            allowing(git).isValidRepo(SOURCE_CODE_DIRECTORY); will(returnValue(true));
+            oneOf(gitCheckoutCommand).checkoutBranch(buildLogger, REPOSITORY_BRANCH, USE_EXISTING_BRANCH, SOURCE_CODE_DIRECTORY);
 
-            one(gitLogCommand).getLastRevisionChecked(); will(returnValue("2009-03-25 01:09:25 +0000"));
-            one(buildLogger).addBuildLogEntry("Collecting changes for 'plankey' on path 'repository.url' since 2009-03-22 01:09:25 +0000");
-            one(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL, REPOSITORY_BRANCH);
-            one(gitLogCommand).extractCommits(); will(returnValue(latestCommits));
+            oneOf(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL, REPOSITORY_BRANCH);
+            oneOf(git).log(SOURCE_CODE_DIRECTORY, LAST_REVISION_CHECKED); will(returnValue(gitLogCommand));
+            oneOf(gitLogCommand).extractCommits(); will(returnValue(latestCommits));
+            oneOf(gitLogCommand).getLastRevisionChecked(); will(returnValue("2009-03-25 01:09:25 +0000"));
+
+            oneOf(buildLogger).addBuildLogEntry("Collecting changes for 'plankey' on path 'repository.url' since 2009-03-22 01:09:25 +0000");
         }});
 
         String latestUpdate = gitClient.getLatestUpdate(buildLogger, REPOSITORY_URL, REPOSITORY_BRANCH, PLAN_KEY, LAST_REVISION_CHECKED, commits, SOURCE_CODE_DIRECTORY);
@@ -93,7 +113,8 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
         final IOException ioException = new IOException("EXPECTED EXCEPTION");
 
         checking(new Expectations() {{
-            oneOf(gitRepositoryDetector).containsValidRepo(SOURCE_CODE_DIRECTORY); will(returnValue(true));
+            allowing(git).isValidRepo(SOURCE_CODE_DIRECTORY); will(returnValue(true));
+            oneOf(gitCheckoutCommand).checkoutBranch(buildLogger, REPOSITORY_BRANCH, USE_EXISTING_BRANCH, SOURCE_CODE_DIRECTORY);
 
             one(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL, REPOSITORY_BRANCH); will(throwException(ioException));
         }});
@@ -112,40 +133,19 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
         gitRepositoryConfig.setBranch(REPOSITORY_BRANCH);
 
         checking(new Expectations() {{
-            allowing(gitPullCommand);
             allowing(gitLogCommand);
 
-            oneOf(gitRepositoryDetector).containsValidRepo(SOURCE_CODE_DIRECTORY); will(returnValue(false));
-            oneOf(buildLogger).addBuildLogEntry(SOURCE_CODE_DIRECTORY.getAbsolutePath() + " is empty. Creating new git repository");
-            oneOf(gitInitCommand).init(buildLogger);
-            oneOf(gitRemoteCommand).add_origin(REPOSITORY_URL, REPOSITORY_BRANCH, buildLogger);
+            allowing(git).isValidRepo(SOURCE_CODE_DIRECTORY); will(returnValue(USE_EXISTING_BRANCH));
+            one(buildLogger).addBuildLogEntry(SOURCE_CODE_DIRECTORY.getAbsolutePath() + " is empty. Creating new git repository");
+
+            oneOf(gitCloneCommand).cloneUrl(buildLogger, REPOSITORY_URL, SOURCE_CODE_DIRECTORY);
+            oneOf(gitCheckoutCommand).checkoutBranch(buildLogger, REPOSITORY_BRANCH, CREATE_NEW_BRANCH, SOURCE_CODE_DIRECTORY);
+            oneOf(gitPullCommand).pullUpdatesFromRemoteRepository(buildLogger, REPOSITORY_URL, REPOSITORY_BRANCH);
+            oneOf(git).log(SOURCE_CODE_DIRECTORY, LAST_REVISION_CHECKED); will(returnValue(gitLogCommand));
+
             one(buildLogger).addBuildLogEntry("Collecting changes for 'plankey' on path 'repository.url' since 2009-03-22 01:09:25 +0000");
         }});
 
         gitClient.getLatestUpdate(buildLogger, REPOSITORY_URL, REPOSITORY_BRANCH, PLAN_KEY, LAST_REVISION_CHECKED, commits, SOURCE_CODE_DIRECTORY);
-    }
-
-    private CmdLineGitClient gitClient() {
-        return new CmdLineGitClient() {
-            protected GitPullCommand pullCommand(File sourceCodeDirectory) {
-                return gitPullCommand;
-            }
-
-            protected GitLogCommand logCommand(File sourceCodeDirectory, String lastRevisionChecked) {
-                return gitLogCommand;
-            }
-
-            protected GitInitCommand initCommand(File sourceCodeDirectory) {
-                return gitInitCommand;
-            }
-
-            protected GitRemoteCommand remoteCommand(File sourceCodeDirectory) {
-                return gitRemoteCommand;
-            }
-
-            protected GitRepositoryDetector gitRepositoryDetectory() {
-                return gitRepositoryDetector;
-            }
-        };
     }
 }

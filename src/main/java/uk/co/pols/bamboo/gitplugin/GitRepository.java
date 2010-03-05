@@ -17,6 +17,7 @@ import java.util.List;
 
 import uk.co.pols.bamboo.gitplugin.client.CmdLineGitClient;
 import uk.co.pols.bamboo.gitplugin.client.GitClient;
+import uk.co.pols.bamboo.gitplugin.client.git.CmdLineGit;
 
 public class GitRepository extends AbstractRepository implements WebRepositoryEnabledRepository {
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
@@ -189,7 +190,7 @@ public class GitRepository extends AbstractRepository implements WebRepositoryEn
     }
 
     protected GitClient gitClient() {
-        return new CmdLineGitClient();
+        return new CmdLineGitClient(new CmdLineGit());
     }
 
     protected GitRepositoryConfig gitRepositoryConfig() {

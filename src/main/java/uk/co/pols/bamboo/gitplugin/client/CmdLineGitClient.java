@@ -5,9 +5,8 @@ import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.repository.RepositoryException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.co.pols.bamboo.gitplugin.client.utils.GitRepositoryDetector;
-import uk.co.pols.bamboo.gitplugin.client.utils.FileBasedGitRepositoryDetector;
-import uk.co.pols.bamboo.gitplugin.client.git.commands.*;
+import uk.co.pols.bamboo.gitplugin.client.git.Git;
+import uk.co.pols.bamboo.gitplugin.client.git.commands.GitLogCommand;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,17 +14,23 @@ import java.util.List;
 
 public class CmdLineGitClient implements GitClient {
     private static final Log log = LogFactory.getLog(CmdLineGitClient.class);
-    private GitCommandDiscoverer gitCommandDiscoverer = gitCommandDiscoverer();
+    private Git git;
+
+    public CmdLineGitClient(Git git) {
+        this.git = git;
+    }
 
     public String getLatestUpdate(BuildLogger buildLogger, String repositoryUrl, String branch, String planKey, String lastRevisionChecked, List<Commit> commits, File sourceCodeDirectory) throws RepositoryException {
         try {
-            if (!gitRepositoryDetectory().containsValidRepo(sourceCodeDirectory)) {
+            if (!git.isValidRepo(sourceCodeDirectory)) {
                 initialiseRemoteRepository(sourceCodeDirectory, repositoryUrl, branch, buildLogger);
+            } else {
+                git.checkout().checkoutBranch(buildLogger, branch, false, sourceCodeDirectory);
             }
 
-            pullCommand(sourceCodeDirectory).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl, branch);
+            git.pull(sourceCodeDirectory).pullUpdatesFromRemoteRepository(buildLogger, repositoryUrl, branch);
 
-            GitLogCommand gitLogCommand = logCommand(sourceCodeDirectory, lastRevisionChecked);
+            GitLogCommand gitLogCommand = git.log(sourceCodeDirectory, lastRevisionChecked);
             List<Commit> gitCommits = gitLogCommand.extractCommits();
             String latestRevisionOnServer = gitLogCommand.getLastRevisionChecked();
 
@@ -44,38 +49,13 @@ public class CmdLineGitClient implements GitClient {
         }
     }
 
-    protected GitPullCommand pullCommand(File sourceCodeDirectory) {
-        return new ExecutorGitPullCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, new AntCommandExecutor());
-    }
-
-    protected GitLogCommand logCommand(File sourceCodeDirectory, String lastRevisionChecked) {
-        return new ExecutorGitLogCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, lastRevisionChecked, new AntCommandExecutor());
-    }
-
-    protected GitInitCommand initCommand(File sourceCodeDirectory) {
-        return new ExecutorGitInitCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, new AntCommandExecutor());
-    }
-
-    protected GitRemoteCommand remoteCommand(File sourceCodeDirectory) {
-        return new ExecutorGitRemoteCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, new AntCommandExecutor());
-    }
-
-    protected GitRepositoryDetector gitRepositoryDetectory() {
-        return new FileBasedGitRepositoryDetector();
-    }
-
     private void initialiseRemoteRepository(File sourceDirectory, String repositoryUrl, String branch, BuildLogger buildLogger) throws RepositoryException {
         log.info(buildLogger.addBuildLogEntry(sourceDirectory.getAbsolutePath() + " is empty. Creating new git repository"));
         try {
-            sourceDirectory.mkdirs();
-            initCommand(sourceDirectory).init(buildLogger);
-            remoteCommand(sourceDirectory).add_origin(repositoryUrl, branch, buildLogger);
+            git.repositoryClone().cloneUrl(buildLogger, repositoryUrl, sourceDirectory);
+            git.checkout().checkoutBranch(buildLogger, branch, true, sourceDirectory);
         } catch (IOException e) {
             throw new RepositoryException("Failed to initialise repository", e);
         }
-    }
-
-    protected GitCommandDiscoverer gitCommandDiscoverer() {
-        return new BestGuessGitCommandDiscoverer(new AntCommandExecutor());
     }
 }

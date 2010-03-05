@@ -2,11 +2,17 @@ package uk.co.pols.bamboo.gitplugin.client.git;
 
 import uk.co.pols.bamboo.gitplugin.client.git.Git;
 import uk.co.pols.bamboo.gitplugin.client.git.commands.*;
+import uk.co.pols.bamboo.gitplugin.client.utils.GitRepositoryDetector;
+import uk.co.pols.bamboo.gitplugin.client.utils.FileBasedGitRepositoryDetector;
 
 import java.io.File;
 
 public class CmdLineGit implements Git {
     private GitCommandDiscoverer gitCommandDiscoverer = gitCommandDiscoverer();
+
+    public boolean isValidRepo(File sourceDirectory) {
+        return new FileBasedGitRepositoryDetector().containsValidRepo(sourceDirectory);
+    }
 
     public GitPullCommand pull(File sourceCodeDirectory) {
         return new ExecutorGitPullCommand(gitCommandDiscoverer.gitCommand(), sourceCodeDirectory, new AntCommandExecutor());
