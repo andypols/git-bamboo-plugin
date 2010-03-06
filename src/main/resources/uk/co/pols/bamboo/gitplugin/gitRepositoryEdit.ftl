@@ -11,8 +11,10 @@
 
 <SCRIPT TYPE="text/javascript">
 <!--
+String.prototype.startsWith = function(str) {return (this.match("^"+str)==str)}
+
 function populateGitHubWebUrl(textForm) {
-    if(isGitHubRepository(textForm.value) {
+    if (textForm.value.startsWith("git@github.com:")) {
         var newString = textForm.value.replace('git@github.com:', 'https://github.com/').replace('.git', '');
 
         //
@@ -25,10 +27,6 @@ function populateGitHubWebUrl(textForm) {
 
         repoWebUrlField.value = newString;
     }
-}
-
-function isGitHubRepository(repositoryUrl) {
-    return textForm.value.indexOf("git@github.com") > -1;
 }
 //-->
 </SCRIPT>
