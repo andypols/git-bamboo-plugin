@@ -1,19 +1,19 @@
 h1. A Git Plugin for the Bamboo build server
 
-Version 1.0.3
+Version 1.0.4
 
-Build your GitHub repositories on the Amazon Cloud using "Atlassian's Bamboo":http://atlassian.com/bamboo.
+Build your Git repositories on the Amazon Cloud using "Atlassian's Bamboo":http://atlassian.com/bamboo.
 
-* Adds the option “GitHub” to the list of available repositories when you add or edit a plan.
+* Adds the option “Git” to the list of available repositories when you add or edit a plan.
 * Shows the changes that triggered the build.
-* Trigger the build via a GitHub Service Hook.
-* Links the commit code changes back to the GitHub page containing the commit/diff.
+* Can trigger the build via a GitHub Service Hook.
+* Links GitHub repository changes back to the GitHub page containing the commit/diff.
 * Works with Bamboo version 2.2 or greater.
 * Assumes Bamboo is running on *nix (tested on Ubuntu and OSX).  Would need tweaking for windows.
 
 More information on the "Project's wiki":http://wiki.github.com/andypols/git-bamboo-plugin.
 
-NOTE: The trigger on change feature has stopped working since github moved from engineyard to rackspace. Bamboo's  TriggerRemoteBuild checks that the IP address of the source repository matches the IP adress of the build trigger. The trigger now *comes from a different IP and is rejected by Bamboo*. I have raised the following jira with the bamboo team: "BAM-4713":http://jira.atlassian.com/browse/BAM-4713.  Vote on it to get it fixed!!!  The short term fix is to poll for changes instead.
+NOTE: The trigger on change feature has stopped working since github moved from engineyard to rackspace. Bamboo's  TriggerRemoteBuild checks that the IP address of the source repository matches the IP address of the build trigger. The trigger now *comes from a different IP and is rejected by Bamboo*. I have raised the following jira with the bamboo team: "BAM-4713":http://jira.atlassian.com/browse/BAM-4713.  Vote on it to get it fixed!!!  The short term fix is to poll for changes instead.
 
 h2. Installation
 
