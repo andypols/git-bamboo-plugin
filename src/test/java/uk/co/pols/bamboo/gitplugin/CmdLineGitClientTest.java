@@ -11,13 +11,10 @@ import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.commit.CommitImpl;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.repository.RepositoryException;
-import uk.co.pols.bamboo.gitplugin.client.git.commands.GitRemoteCommand;
 import uk.co.pols.bamboo.gitplugin.client.CmdLineGitClient;
-import uk.co.pols.bamboo.gitplugin.client.git.commands.GitInitCommand;
 import uk.co.pols.bamboo.gitplugin.client.git.commands.GitPullCommand;
 import uk.co.pols.bamboo.gitplugin.client.git.commands.*;
 import uk.co.pols.bamboo.gitplugin.client.git.Git;
-import uk.co.pols.bamboo.gitplugin.client.utils.GitRepositoryDetector;
 
 public class CmdLineGitClientTest extends MockObjectTestCase {
     private static final String LAST_REVISION_CHECKED = "2009-03-22 01:09:25 +0000";
@@ -30,11 +27,8 @@ public class CmdLineGitClientTest extends MockObjectTestCase {
     private BuildLogger buildLogger = mock(BuildLogger.class);
     private GitPullCommand gitPullCommand = mock(GitPullCommand.class);
     private GitLogCommand gitLogCommand = mock(GitLogCommand.class);
-    private GitInitCommand gitInitCommand = mock(GitInitCommand.class);
     private GitCloneCommand gitCloneCommand = mock(GitCloneCommand.class);
     private GitCheckoutCommand gitCheckoutCommand = mock(GitCheckoutCommand.class);
-    private GitRemoteCommand gitRemoteCommand = mock(GitRemoteCommand.class);
-    private GitRepositoryDetector gitRepositoryDetector = mock(GitRepositoryDetector.class);
     private Git git = mock(Git.class);
     private ArrayList<Commit> commits = new ArrayList<Commit>();
     private CmdLineGitClient gitClient = new CmdLineGitClient(git);
