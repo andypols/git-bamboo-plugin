@@ -8,7 +8,7 @@ Build your Git repositories on the Amazon Cloud using "Atlassian's Bamboo":http:
 * Shows the changes that triggered the build.
 * Can trigger the build via a GitHub Service Hook.
 * Links GitHub repository changes back to the GitHub page containing the commit/diff.
-* Works with Bamboo version 2.2 or greater.
+* Works with Bamboo version 2.2 or greater (Does not work on the latest release due to API changes - see Issue #13)
 * Assumes Bamboo is running on *nix (tested on Ubuntu and OSX).  Would need tweaking for windows.
 
 More information on the "Project's wiki":http://wiki.github.com/andypols/git-bamboo-plugin.
