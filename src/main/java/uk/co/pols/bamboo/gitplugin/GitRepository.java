@@ -2,7 +2,9 @@ package uk.co.pols.bamboo.gitplugin;
 
 import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.commit.CommitFile;
-import com.atlassian.bamboo.repository.*;
+import com.atlassian.bamboo.repository.AbstractRepository;
+import com.atlassian.bamboo.repository.Repository;
+import com.atlassian.bamboo.repository.RepositoryException;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.v2.build.BuildChanges;
 import com.atlassian.bamboo.v2.build.BuildChangesImpl;
@@ -11,15 +13,14 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import uk.co.pols.bamboo.gitplugin.client.CmdLineGitClient;
 import uk.co.pols.bamboo.gitplugin.client.GitClient;
 import uk.co.pols.bamboo.gitplugin.client.git.CmdLineGit;
 
-public class GitRepository extends AbstractRepository implements WebRepositoryEnabledRepository {
+import java.util.ArrayList;
+import java.util.List;
+
+public class GitRepository extends AbstractRepository {
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
     /*
