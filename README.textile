@@ -1,6 +1,6 @@
 h1. A Git Plugin for the Bamboo build server
 
-Version 1.0.4
+Version 1.0.5
 
 Build your Git repositories on the Amazon Cloud using "Atlassian's Bamboo":http://atlassian.com/bamboo.
 
@@ -18,7 +18,8 @@ NOTE: The trigger on change feature has stopped working since github moved from 
 h2. Bamboo Compatibility
 
 |_. File |_. Bamboo Version |
-| git-repository-1.0.4.jar | 2.2/2.3/2.4 |
+| git-repository-1.0.5.jar | 2.2/2.3/2.4/2.5 |
+| git-repository-1.0.4.jar | 2.2/2.3/2.4     |
 
 h2. Installation
 

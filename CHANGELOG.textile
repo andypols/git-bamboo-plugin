@@ -1,5 +1,9 @@
 h1. Release Notes
 
+1.0.5 Bug Fix
+
+* Updated to work with version Bamboo 2.5
+
 1.0.4 Bug Fix
 
 * The build branch now has the same name as the branch on the remote repository.  Previously, due to the way I was creating the local branch on the build agent, it always calling all the build branch "master". "Issue 11":http://github.com/andypols/git-bamboo-plugin/issues/issue/11.
