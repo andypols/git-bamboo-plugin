@@ -6,6 +6,9 @@ import com.atlassian.bamboo.utils.error.SimpleErrorCollection;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.jmock.integration.junit3.MockObjectTestCase;
+
+import static uk.co.pols.bamboo.gitplugin.GitRepositoryConfig.AvailableConfig.REPOSITORY;
+import static uk.co.pols.bamboo.gitplugin.GitRepositoryConfig.AvailableConfig.WEB_REPOSITORY;
 import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitFile;
 import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitWithFile;
 
@@ -16,7 +19,7 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         BuildConfiguration buildConfiguration = new BuildConfiguration();
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "TheBranch");
 
-        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
+        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration, REPOSITORY);
 
         assertHasError(errorCollection, GitRepositoryConfig.GIT_REPO_URL, "Please specify where the repository is located");
     }
@@ -25,7 +28,7 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         BuildConfiguration buildConfiguration = new BuildConfiguration();
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "The Rep Url");
 
-        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
+        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration, REPOSITORY);
 
         assertHasError(errorCollection, GitRepositoryConfig.GIT_BRANCH, "Please specify which branch you want to build");
     }
@@ -34,20 +37,20 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
         BuildConfiguration buildConfiguration = new BuildConfiguration();
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "TheBranch");
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "The Rep Url");
-//        buildConfiguration.setProperty(AbstractRepository.WEB_REPO_URL, "An Invalid Url");
+        buildConfiguration.setProperty(GitRepositoryConfig.WEB_REPO_URL, "An Invalid Url");
 
-        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
+        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration, WEB_REPOSITORY);
 
-//        assertHasError(errorCollection, AbstractRepository.WEB_REPO_URL, "This is not a valid url");
+        assertHasError(errorCollection, GitRepositoryConfig.WEB_REPO_URL, "This is not a valid url");
     }
 
     public void testAcceptsARepositoryAndBranchWithoutReportingAnyErrors() {
         BuildConfiguration buildConfiguration = new BuildConfiguration();
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "The Rep Url");
         buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "The Branch");
-//        buildConfiguration.setProperty(AbstractRepository.WEB_REPO_URL, "https://github.com/andypols/git-bamboo-plugin/tree/master");
+        buildConfiguration.setProperty(GitRepositoryConfig.WEB_REPO_URL, "https://github.com/andypols/git-bamboo-plugin/tree/master");
 
-        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
+        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration, REPOSITORY);
 
         assertFalse(errorCollection.hasAnyErrors());
     }
@@ -55,7 +58,7 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
     public void testReportsMultipleErrorsAtSameTime() {
         BuildConfiguration buildConfiguration = new BuildConfiguration();
 
-        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration);
+        ErrorCollection errorCollection = repositoryConfig.validate(new SimpleErrorCollection(), buildConfiguration, REPOSITORY);
 
         assertTrue(errorCollection.hasAnyErrors());
         assertEquals(2, errorCollection.getTotalErrors());
@@ -65,35 +68,46 @@ public class GitRepositoryConfigTest extends MockObjectTestCase {
 
     public void testSavesTheRepositorySettingsInTheBuildConfiguration() {
         repositoryConfig.setRepositoryUrl("TheTopSecretBuildRepoUrl");
-        repositoryConfig.setWebRepositoryUrl("TheRepoWebUrl");
         repositoryConfig.setBranch("TheBranch");
-        repositoryConfig.setKeyFile("the/key/file");
-        repositoryConfig.setPassphrase("passphrase");
 
-        HierarchicalConfiguration hierarchicalConfiguration = repositoryConfig.toConfiguration(new HierarchicalConfiguration());
+        HierarchicalConfiguration hierarchicalConfiguration = repositoryConfig.toConfiguration(new HierarchicalConfiguration(), REPOSITORY);
 
         assertEquals("TheTopSecretBuildRepoUrl", hierarchicalConfiguration.getProperty(GitRepositoryConfig.GIT_REPO_URL));
         assertEquals("TheBranch", hierarchicalConfiguration.getProperty(GitRepositoryConfig.GIT_BRANCH));
-//        assertEquals("TheRepoWebUrl", hierarchicalConfiguration.getProperty(AbstractRepository.WEB_REPO_URL));
     }
 
-//    public void testLoadsTheRepositorySettingsFromTheBuildConfiguration() {
-//        HierarchicalConfiguration buildConfiguration = new HierarchicalConfiguration();
-//        buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "TheTopSecretBuildRepoUrl");
-//        buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "TheSpecialBranch");
-//        buildConfiguration.setProperty(AbstractRepository.WEB_REPO_URL, "WebRepositoryUrl");
-//
-//        repositoryConfig.populateFromConfig(buildConfiguration);
-//
-//        assertEquals("TheSpecialBranch", repositoryConfig.getBranch());
-//        assertEquals("TheTopSecretBuildRepoUrl", repositoryConfig.getRepositoryUrl());
-//        assertEquals("WebRepositoryUrl", repositoryConfig.getWebRepositoryUrl());
-//    }
+    public void testSavesTheWebRepositorySettingsInTheBuildConfiguration() {
+        repositoryConfig.setWebRepositoryUrl("TheRepoWebUrl");
+
+        HierarchicalConfiguration hierarchicalConfiguration = repositoryConfig.toConfiguration(new HierarchicalConfiguration(), WEB_REPOSITORY);
+
+        assertEquals("TheRepoWebUrl", hierarchicalConfiguration.getProperty(GitRepositoryConfig.WEB_REPO_URL));
+    }
+
+    public void testLoadsTheRepositorySettingsFromTheBuildConfiguration() {
+        HierarchicalConfiguration buildConfiguration = new HierarchicalConfiguration();
+        buildConfiguration.setProperty(GitRepositoryConfig.GIT_REPO_URL, "TheTopSecretBuildRepoUrl");
+        buildConfiguration.setProperty(GitRepositoryConfig.GIT_BRANCH, "TheSpecialBranch");
+
+        repositoryConfig.populateFromConfig(buildConfiguration, REPOSITORY);
+
+        assertEquals("TheSpecialBranch", repositoryConfig.getBranch());
+        assertEquals("TheTopSecretBuildRepoUrl", repositoryConfig.getRepositoryUrl());
+    }
+
+    public void testLoadsTheWebRepositorySettingsFromTheBuildConfiguration() {
+        HierarchicalConfiguration buildConfiguration = new HierarchicalConfiguration();
+        buildConfiguration.setProperty(GitRepositoryConfig.WEB_REPO_URL, "WebRepositoryUrl");
+
+        repositoryConfig.populateFromConfig(buildConfiguration, WEB_REPOSITORY);
+
+        assertEquals("WebRepositoryUrl", repositoryConfig.getWebRepositoryUrl());
+    }
 
     public void testDefaultsToUsingTheMasterBranchOnNewPlans() {
         BuildConfiguration buildConfiguration = new BuildConfiguration();
 
-        repositoryConfig.addDefaultValues(buildConfiguration);
+        repositoryConfig.addDefaultValues(buildConfiguration, REPOSITORY);
 
         assertEquals("master", buildConfiguration.getProperty(GitRepositoryConfig.GIT_BRANCH));
     }

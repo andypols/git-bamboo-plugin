@@ -1,6 +1,5 @@
 package uk.co.pols.bamboo.gitplugin;
 
-//import static com.atlassian.bamboo.repository.AbstractRepository.WEB_REPO_URL;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.StringUtils;
 import com.atlassian.bamboo.repository.Repository;
@@ -13,23 +12,40 @@ import com.opensymphony.util.UrlUtils;
 import java.io.Serializable;
 import java.util.List;
 
+import static uk.co.pols.bamboo.gitplugin.GitRepositoryConfig.AvailableConfig.REPOSITORY;
+
 public class GitRepositoryConfig implements Serializable {
     public static final String REPO_PREFIX = "repository.github.";
 
     public static final String GIT_REPO_URL = REPO_PREFIX + "repositoryUrl";
     public static final String GIT_BRANCH = REPO_PREFIX + "branch";
+    public static final String WEB_REPO_URL = REPO_PREFIX + "webRepositoryUrl";
     private static final String DEFAULT_BRANCH = "master";
+
+    enum AvailableConfig {REPOSITORY, WEB_REPOSITORY}
 
     private String repositoryUrl;
     private String branch;
     private String webRepositoryUrl;
-    private String keyFile;
-    private String passphrase;
 
-    public void populateFromConfig(HierarchicalConfiguration config) {
-        repositoryUrl = config.getString(GIT_REPO_URL);
-        branch = config.getString(GIT_BRANCH);
-//        webRepositoryUrl = config.getString(WEB_REPO_URL);
+    public void populateFromConfig(HierarchicalConfiguration config, AvailableConfig availableConfig) {
+        if (availableConfig.equals(REPOSITORY)) {
+            repositoryUrl = config.getString(GIT_REPO_URL);
+            branch = config.getString(GIT_BRANCH);
+        } else {
+            webRepositoryUrl = config.getString(WEB_REPO_URL);
+        }
+    }
+
+    public HierarchicalConfiguration toConfiguration(HierarchicalConfiguration configuration, AvailableConfig availableConfig) {
+        if (availableConfig.equals(REPOSITORY)) {
+            configuration.setProperty(GIT_REPO_URL, getRepositoryUrl());
+            configuration.setProperty(GIT_BRANCH, getBranch());
+        } else {
+            configuration.setProperty(WEB_REPO_URL, getWebRepositoryUrl());
+        }
+
+        return configuration;
     }
 
     public String getRepositoryUrl() {
@@ -46,22 +62,6 @@ public class GitRepositoryConfig implements Serializable {
 
     public void setBranch(String branch) {
         this.branch = branch;
-    }
-
-    public String getKeyFile() {
-        return StringUtils.trim(keyFile);
-    }
-
-    public void setKeyFile(String keyFile) {
-        this.keyFile = StringUtils.trim(keyFile);
-    }
-
-    public String getPassphrase() {
-        return StringUtils.trim(passphrase);
-    }
-
-    public void setPassphrase(String passphrase) {
-        this.passphrase = StringUtils.trim(passphrase);
     }
 
     public String getHost() {
@@ -84,22 +84,16 @@ public class GitRepositoryConfig implements Serializable {
         return StringUtils.isNotBlank(webRepositoryUrl) && webRepositoryUrl.contains("github.com");
     }
 
-    public HierarchicalConfiguration toConfiguration(HierarchicalConfiguration configuration) {
-        configuration.setProperty(GIT_REPO_URL, getRepositoryUrl());
-        configuration.setProperty(GIT_BRANCH, getBranch());
-//        configuration.setProperty(WEB_REPO_URL, getWebRepositoryUrl());
-
-        return configuration;
-    }
-
-    public ErrorCollection validate(ErrorCollection errorCollection, BuildConfiguration buildConfiguration) {
-        validateMandatoryField(buildConfiguration, errorCollection, GIT_REPO_URL, "Please specify where the repository is located");
-        validateMandatoryField(buildConfiguration, errorCollection, GIT_BRANCH, "Please specify which branch you want to build");
-
-//        String webRepoUrl = buildConfiguration.getString(WEB_REPO_URL);
-//        if (!StringUtils.isBlank(webRepoUrl) && !UrlUtils.verifyHierachicalURI(webRepoUrl)) {
-//            errorCollection.addError(WEB_REPO_URL, "This is not a valid url");
-//        }
+    public ErrorCollection validate(ErrorCollection errorCollection, BuildConfiguration buildConfiguration, AvailableConfig availableConfig) {
+        if (availableConfig.equals(REPOSITORY)) {
+            validateMandatoryField(buildConfiguration, errorCollection, GIT_REPO_URL, "Please specify where the repository is located");
+            validateMandatoryField(buildConfiguration, errorCollection, GIT_BRANCH, "Please specify which branch you want to build");
+        } else {
+            String webRepoUrl = buildConfiguration.getString(WEB_REPO_URL);
+            if (!StringUtils.isBlank(webRepoUrl) && !UrlUtils.verifyHierachicalURI(webRepoUrl)) {
+                errorCollection.addError(WEB_REPO_URL, "This is not a valid url");
+            }
+        }
 
         return errorCollection;
     }
@@ -110,8 +104,10 @@ public class GitRepositoryConfig implements Serializable {
         }
     }
 
-    public void addDefaultValues(BuildConfiguration buildConfiguration) {
-        buildConfiguration.setProperty(GIT_BRANCH, DEFAULT_BRANCH);
+    public void addDefaultValues(BuildConfiguration buildConfiguration, AvailableConfig availableConfig) {
+        if (availableConfig.equals(REPOSITORY)) {
+            buildConfiguration.setProperty(GIT_BRANCH, DEFAULT_BRANCH);
+        }
     }
 
     public String getWebRepositoryUrlForFile(CommitFile commitFile) {
@@ -133,7 +129,7 @@ public class GitRepositoryConfig implements Serializable {
 
     private String commitIdFor(Commit commit) {
         List<CommitFile> files = commit.getFiles();
-        if(files.isEmpty()) {
+        if (files.isEmpty()) {
             return "UNKNOWN";
         }
         return files.get(0).getRevision();

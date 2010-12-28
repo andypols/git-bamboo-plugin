@@ -55,6 +55,7 @@
                 <include name="atlassian-bamboo-persistence-*.jar"/>
                 <include name="atlassian-bamboo-charts-*.jar"/>
                 <include name="atlassian-util-concurrent-*.jar"/>
+                <include name="atlassian-plugins-core-*.jar"/>
                 <include name="ant-*.jar"/>
                 <include name="joda-time-*.jar"/>
                 <include name="commons-logging-*.jar"/>

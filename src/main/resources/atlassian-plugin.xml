@@ -10,4 +10,11 @@
         <resource type="freemarker" name="edit" location="uk/co/pols/bamboo/gitplugin/gitRepositoryEdit.ftl"/>
         <resource type="freemarker" name="view" location="uk/co/pols/bamboo/gitplugin/gitRepositoryView.ftl"/>
     </repository>
+
+    <webRepositoryViewer key="githubRepositoryViewer" name="GitHub Web Repository" class="uk.co.pols.bamboo.gitplugin.GitHubWebRepositoryViewer">
+        <description>Renders GitHub Links for commits.</description>
+        <resource type="freemarker" name="edit" location="uk/co/pols/bamboo/gitplugin/gitHubRepositoryViewerEdit.ftl"/>
+        <resource type="freemarker" name="view" location="uk/co/pols/bamboo/gitplugin/gitHubRepositoryViewerView.ftl"/>
+    </webRepositoryViewer>
+
 </atlassian-plugin>

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.atlassian.bamboo.plan.PlanKeys.getPlanKey;
+import static uk.co.pols.bamboo.gitplugin.GitRepositoryConfig.AvailableConfig.REPOSITORY;
 
 public class GitRepository extends AbstractRepository {
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
@@ -102,22 +103,22 @@ public class GitRepository extends AbstractRepository {
     @Override
     public void populateFromConfig(HierarchicalConfiguration config) {
         super.populateFromConfig(config);
-        gitRepositoryConfig.populateFromConfig(config);
+        gitRepositoryConfig.populateFromConfig(config, REPOSITORY);
     }
 
     @Override
     public HierarchicalConfiguration toConfiguration() {
-        return gitRepositoryConfig.toConfiguration(super.toConfiguration());
+        return gitRepositoryConfig.toConfiguration(super.toConfiguration(), REPOSITORY);
     }
 
     @Override
     public ErrorCollection validate(BuildConfiguration buildConfiguration) {
-        return gitRepositoryConfig.validate(super.validate(buildConfiguration), buildConfiguration);
+        return gitRepositoryConfig.validate(super.validate(buildConfiguration), buildConfiguration, REPOSITORY);
     }
 
     public void addDefaultValues(BuildConfiguration buildConfiguration) {
         super.addDefaultValues(buildConfiguration);
-        gitRepositoryConfig.addDefaultValues(buildConfiguration);
+        gitRepositoryConfig.addDefaultValues(buildConfiguration, REPOSITORY);
     }
 
     public void setRepositoryUrl(String repositoryUrl) {
@@ -134,42 +135,6 @@ public class GitRepository extends AbstractRepository {
 
     public void setBranch(String branch) {
         gitRepositoryConfig.setBranch(branch);
-    }
-
-    public boolean hasWebBasedRepositoryAccess() {
-        return gitRepositoryConfig.hasWebBasedRepositoryAccess();
-    }
-
-    public void setWebRepositoryUrl(String url) {
-        gitRepositoryConfig.setWebRepositoryUrl(url);
-    }
-
-    public void setWebRepositoryUrlRepoName(String url) {
-    }
-
-    public String getWebRepositoryUrl() {
-        return gitRepositoryConfig.getWebRepositoryUrl();
-    }
-
-    public String getWebRepositoryUrlRepoName() {
-        return null;
-    }
-
-    public String getWebRepositoryUrlForFile(CommitFile commitFile) {
-        return gitRepositoryConfig.getWebRepositoryUrlForFile(commitFile);
-    }
-
-//   TODO  @Override
-    public String getWebRepositoryUrlForCommit(Commit commit) {
-        return gitRepositoryConfig.getWebRepositoryUrlForCommit(commit);
-    }
-
-    public String getWebRepositoryUrlForDiff(CommitFile file) {
-        return gitRepositoryConfig.getWebRepositoryUrlForDiff(file);
-    }
-
-    public String getWebRepositoryUrlForRevision(CommitFile file) {
-        return gitRepositoryConfig.getWebRepositoryUrlForRevision(file);
     }
 
     public String getHost() {
