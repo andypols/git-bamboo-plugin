@@ -2,14 +2,18 @@ package uk.co.pols.bamboo.gitplugin;
 
 import org.jmock.integration.junit3.MockObjectTestCase;
 
-import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitFile;
-import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitWithFile;
+import java.util.Arrays;
+
 import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitFile;
 import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitWithFile;
 
 public class GitHubWebRepositoryViewerTest extends MockObjectTestCase {
     private GitHubWebRepositoryViewer gitHubWebRepositoryViewer = new GitHubWebRepositoryViewer();
 
+
+    public void testWorksWithTheGitHubRepositoryPlugin() {
+        assertEquals(Arrays.asList("uk.co.pols.bamboo.gitplugin:github"), gitHubWebRepositoryViewer.getSupportedRepositories());
+    }
 
     public void testProvidesBambooWithWebUrlAllowingTheCodeChangePageLinkBackToGitHub() {
         gitHubWebRepositoryViewer.setWebRepositoryUrl("https://github.com/andypols/git-bamboo-plugin");

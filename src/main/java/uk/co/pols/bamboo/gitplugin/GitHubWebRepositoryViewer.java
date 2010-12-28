@@ -1,6 +1,5 @@
 package uk.co.pols.bamboo.gitplugin;
 
-import com.atlassian.bamboo.collections.ActionParametersMap;
 import com.atlassian.bamboo.commit.Commit;
 import com.atlassian.bamboo.commit.CommitFile;
 import com.atlassian.bamboo.repository.Repository;
@@ -25,11 +24,6 @@ public class GitHubWebRepositoryViewer extends AbstractWebRepositoryViewer imple
     }
 
     @Override
-    public void populateFromParams(ActionParametersMap params) {
-        super.populateFromParams(params);
-    }
-
-    @Override
     public void populateFromConfig(HierarchicalConfiguration config) {
         super.populateFromConfig(config);
         gitRepositoryConfig.populateFromConfig(config, WEB_REPOSITORY);
@@ -46,10 +40,12 @@ public class GitHubWebRepositoryViewer extends AbstractWebRepositoryViewer imple
     }
 
     public String getHtmlForCommitsFull(ResultsSummary resultsSummary, Repository repository) {
+        System.out.println("resultsSummary = " + resultsSummary);
         return "<p>getHtmlForCommitsFull</p>";
     }
 
     public String getHtmlForCommitsSummary(ResultsSummary resultsSummary, Repository repository) {
+        System.out.println("resultsSummary = " + resultsSummary);
         return "<p>getHtmlForCommitsSummary</p>";
     }
 
@@ -72,20 +68,7 @@ public class GitHubWebRepositoryViewer extends AbstractWebRepositoryViewer imple
         return gitRepositoryConfig.getWebRepositoryUrlForCommit(commit);
     }
 
-//    public String getWebRepositoryUrlForDiff(CommitFile file) {
-//        return gitRepositoryConfig.getWebRepositoryUrlForDiff(file);
-//    }
-//
-//    public String getWebRepositoryUrlForRevision(CommitFile file) {
-//        return gitRepositoryConfig.getWebRepositoryUrlForRevision(file);
-//    }
-
     protected GitRepositoryConfig gitRepositoryConfig() {
         return new GitRepositoryConfig();
     }
-
-//    public boolean hasWebBasedRepositoryAccess() {
-//        return gitRepositoryConfig.hasWebBasedRepositoryAccess();
-//    }
-
 }
