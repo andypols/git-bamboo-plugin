@@ -5,11 +5,14 @@ import static uk.co.pols.bamboo.gitplugin.SampleCommitFactory.commitWithFile;
 import com.atlassian.bamboo.build.BuildLoggerManager;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.commit.Commit;
+import com.atlassian.bamboo.plan.PlanKeys;
 import com.atlassian.bamboo.repository.AbstractRepository;
 import com.atlassian.bamboo.repository.Repository;
 import com.atlassian.bamboo.repository.RepositoryException;
 import com.atlassian.bamboo.repository.cvsimpl.CVSRepository;
 import com.atlassian.bamboo.v2.build.BuildChanges;
+import com.atlassian.bamboo.v2.build.BuildContext;
+import com.atlassian.bamboo.v2.build.BuildContextImpl;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
@@ -36,10 +39,6 @@ public class GitRepositoryTest extends MockObjectTestCase {
         assertEquals("Git", gitRepository.getName());
     }
 
-    public void testProvidesALinkToTheGitHubGuidesPage() {
-        assertEquals("http://github.com/guides/home", gitRepository.getUrl());
-    }
-
     public void testClassesARepositoryOfADifferentTypeAsDifferent() {
         assertTrue(gitRepository.isRepositoryDifferent(new TestRepository()));
     }
@@ -57,18 +56,29 @@ public class GitRepositoryTest extends MockObjectTestCase {
         assertTrue(gitRepository.isRepositoryDifferent(repositoryToCompare));
     }
 
+    public void testClassesAGitRepositoryWithADifferentBranchAsDifferent() {
+        GitRepository repositoryToCompare = new GitRepository();
+        repositoryToCompare.setBranch("MASTER");
+
+        gitRepository.setBranch("ANOTHER");
+
+        assertTrue(gitRepository.isRepositoryDifferent(repositoryToCompare));
+    }
+
     public void testClassesAGitRepositoryWithTheSameUrlAsBeingTheSame() {
         GitRepository repositoryToCompare = new GitRepository();
         repositoryToCompare.setRepositoryUrl("repositoryUrl");
+        repositoryToCompare.setBranch("MASTER");
 
         gitRepository.setRepositoryUrl("repositoryUrl");
+        gitRepository.setBranch("MASTER");
 
         assertFalse(gitRepository.isRepositoryDifferent(repositoryToCompare));
     }
 
     public void testUsesAGitClientToDetectTheChangesSinceTheLastBuild() throws RepositoryException {
         checking(new Expectations() {{
-            one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
+            one(buildLoggerManager).getBuildLogger(PlanKeys.getPlanKey(PLAN_KEY)); will(returnValue(buildLogger));
             one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, BRANCH, PLAN_KEY, "time of previous build", new ArrayList<Commit>(), SRC_CODE_DIR);
             will(returnValue("time of this build"));
         }});
@@ -79,13 +89,17 @@ public class GitRepositoryTest extends MockObjectTestCase {
     }
 
     public void testGetsLatestCodeRetrievingLatestSourceCode() throws RepositoryException {
+        final BuildContext buildContext = mock(BuildContext.class);
+
         checking(new Expectations() {{
-            one(buildLoggerManager).getBuildLogger(PLAN_KEY); will(returnValue(buildLogger));
+            one(buildContext).getPlanKey(); will(returnValue(PLAN_KEY));
+            one(buildLoggerManager).getBuildLogger(PlanKeys.getPlanKey(PLAN_KEY)); will(returnValue(buildLogger));
             one(gitClient).getLatestUpdate(buildLogger, RESPOSITORY_URL, BRANCH, PLAN_KEY, null, new ArrayList<Commit>(), SRC_CODE_DIR);
             will(returnValue("time of this build"));
         }});
 
-        String timeOfLastCommmit = gitRepository(true).retrieveSourceCode(PLAN_KEY, null);
+
+        String timeOfLastCommmit = gitRepository(true).retrieveSourceCode(buildContext, null);
 
         assertEquals("time of this build", timeOfLastCommmit);
     }
@@ -161,6 +175,10 @@ public class GitRepositoryTest extends MockObjectTestCase {
         }
 
         public String retrieveSourceCode(String string, String string1) throws RepositoryException {
+            return null;
+        }
+
+        public String retrieveSourceCode(BuildContext buildContext, String s) throws RepositoryException {
             return null;
         }
 

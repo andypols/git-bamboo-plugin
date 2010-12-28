@@ -1,6 +1,6 @@
 package uk.co.pols.bamboo.gitplugin;
 
-import static com.atlassian.bamboo.repository.AbstractRepository.WEB_REPO_URL;
+//import static com.atlassian.bamboo.repository.AbstractRepository.WEB_REPO_URL;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.StringUtils;
 import com.atlassian.bamboo.repository.Repository;
@@ -29,7 +29,7 @@ public class GitRepositoryConfig implements Serializable {
     public void populateFromConfig(HierarchicalConfiguration config) {
         repositoryUrl = config.getString(GIT_REPO_URL);
         branch = config.getString(GIT_BRANCH);
-        webRepositoryUrl = config.getString(WEB_REPO_URL);
+//        webRepositoryUrl = config.getString(WEB_REPO_URL);
     }
 
     public String getRepositoryUrl() {
@@ -87,7 +87,7 @@ public class GitRepositoryConfig implements Serializable {
     public HierarchicalConfiguration toConfiguration(HierarchicalConfiguration configuration) {
         configuration.setProperty(GIT_REPO_URL, getRepositoryUrl());
         configuration.setProperty(GIT_BRANCH, getBranch());
-        configuration.setProperty(WEB_REPO_URL, getWebRepositoryUrl());
+//        configuration.setProperty(WEB_REPO_URL, getWebRepositoryUrl());
 
         return configuration;
     }
@@ -96,10 +96,10 @@ public class GitRepositoryConfig implements Serializable {
         validateMandatoryField(buildConfiguration, errorCollection, GIT_REPO_URL, "Please specify where the repository is located");
         validateMandatoryField(buildConfiguration, errorCollection, GIT_BRANCH, "Please specify which branch you want to build");
 
-        String webRepoUrl = buildConfiguration.getString(WEB_REPO_URL);
-        if (!StringUtils.isBlank(webRepoUrl) && !UrlUtils.verifyHierachicalURI(webRepoUrl)) {
-            errorCollection.addError(WEB_REPO_URL, "This is not a valid url");
-        }
+//        String webRepoUrl = buildConfiguration.getString(WEB_REPO_URL);
+//        if (!StringUtils.isBlank(webRepoUrl) && !UrlUtils.verifyHierachicalURI(webRepoUrl)) {
+//            errorCollection.addError(WEB_REPO_URL, "This is not a valid url");
+//        }
 
         return errorCollection;
     }

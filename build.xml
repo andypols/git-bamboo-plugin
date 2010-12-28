@@ -8,7 +8,7 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
     <property name="bamboo.server.lib" value="/Applications/Bamboo/webapp/WEB-INF/lib/"/>
 
-    <property name="release.version" value="1.0.5"/>
+    <property name="release.version" value="1.0.6"/>
 
     <patternset id="compiler.resources">
         <include name="**/?*.properties"/>
@@ -54,12 +54,14 @@
                 <include name="atlassian-bamboo-core-*.jar"/>
                 <include name="atlassian-bamboo-persistence-*.jar"/>
                 <include name="atlassian-bamboo-charts-*.jar"/>
+                <include name="atlassian-util-concurrent-*.jar"/>
                 <include name="ant-*.jar"/>
                 <include name="joda-time-*.jar"/>
                 <include name="commons-logging-*.jar"/>
                 <include name="commons-lang-*.jar"/>
                 <include name="commons-configuration-*.jar"/>
                 <include name="commons-collections-*.jar"/>
+                <include name="google-collections-*.jar"/>
                 <include name="jsch-*.jar"/>
                 <include name="oscore-*.jar"/>
                 <include name="log4j-*.jar"/>

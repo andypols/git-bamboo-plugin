@@ -8,6 +8,7 @@ import com.atlassian.bamboo.repository.RepositoryException;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.bamboo.v2.build.BuildChanges;
 import com.atlassian.bamboo.v2.build.BuildChangesImpl;
+import com.atlassian.bamboo.v2.build.BuildContext;
 import com.atlassian.bamboo.ww2.actions.build.admin.create.BuildConfiguration;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.builder.CompareToBuilder;
@@ -20,19 +21,39 @@ import uk.co.pols.bamboo.gitplugin.client.git.CmdLineGit;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.atlassian.bamboo.plan.PlanKeys.getPlanKey;
+
 public class GitRepository extends AbstractRepository {
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
+
+    public String getName() {
+        return "Git";
+    }
+
+
+    public boolean isRepositoryDifferent(Repository repository) {
+        if (repository instanceof GitRepository) {
+            GitRepository gitRepository = (GitRepository) repository;
+            return !new EqualsBuilder()
+                    .append(this.getName(), gitRepository.getName())
+                    .append(this.getBranch(), gitRepository.getBranch())
+                    .append(getRepositoryUrl(), gitRepository.getRepositoryUrl())
+                    .isEquals();
+        }
+        return true;
+    }
+
     /*
      * This is called by bamboo when a build has been triggered to calculate the changes since the previous build.
-     * It is executed on the server.  It does not get run on the intial build, so may have to handle an empty git repo
-     * when the sencond build is triggered
+     * It is executed on the server.  It does not get run on the initial build, so may have to handle an empty git repo
+     * when the second build is triggered
      */
     public synchronized BuildChanges collectChangesSinceLastBuild(final String planKey, final String lastVcsRevisionKey) throws RepositoryException {
         List<Commit> commits = new ArrayList<Commit>();
 
         String latestCommitTime = gitClient().getLatestUpdate(
-                buildLoggerManager.getBuildLogger(planKey),
+                buildLoggerManager.getBuildLogger(getPlanKey(planKey)),
                 gitRepositoryConfig.getRepositoryUrl(),
                 gitRepositoryConfig.getBranch(),
                 planKey,
@@ -44,11 +65,25 @@ public class GitRepository extends AbstractRepository {
         return new BuildChangesImpl(String.valueOf(latestCommitTime), commits);
     }
 
+
     /**
      * This is called by the agent to get the latest code.
-     *
-     * TODO: There is a race condition where the agent could check out a more recent commit from the change set
-     * detected by the build server - Yuck.
+     */
+    public String retrieveSourceCode(BuildContext buildContext, String targetRevision) throws RepositoryException {
+        final String planKey = buildContext.getPlanKey();
+
+        return gitClient().getLatestUpdate(
+                buildLoggerManager.getBuildLogger(getPlanKey(planKey)),
+                gitRepositoryConfig.getRepositoryUrl(),
+                gitRepositoryConfig.getBranch(),
+                planKey,
+                targetRevision,
+                new ArrayList<Commit>(),
+                getSourceCodeDirectory(planKey));
+    }
+
+    /**
+     * @deprecated not used in the latest version of Bamboo
      */
     public String retrieveSourceCode(final String planKey, final String vcsRevisionKey) throws RepositoryException {
         return gitClient().getLatestUpdate(
@@ -59,27 +94,6 @@ public class GitRepository extends AbstractRepository {
                 vcsRevisionKey,
                 new ArrayList<Commit>(),
                 getSourceCodeDirectory(planKey));
-    }
-
-    @Override
-    public ErrorCollection validate(BuildConfiguration buildConfiguration) {
-        return gitRepositoryConfig.validate(super.validate(buildConfiguration), buildConfiguration);
-    }
-
-    public boolean isRepositoryDifferent(Repository repository) {
-        if (repository instanceof GitRepository) {
-            GitRepository gitRepository = (GitRepository) repository;
-            return !new EqualsBuilder()
-                    .append(this.getName(), gitRepository.getName())
-                    .append(getRepositoryUrl(), gitRepository.getRepositoryUrl())
-                    .isEquals();
-        }
-        return true;
-    }
-
-    public void addDefaultValues(BuildConfiguration buildConfiguration) {
-        super.addDefaultValues(buildConfiguration);
-        gitRepositoryConfig.addDefaultValues(buildConfiguration);
     }
 
     public void prepareConfigObject(BuildConfiguration buildConfiguration) {
@@ -96,14 +110,15 @@ public class GitRepository extends AbstractRepository {
         return gitRepositoryConfig.toConfiguration(super.toConfiguration());
     }
 
-    public String getName() {
-        return "Git";
+    @Override
+    public ErrorCollection validate(BuildConfiguration buildConfiguration) {
+        return gitRepositoryConfig.validate(super.validate(buildConfiguration), buildConfiguration);
     }
 
-    public String getUrl() {
-        return "http://github.com/guides/home";
+    public void addDefaultValues(BuildConfiguration buildConfiguration) {
+        super.addDefaultValues(buildConfiguration);
+        gitRepositoryConfig.addDefaultValues(buildConfiguration);
     }
-
 
     public void setRepositoryUrl(String repositoryUrl) {
         gitRepositoryConfig.setRepositoryUrl(repositoryUrl);
@@ -144,7 +159,7 @@ public class GitRepository extends AbstractRepository {
         return gitRepositoryConfig.getWebRepositoryUrlForFile(commitFile);
     }
 
-    @Override
+//   TODO  @Override
     public String getWebRepositoryUrlForCommit(Commit commit) {
         return gitRepositoryConfig.getWebRepositoryUrlForCommit(commit);
     }
