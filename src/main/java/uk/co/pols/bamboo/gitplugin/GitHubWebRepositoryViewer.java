@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import static uk.co.pols.bamboo.gitplugin.GitRepositoryConfig.AvailableConfig.WEB_REPOSITORY;
 
@@ -35,44 +37,54 @@ public class GitHubWebRepositoryViewer extends DefaultWebRepositoryViewer implem
 
     @Override
     public HierarchicalConfiguration toConfiguration() {
-        log.info("********************  GitHubWebRepositoryViewer.toConfiguration");
         return gitRepositoryConfig.toConfiguration(super.toConfiguration(), WEB_REPOSITORY);
     }
 
     @Override
     public ErrorCollection validate(BuildConfiguration buildConfiguration) {
-        log.info("********************  GitHubWebRepositoryViewer.validate");
         return gitRepositoryConfig.validate(super.validate(buildConfiguration), buildConfiguration, WEB_REPOSITORY);
     }
 
     public String getHtmlForCommitsFull(ResultsSummary resultsSummary, Repository repository) {
-        log.info("****************  GitHubWebRepositoryViewer.getHtmlForCommitsFull");
-        String html = super.getHtmlForCommitsFull(resultsSummary,repository);
-        log.info("************* resultsSummary = " + html);
+        String html = super.getHtmlForCommitsFull(resultsSummary, repository);
+
+        log.info("**********************************************************************************");
+        log.info("**********************************************************************************");
+        log.info("**********************************************************************************");
+        log.info("**********************************************************************************");
+        log.info("Original resultsSummary = " + html);
+
+        for (Commit commit : resultsSummary.getCommits()) {
+            for (CommitFile commitFile : commit.getFiles()) {
+                if (commitFile.isRevisionKnown()) {
+                    String revision = commitFile.getRevision();
+                    String name = commitFile.getName();
+
+                    log.info("file name: " + name);
+                    html.replaceAll(name + "\n" + "(version " + revision + ")",
+                                    name + "\n" + "(version <a href=\"" + getWebRepositoryUrlForFile(commitFile) + "\">" + revision + "</a>)");
+                }
+            }
+        }
+
+        log.info("tweaked resultsSummary = " + html);
 
         return html;
     }
 
     public String getHtmlForCommitsSummary(ResultsSummary resultsSummary, Repository repository) {
-        log.info("****************** GitHubWebRepositoryViewer.getHtmlForCommitsSummary");
-        String html = super.getHtmlForCommitsSummary(resultsSummary, repository);
-        log.info("resultsSummary = " + html);
-        return html;
+        return super.getHtmlForCommitsSummary(resultsSummary, repository);
     }
 
     public void setWebRepositoryUrl(String url) {
-        log.info("*****************  GitHubWebRepositoryViewer.setWebRepositoryUrl");
         gitRepositoryConfig.setWebRepositoryUrl(url);
     }
 
     public String getWebRepositoryUrl() {
-        log.info("****************  GitHubWebRepositoryViewer.getWebRepositoryUrl");
         return gitRepositoryConfig.getWebRepositoryUrl();
     }
 
     public String getWebRepositoryUrlForFile(CommitFile commitFile) {
-        log.info("**************** GitHubWebRepositoryViewer.getWebRepositoryUrlForFile");
-
         return gitRepositoryConfig.getWebRepositoryUrlForFile(commitFile);
     }
 
@@ -80,7 +92,6 @@ public class GitHubWebRepositoryViewer extends DefaultWebRepositoryViewer implem
         Rendering links in emails too
     */
     public String getWebRepositoryUrlForCommit(Commit commit, Repository repository) {
-        log.info("************** GitHubWebRepositoryViewer.getWebRepositoryUrlForCommit");
         return gitRepositoryConfig.getWebRepositoryUrlForCommit(commit);
     }
 
