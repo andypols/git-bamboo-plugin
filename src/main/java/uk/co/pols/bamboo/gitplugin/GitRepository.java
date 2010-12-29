@@ -1,7 +1,6 @@
 package uk.co.pols.bamboo.gitplugin;
 
 import com.atlassian.bamboo.commit.Commit;
-import com.atlassian.bamboo.commit.CommitFile;
 import com.atlassian.bamboo.repository.AbstractRepository;
 import com.atlassian.bamboo.repository.Repository;
 import com.atlassian.bamboo.repository.RepositoryException;
@@ -27,11 +26,9 @@ import static uk.co.pols.bamboo.gitplugin.GitRepositoryConfig.AvailableConfig.RE
 public class GitRepository extends AbstractRepository {
     private GitRepositoryConfig gitRepositoryConfig = gitRepositoryConfig();
 
-
     public String getName() {
         return "Git";
     }
-
 
     public boolean isRepositoryDifferent(Repository repository) {
         if (repository instanceof GitRepository) {
@@ -87,14 +84,7 @@ public class GitRepository extends AbstractRepository {
      * @deprecated not used in the latest version of Bamboo
      */
     public String retrieveSourceCode(final String planKey, final String vcsRevisionKey) throws RepositoryException {
-        return gitClient().getLatestUpdate(
-                buildLoggerManager.getBuildLogger(planKey),
-                gitRepositoryConfig.getRepositoryUrl(),
-                gitRepositoryConfig.getBranch(),
-                planKey,
-                vcsRevisionKey,
-                new ArrayList<Commit>(),
-                getSourceCodeDirectory(planKey));
+        throw new UnsupportedOperationException("Deprecated call");
     }
 
     public void prepareConfigObject(BuildConfiguration buildConfiguration) {
