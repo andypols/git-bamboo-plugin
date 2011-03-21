@@ -1,6 +1,10 @@
 h1. Release Notes
 
-1.0.6 Upgrade for Bamboo 2.7
+1.0.7 Bug Fix
+
+* Tweak to the git checkout to use remote tracking branch. Fixes problem Lance Johnston had checking out none-master branches.
+
+ 1.0.6 Upgrade for Bamboo 2.7
 
 * Provides a custom GitHub Web Repository to link builds back to GitHub
 

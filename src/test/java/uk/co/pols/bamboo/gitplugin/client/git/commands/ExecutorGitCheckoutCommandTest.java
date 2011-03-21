@@ -17,12 +17,12 @@ public class ExecutorGitCheckoutCommandTest extends MockObjectTestCase {
     private final CommandExecutor commandExecutor = mock(CommandExecutor.class);
     private final BuildLogger buildLogger = mock(BuildLogger.class);
 
-    public void testCheckoutsAndANewBranch() throws IOException {
+    public void testCheckoutsAndANewRemoteTrackingBranch() throws IOException {
         ExecutorGitCheckoutCommand checkoutCommand = new ExecutorGitCheckoutCommand(GIT_EXE, commandExecutor);
 
         checking(new Expectations() {{
-            oneOf(buildLogger).addBuildLogEntry("Running 'git checkout -b BRANCH'");
-            one(commandExecutor).execute(new String[]{GIT_EXE, "checkout", "-b", "BRANCH"}, SOURCE_CODE_DIRECTORY);
+            oneOf(buildLogger).addBuildLogEntry("Running 'git checkout -b BRANCH origin/BRANCH'");
+            one(commandExecutor).execute(new String[]{GIT_EXE, "checkout", "-b", "BRANCH", "origin/BRANCH"}, SOURCE_CODE_DIRECTORY);
         }});
 
         checkoutCommand.checkoutBranch(buildLogger, "BRANCH", true, SOURCE_CODE_DIRECTORY);

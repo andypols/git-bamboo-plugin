@@ -19,6 +19,7 @@ h2. Bamboo Compatibility
 
 |_. File |_. Bamboo Version |
 | Bamboo 3.0 has built-in git support | 3.0      |
+| git-repository-1.0.7.jar | 2.7                 |
 | git-repository-1.0.6.jar | 2.7                 |
 | git-repository-1.0.5.jar | 2.2/2.3/2.4/2.5/2.6 |
 | git-repository-1.0.4.jar | 2.2/2.3/2.4         |

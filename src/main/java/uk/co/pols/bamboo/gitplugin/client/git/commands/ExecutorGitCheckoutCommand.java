@@ -21,11 +21,10 @@ public class ExecutorGitCheckoutCommand implements GitCheckoutCommand {
 
     public void checkoutBranch(BuildLogger buildLogger, String branch, boolean create, File sourceDirectory) throws IOException {
         if(create) {
-            log.info(buildLogger.addBuildLogEntry("Running '" + gitExe + " checkout -b " + branch + "'"));
-            commandExecutor.execute(new String[]{"git", "checkout", "-b", branch}, sourceDirectory);
+            log.info(buildLogger.addBuildLogEntry("Running '" + gitExe + " checkout -b " + branch + " origin/" + branch + "'"));
+            commandExecutor.execute(new String[]{"git", "checkout", "-b", branch, "origin/" + branch}, sourceDirectory);
         } else {
             log.info(buildLogger.addBuildLogEntry("Running '" + gitExe + " checkout " + branch + "'"));
             commandExecutor.execute(new String[]{"git", "checkout", branch}, sourceDirectory);
         }
-    }
-}
+    }}

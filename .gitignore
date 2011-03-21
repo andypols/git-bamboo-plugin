@@ -39,3 +39,7 @@ lib/rife-continuations-0.0.2.jar
 lib/spring-context-2.0.7.jar
 lib/commons-collections-3.2.1.jar
 lib/atlassian-plugins-core-2.4.3.jar
+lib/atlassian-bamboo-api-2.7.4.jar
+lib/atlassian-bamboo-charts-2.7.4.jar
+lib/atlassian-bamboo-core-2.7.4.jar
+lib/atlassian-bamboo-persistence-2.7.4.jar
