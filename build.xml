@@ -129,11 +129,4 @@
 
     <target name="ci" depends="clean, test" description="Continuous Integration"/>
 
-    <target name="spike">
-        <exec executable="/usr/bin/ssh-add">
-            <arg value="/Users/andy/.ssh/bamboo-gbp"/>
-            <redirector inputstring="bamboo-gbp"/>
-        </exec>
-    </target>
-
 </project>
